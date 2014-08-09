@@ -1,0 +1,20 @@
+Default: &defaults
+  database: eidolon.sqlite3
+  poolsize: 10
+
+Development:
+  <<: *defaults
+
+Testing:
+  database: eidolon_test.sqlite3
+  <<: *defaults
+
+Staging:
+  database: eidolon_staging.sqlite3
+  poolsize: 100
+  <<: *defaults
+
+Production:
+  database: eidolon_production.sqlite3
+  poolsize: 100
+  <<: *defaults
