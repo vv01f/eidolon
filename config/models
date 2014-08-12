@@ -1,12 +1,22 @@
 User
-    ident Text
-    password Text Maybe
-    UniqueUser ident
-    deriving Typeable
-Email
+    name Text
     email Text
-    user UserId Maybe
-    verkey Text Maybe
-    UniqueEmail email
+    password Text
+    deriving Typeable
+-- Email
+--    email Text
+--    user UserId Maybe
+--    verkey Text Maybe
+--    UniqueEmail email
+Token
+    token Text
+    user User
+Media
+    title Text
+    path FilePath
+    thumbPath FilePath
+    time UTCTime
+    description Text
+    tags Texts
 
  -- By default this file is used in Model.hs (which is imported by Foundation.hs)

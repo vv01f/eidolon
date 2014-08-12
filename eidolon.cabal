@@ -20,6 +20,9 @@ library
                      Settings.StaticFiles
                      Settings.Development
                      Handler.Home
+                     Handler.Signup
+                     Handler.Login
+                     Handler.Activate
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT
