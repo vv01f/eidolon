@@ -1,0 +1,14 @@
+$newline always
+<h3>Profile of #{username}
+
+$if msu == (Just username)
+  Coming soon: create new album
+  <br>
+
+$if null userMedia
+  Dieser Benutzer hat noch keine Medien hochgeladen.
+$else
+  Neueste Medien:
+  $forall (Entity mediaId medium) <- userMedia
+    <div class="thumbnails">
+      <div class="single">

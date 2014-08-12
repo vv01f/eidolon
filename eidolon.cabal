@@ -23,6 +23,8 @@ library
                      Handler.Signup
                      Handler.Login
                      Handler.Activate
+                     Handler.Profile
+                     Handler.Upload
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT

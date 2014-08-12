@@ -23,7 +23,7 @@ postSignupR = do
         True -> do
           tokenString <- liftIO generateString
           uId <- runDB $ insert $ Token tokenString user
-          activateLink <- ($ ActivateR $ T.unpack tokenString) <$> getUrlRender
+          activateLink <- ($ ActivateR tokenString) <$> getUrlRender
           sendMail (userEmail user) "Please activate your account!" $
             [shamlet|
               <h1> Welcome to Eidolon!

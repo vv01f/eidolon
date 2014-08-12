@@ -1,11 +1,10 @@
 module Handler.Activate where
 
 import Import as I
-import Data.Text as T
 
-getActivateR :: String -> Handler Html
+getActivateR :: Text -> Handler Html
 getActivateR token = do
-  t <- runDB $ selectList [TokenToken ==. (T.pack token)] []
+  t <- runDB $ selectList [TokenToken ==. token] []
   case t of
     [] -> do
       setMessage $ [shamlet|<pre>Invalid Token!|]

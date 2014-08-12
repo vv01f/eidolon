@@ -6,13 +6,17 @@ User
 Token
     token Text
     user User
-Media
+Album
+    title Text
+    owner Text
+    content [MediumId]
+Medium
     title Text
     path FilePath
     thumbPath FilePath
     time UTCTime
     owner Text
     description Text
-    tags Texts
+    tags [Text]
 
  -- By default this file is used in Model.hs (which is imported by Foundation.hs)

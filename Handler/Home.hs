@@ -12,7 +12,7 @@ import Import
 -- inclined, or create a single monolithic file.
 getHomeR :: Handler Html
 getHomeR = do
-  recentMedia <- runDB $ selectList [] [Desc MediaTime]
+  recentMedia <- runDB $ selectList [] [Desc MediumTime]
   defaultLayout $ do
     $(widgetFile "home")
 

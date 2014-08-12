@@ -7,4 +7,6 @@
 /signup SignupR GET POST
 /login LoginR GET POST
 /logout LogoutR GET
-/activate/#String ActivateR GET
+/activate/#Text ActivateR GET
+/user/#Text ProfileR GET
+/upload UploadR GET POST

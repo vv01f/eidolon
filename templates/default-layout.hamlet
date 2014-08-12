@@ -5,6 +5,8 @@
       Logged in as #{fromJust msu}
       <li>
         <a href=@{LogoutR}>Logout
+      <li>
+        <a href=@{UploadR}>Upload image
     $nothing
       <li>
         <a href=@{LoginR}>Login
