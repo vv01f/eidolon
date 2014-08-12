@@ -3,11 +3,6 @@ User
     email Text
     password Text
     deriving Typeable
--- Email
---    email Text
---    user UserId Maybe
---    verkey Text Maybe
---    UniqueEmail email
 Token
     token Text
     user User
@@ -16,6 +11,7 @@ Media
     path FilePath
     thumbPath FilePath
     time UTCTime
+    owner Text
     description Text
     tags Texts
 

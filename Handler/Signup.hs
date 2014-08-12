@@ -28,7 +28,7 @@ postSignupR = do
             [shamlet|
               <h1> Welcome to Eidolon!
               To complete your sgnup please activate your account by visiting the following link
-              <a href="#{activateLink}">#{activateLink}</a>
+              <a href="#{activateLink}">#{activateLink}
             |]
           setMessage $ [shamlet|<pre>User created|]
           redirect $ HomeR
