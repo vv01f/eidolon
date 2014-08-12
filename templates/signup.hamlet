@@ -1,0 +1,6 @@
+<h3>Signup
+
+<form method=post enctype=#{enctype}>
+  ^{signupWidget}
+  <div>
+    <input type=submit value="Register">

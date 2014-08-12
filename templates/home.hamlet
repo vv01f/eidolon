@@ -1,0 +1,9 @@
+<a href=@{LoginR}>Login
+<a href=@{SignupR}>Signup
+
+$if null recentMedia
+  <p>This gallery is still empty.
+$else
+  $forall (Entity mediaId medium) <- recentMedia
+    <div class="thumbnails">
+      <div class="single">
