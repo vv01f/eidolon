@@ -1,6 +1,3 @@
-<a href=@{LoginR}>Login
-<a href=@{SignupR}>Signup
-
 $if null recentMedia
   <p>This gallery is still empty.
 $else

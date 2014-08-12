@@ -14,10 +14,12 @@ import qualified Database.Persist
 import Database.Persist.Sql (SqlPersistT)
 import Settings.StaticFiles
 import Settings (widgetFile, Extra (..))
--- import Model
+import Model
 import Text.Jasmine (minifym)
 import Text.Hamlet (hamletFile)
 import Yesod.Core.Types (Logger)
+-- costom imports
+import Data.Maybe
 
 -- | The site argument for your application. This can be a good place to
 -- keep settings and values requiring initialization before your application
@@ -63,6 +65,7 @@ instance Yesod App where
     defaultLayout widget = do
         master <- getYesod
         mmsg <- getMessage
+        msu <- lookupSession "username"
 
         -- We break up the default layout into two components:
         -- default-layout is the contents of the body tag, and

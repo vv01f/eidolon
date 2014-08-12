@@ -6,4 +6,5 @@
 / HomeR GET POST
 /signup SignupR GET POST
 /login LoginR GET POST
+/logout LogoutR GET
 /activate/#String ActivateR GET
