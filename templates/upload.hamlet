@@ -1,0 +1,10 @@
+<h3>Image upload
+
+Here you can upload your image.
+
+
+
+<form method=post enctype=#{enctype}>
+  ^{uploadWidget}
+  <div>
+    <input type=submit value="Upload">

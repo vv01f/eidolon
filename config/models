@@ -13,10 +13,9 @@ Album
 Medium
     title Text
     path FilePath
-    thumbPath FilePath
     time UTCTime
     owner Text
-    description Text
+    description Textarea
     tags [Text]
 
  -- By default this file is used in Model.hs (which is imported by Foundation.hs)
