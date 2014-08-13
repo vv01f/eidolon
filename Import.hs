@@ -17,6 +17,7 @@ import           Settings.StaticFiles as Import
 
 -- custom imports
 
+import           Helper               as Import
 
 -- end custom imports
 

@@ -21,25 +21,21 @@ getUploadR = do
   msu <- lookupSession "userId"
   case msu of
     Just tempUserId -> do
-      userId <- lift $ getUserIdFromText tempUserId
-      (uploadWidget, enctype) <- generateFormPost (uploadForm userId)
+      userId <- lift $ pure $ getUserIdFromText tempUserId
+      (uploadWidget, enctype) <- generateFormPost (uploadForm $ Key userId)
       defaultLayout $ do
         $(widgetFile "upload")
     Nothing -> do
       setMessage $ [shamlet|<pre>You need to be logged in|]
       redirect $ LoginR
 
---getUserIdFromText :: Text -> UserId
-getUserIdFromText tempUserId =
-  Key $ PersistInt64 $ fromIntegral $ read $ unpack tempUserId
-
 postUploadR :: Handler Html
 postUploadR = do
   msu <- lookupSession "userId"
   case msu of
     Just tempUserId -> do
-      userId <- lift $ getUserIdFromText tempUserId
-      ((result, uploadWidget), enctype) <- runFormPost (uploadForm userId)
+      userId <- lift $ pure $ getUserIdFromText tempUserId
+      ((result, uploadWidget), enctype) <- runFormPost (uploadForm $ Key userId)
       case result of
         FormSuccess temp -> do
           path <- writeOnDrive $ tempMediumFile temp
