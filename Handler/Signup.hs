@@ -44,6 +44,7 @@ signupForm = renderDivs $ User
   <$> areq textField "Username" Nothing
   <*> areq emailField "Email" Nothing
   <*> areq passwordField "Password" Nothing
+  <*> pure []
 
 validateLen :: Text -> Bool
 validateLen a =

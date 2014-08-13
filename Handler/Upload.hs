@@ -4,37 +4,44 @@ import Import as I
 import Data.Time
 import Data.Text
 import System.FilePath
+import Database.Persist.Types
 
 data TempMedium = TempMedium
   { tempMediumTitle :: Text
   , tempMediumFile :: FileInfo
   , tempMediumTime :: UTCTime
-  , tempMediumOwner :: Text
+  , tempMediumOwner :: UserId
   , tempMediumDesc :: Textarea
   , tempMediumTags :: [Text]
   }
 
 getUploadR :: Handler Html
 getUploadR = do
-  msu <- lookupSession "username"
+  msu <- lookupSession "userId"
   case msu of
-    Just username -> do
-      (uploadWidget, enctype) <- generateFormPost (uploadForm username)
+    Just tempUserId -> do
+      userId <- lift $ getUserIdFromText tempUserId
+      (uploadWidget, enctype) <- generateFormPost (uploadForm userId)
       defaultLayout $ do
         $(widgetFile "upload")
     Nothing -> do
       setMessage $ [shamlet|<pre>You need to be logged in|]
       redirect $ LoginR
 
+--getUserIdFromText :: Text -> UserId
+getUserIdFromText tempUserId =
+  Key $ PersistInt64 $ fromIntegral $ read $ unpack tempUserId
+
 postUploadR :: Handler Html
 postUploadR = do
-  msu <- lookupSession "username"
+  msu <- lookupSession "userId"
   case msu of
-    Just username -> do
-      ((result, uploadWidget), enctype) <- runFormPost (uploadForm username)
+    Just tempUserId -> do
+      userId <- lift $ getUserIdFromText tempUserId
+      ((result, uploadWidget), enctype) <- runFormPost (uploadForm userId)
       case result of
         FormSuccess temp -> do
-          path <- writeOnDrive username $ tempMediumFile temp
+          path <- writeOnDrive $ tempMediumFile temp
           medium <- return $ Medium
             (tempMediumTitle temp)
             path
@@ -52,21 +59,26 @@ postUploadR = do
       setMessage $ [shamlet|<pre>You need to be logged in|]
       redirect $ LoginR
 
-writeOnDrive :: Text -> FileInfo -> Handler FilePath
-writeOnDrive username file = do
+writeOnDrive :: FileInfo -> Handler FilePath
+writeOnDrive file = do
   filename <- return $ fileName file
   path <- return $ "static" </> (unpack filename)
   liftIO $ fileMove file path
   return path
 
-uploadForm :: Text -> Form TempMedium
-uploadForm username = renderDivs $ TempMedium
+uploadForm :: UserId -> Form TempMedium
+uploadForm userId = renderDivs $ TempMedium
   <$> areq textField "Title" Nothing
   <*> areq fileField "Select file" Nothing
   <*> lift (liftIO getCurrentTime)
-  <*> pure username
+  <*> pure userId
   <*> areq textareaField "Description" Nothing
   <*> areq tagField "Enter tags" Nothing
+--  <*> areq (selectField albums) "Album" Nothing
+--  where
+--    albums :: Handler App App (OptionList AlbumId)
+--    albums = do
+--      runDB $ selectList [AlbumOwner ==. userId] [Desc AlbumTitle]
 
 tagField :: Field Handler [Text]
 tagField = Field

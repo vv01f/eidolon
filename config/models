@@ -2,20 +2,25 @@ User
     name Text
     email Text
     password Text
+    albums [AlbumId]
     deriving Typeable
 Token
     token Text
     user User
+    deriving
 Album
     title Text
-    owner Text
+    owner [UserId]
     content [MediumId]
+    deriving
 Medium
     title Text
     path FilePath
     time UTCTime
-    owner Text
+    owner UserId
     description Textarea
     tags [Text]
+    album AlbumId
+    deriving
 
  -- By default this file is used in Model.hs (which is imported by Foundation.hs)

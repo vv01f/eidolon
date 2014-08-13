@@ -1,8 +1,8 @@
 <nav>
   <div id="top-nav">
   <ul id="user-nav">
-    $maybe user <- msu
-      Logged in as #{fromJust msu}
+    $maybe userId <- msu
+      Logged in as #{userId}
       <li>
         <a href=@{LogoutR}>Logout
       <li>

@@ -1,6 +1,7 @@
 module Handler.Login where
 
 import Import
+import Data.Text
 
 data Credentials = Credentials
   { credentialsName   :: Text
@@ -24,7 +25,7 @@ postLoginR = do
         Just user -> do
           case credentialsPasswd cred == userPassword (entityVal user) of
             True -> do
-              setSession "username" $ userName (entityVal user)
+              setSession "userId" $ pack $ show $ entityKey user
               setMessage $ [shamlet|<pre>Successfully logged in|]
               redirect $ HomeR
             False -> do
@@ -41,6 +42,6 @@ loginForm = renderDivs $ Credentials
 
 getLogoutR :: Handler Html
 getLogoutR = do
-  deleteSession "username"
+  deleteSession "userId"
   setMessage $ [shamlet|<pre>Succesfully logged out|]
   redirect $ HomeR
