@@ -1,6 +1,8 @@
 $if null recentMedia
   <p>This gallery is still empty.
 $else
-  $forall (Entity mediaId medium) <- recentMedia
+  $forall (Entity mediumId medium) <- recentMedia
     <div class="thumbnails">
-      <div class="single">
+      <a href=#{mediumPath medium}>
+        <img src=#{mediumPath medium}><br>
+        #{mediumTitle medium}

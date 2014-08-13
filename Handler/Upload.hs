@@ -34,7 +34,7 @@ postUploadR = do
       ((result, uploadWidget), enctype) <- runFormPost (uploadForm username)
       case result of
         FormSuccess temp -> do
-          path <- writeOnDrive $ tempMediumFile temp
+          path <- writeOnDrive username $ tempMediumFile temp
           medium <- return $ Medium
             (tempMediumTitle temp)
             path
@@ -52,8 +52,8 @@ postUploadR = do
       setMessage $ [shamlet|<pre>You need to be logged in|]
       redirect $ LoginR
 
-writeOnDrive :: FileInfo -> Handler FilePath
-writeOnDrive file = do
+writeOnDrive :: Text -> FileInfo -> Handler FilePath
+writeOnDrive username file = do
   filename <- return $ fileName file
   path <- return $ "static" </> (unpack filename)
   liftIO $ fileMove file path
