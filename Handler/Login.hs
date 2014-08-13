@@ -25,7 +25,7 @@ postLoginR = do
         Just user -> do
           case credentialsPasswd cred == userPassword (entityVal user) of
             True -> do
-              setSession "userId" $ pack $ show $ entityKey user
+              setSession "userId" $ extractKey $ entityKey user
               setMessage $ [shamlet|<pre>Successfully logged in|]
               redirect $ HomeR
             False -> do
@@ -34,6 +34,12 @@ postLoginR = do
         Nothing -> do
           setMessage $ [shamlet|<pre>User does not exist|]
           redirect $ LoginR
+
+extractKey :: KeyBackend backend entity -> Text
+extractKey = extractKey' . unKey
+  where
+    extractKey' (PersistInt64 k) = pack $ show k
+    extractKey' _ = ""
 
 loginForm :: Form Credentials
 loginForm = renderDivs $ Credentials
