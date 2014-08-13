@@ -10,7 +10,7 @@ Token
     deriving
 Album
     title Text
-    owner [UserId]
+    owner UserId
     content [MediumId]
     deriving
 Medium

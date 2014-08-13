@@ -13,6 +13,7 @@ data TempMedium = TempMedium
   , tempMediumOwner :: UserId
   , tempMediumDesc :: Textarea
   , tempMediumTags :: [Text]
+  , tempMediumAlbum :: AlbumId
   }
 
 getUploadR :: Handler Html
@@ -49,11 +50,12 @@ postUploadR = do
             (tempMediumOwner temp)
             (tempMediumDesc temp)
             (tempMediumTags temp)
-          mId <- runDB $ insert medium
-          setMessage $ [shamlet|Image succesfully uploaded|]
+            (tempMediumAlbum temp)
+          mId <- runDB $ I.insert medium
+          setMessage $ [shamlet|<pre>Image succesfully uploaded|]
           redirect $ HomeR
         _ -> do
-          setMessage $ [shamlet|There was an error uploading the file|]
+          setMessage $ [shamlet|<pre>There was an error uploading the file|]
           redirect $ UploadR
     Nothing -> do
       setMessage $ [shamlet|<pre>You need to be logged in|]
@@ -74,11 +76,12 @@ uploadForm userId = renderDivs $ TempMedium
   <*> pure userId
   <*> areq textareaField "Description" Nothing
   <*> areq tagField "Enter tags" Nothing
---  <*> areq (selectField albums) "Album" Nothing
---  where
---    albums :: Handler App App (OptionList AlbumId)
---    albums = do
---      runDB $ selectList [AlbumOwner ==. userId] [Desc AlbumTitle]
+  <*> areq (selectField albums) "Album" Nothing
+  where
+--    albums :: GHandler App App (OptionList AlbumId)
+    albums = do
+      entities <- runDB $ selectList [AlbumOwner ==. userId] [Desc AlbumTitle]
+      optionsPairs $ I.map (\alb -> (albumTitle $ entityVal alb, entityKey alb)) entities
 
 tagField :: Field Handler [Text]
 tagField = Field
