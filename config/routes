@@ -10,3 +10,4 @@
 /activate/#Text ActivateR GET
 /user/#Text ProfileR GET
 /upload UploadR GET POST
+/newalbum NewAlbumR GET POST
