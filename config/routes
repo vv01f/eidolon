@@ -8,6 +8,6 @@
 /login LoginR GET POST
 /logout LogoutR GET
 /activate/#Text ActivateR GET
-/user/#Text ProfileR GET
+/user/#UserId ProfileR GET
 /upload UploadR GET POST
 /newalbum NewAlbumR GET POST

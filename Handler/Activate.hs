@@ -1,6 +1,9 @@
 module Handler.Activate where
 
 import Import as I
+import Data.Text
+import System.Directory
+import System.FilePath
 
 getActivateR :: Text -> Handler Html
 getActivateR token = do
@@ -10,6 +13,7 @@ getActivateR token = do
       setMessage $ [shamlet|<pre>Invalid Token!|]
       redirect $ HomeR
     Just x -> do
-      _ <- runDB $ insert $ tokenUser (entityVal x)
+      userId <- runDB $ insert $ tokenUser (entityVal x)
+      liftIO $ createDirectory $ "static" </> (unpack $ extractKey userId)
       setMessage $ [shamlet|<pre>User activated|]
       redirect $ HomeR

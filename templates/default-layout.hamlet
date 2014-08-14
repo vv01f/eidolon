@@ -6,7 +6,7 @@
       <li>
         <a href=@{LogoutR}>Logout
       <li>
-        <a href=@{UploadR}>Upload image
+        <a href=@{NewAlbumR}>Create album
     $nothing
       <li>
         <a href=@{LoginR}>Login
