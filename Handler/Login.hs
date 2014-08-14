@@ -35,12 +35,6 @@ postLoginR = do
           setMessage $ [shamlet|<pre>User does not exist|]
           redirect $ LoginR
 
-extractKey :: KeyBackend backend entity -> Text
-extractKey = extractKey' . unKey
-  where
-    extractKey' (PersistInt64 k) = pack $ show k
-    extractKey' _ = ""
-
 loginForm :: Form Credentials
 loginForm = renderDivs $ Credentials
   <$> areq textField "Username" Nothing
