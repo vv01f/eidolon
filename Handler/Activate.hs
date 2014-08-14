@@ -14,6 +14,6 @@ getActivateR token = do
       redirect $ HomeR
     Just x -> do
       userId <- runDB $ insert $ tokenUser (entityVal x)
-      liftIO $ createDirectory $ "static" </> (unpack $ extractKey userId)
+      liftIO $ createDirectory $ "data" </> (unpack $ extractKey userId)
       setMessage $ [shamlet|<pre>User activated|]
       redirect $ HomeR
