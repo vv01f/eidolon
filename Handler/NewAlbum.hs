@@ -1,9 +1,39 @@
 module Handler.NewAlbum where
 
 import Import
+import Data.Text
+import System.Directory
+import System.FilePath
 
 getNewAlbumR :: Handler Html
-getNewAlbumR = error "Not yet implemented: getNewAlbumR"
+getNewAlbumR = do
+  msu <- lookupSession "userId"
+  case msu of
+    Just tempUserId -> do
+      userId <- lift $ pure $ getUserIdFromText tempUserId
+      (albumWidget, enctype) <- generateFormPost (albumForm $ Key userId)
+      defaultLayout $ do
+        $(widgetFile "newAlbum")
+    Nothing -> do
+      setMessage $ [shamlet|<pre>You need to be lgged in|]
+      redirect $ LoginR
 
 postNewAlbumR :: Handler Html
-postNewAlbumR = error "Not yet implemented: postNewAlbumR"
+postNewAlbumR = do
+  msu <- lookupSession "userId"
+  case msu of
+    Just tempUserId -> do
+      userId <- lift $ pure $ getUserIdFromText tempUserId
+      ((result, albumWidget), enctype) <- runFormPost (albumForm $ Key userId)
+      case result of
+        FormSuccess album -> do
+          albumId <- runDB $ insert album
+          liftIO $ createDirectory $ "static" </> (unpack $ extractKey $ Key userId) </> (unpack $ extractKey albumId)
+          setMessage $ [shamlet|<pre>Album successfully created|]
+          redirect $ ProfileR $ Key userId
+
+albumForm :: UserId -> Form Album
+albumForm userId = renderDivs $ Album
+  <$> areq textField "Title" Nothing
+  <*> pure userId
+  <*> pure []
