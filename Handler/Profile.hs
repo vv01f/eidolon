@@ -2,8 +2,8 @@ module Handler.Profile where
 
 import Import
 
-getProfileR :: Text -> Handler Html
-getProfileR username = error "reworking logic" -- do
+getProfileR :: UserId -> Handler Html
+getProfileR userId = error "reworking logic" -- do
 --  msu <- lookupSession "id"
 --  case msu of
 --    Just tempUserId -> do
