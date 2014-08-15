@@ -22,7 +22,7 @@ getUploadR = do
   case msu of
     Just tempUserId -> do
       userId <- lift $ pure $ getUserIdFromText tempUserId
-      (uploadWidget, enctype) <- generateFormPost (uploadForm $ Key userId)
+      (uploadWidget, enctype) <- generateFormPost (uploadForm userId)
       defaultLayout $ do
         $(widgetFile "upload")
     Nothing -> do
@@ -35,7 +35,7 @@ postUploadR = do
   case msu of
     Just tempUserId -> do
       userId <- lift $ pure $ getUserIdFromText tempUserId
-      ((result, uploadWidget), enctype) <- runFormPost (uploadForm $ Key userId)
+      ((result, uploadWidget), enctype) <- runFormPost (uploadForm userId)
       case result of
         FormSuccess temp -> do
           path <- writeOnDrive $ tempMediumFile temp

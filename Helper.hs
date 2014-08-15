@@ -19,7 +19,7 @@ import Yesod.Core.Types
 
 getUserIdFromText :: Text -> UserId
 getUserIdFromText tempUserId =
-  PersistInt64 $ fromIntegral $ read $ unpack tempUserId
+  Key $ PersistInt64 $ fromIntegral $ read $ unpack tempUserId
 
 extractKey :: KeyBackend backend entity -> Text
 extractKey = extractKey' . unKey

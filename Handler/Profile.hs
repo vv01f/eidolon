@@ -13,6 +13,6 @@ getProfileR user = do
   case msu of
     Just tempUserId -> do
       userId <- lift $ pure $ getUserIdFromText tempUserId
-      presence <- lift $ pure $ (Key userId) == user
+      presence <- lift $ pure $ userId == user
       defaultLayout $ do
         $(widgetFile "profile")
