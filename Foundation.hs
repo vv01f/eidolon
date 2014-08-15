@@ -68,6 +68,14 @@ instance Yesod App where
         master <- getYesod
         mmsg <- getMessage
         msu <- lookupSession "userId"
+        username <- case msu of 
+          Just a -> do
+            uId <- return $ getUserIdFromText a
+            user <- runDB $ getJust uId
+            return $ userName user
+          otherwise -> do
+            return ("" :: Text)
+
 
         -- We break up the default layout into two components:
         -- default-layout is the contents of the body tag, and

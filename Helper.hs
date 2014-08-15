@@ -1,7 +1,7 @@
 module Helper 
   ( getUserIdFromText
   , extractKey
---  , getUserName
+--  , getUserNameById
   )
 where
 
@@ -27,10 +27,9 @@ extractKey = extractKey' . unKey
     extractKey' (PersistInt64 k) = pack $ show k
     extractKey' _ = ""
 
---getUserName :: Text -> User
---getUserName textId =
+--getUserNameById :: UserId -> Text
+--getUserNameById userId =
 --  let
---    userId = getUserIdFromText textId
---    user = get $ userId
+--    user = runDB $ getJust $ userId
 --  in
---    show user
+--    userName user
