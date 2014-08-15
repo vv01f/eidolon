@@ -12,6 +12,7 @@ Album
     title Text
     owner UserId
     content [MediumId]
+    samplePic MediumId Maybe
     deriving
 Medium
     title Text

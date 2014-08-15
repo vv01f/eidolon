@@ -1,14 +1,17 @@
 $newline always
-<h3>Profile of #{username}
+<h3>Profile of #{ownerName}
 
-$if msu == (Just username)
-  Coming soon: create new album
-  <br>
-
-$if null userMedia
-  Dieser Benutzer hat noch keine Medien hochgeladen.
+$if null userAlbums
+  This user has no albums yet
 $else
-  Neueste Medien:
-  $forall (Entity mediaId medium) <- userMedia
+  Albums of this user:
+  $forall (Entity albumId album) <- userAlbums
     <div class="thumbnails">
-      <div class="single">
+
+$if null recentMedia
+  This user has not uploaded any images
+$else
+  Newest images:
+  $forall (Entity mediaId medium) <- take 10 recentMedia
+    <div class="thumbnails">
+      <img src=#{mediumPath medium}>
