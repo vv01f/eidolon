@@ -26,10 +26,10 @@ postLoginR = do
           case credentialsPasswd cred == userPassword (entityVal user) of
             True -> do
               setSession "userId" $ extractKey $ entityKey user
-              setMessage $ [shamlet|<pre>Successfully logged in|]
+              setMessage "Successfully logged in"
               redirect $ HomeR
             False -> do
-              setMessage $ [shamlet|<pre>Login error|]
+              setMessage $ "Login error"
               redirect $ LoginR
         Nothing -> do
           setMessage $ [shamlet|<pre>User does not exist|]
@@ -43,5 +43,5 @@ loginForm = renderDivs $ Credentials
 getLogoutR :: Handler Html
 getLogoutR = do
   deleteSession "userId"
-  setMessage $ [shamlet|<pre>Succesfully logged out|]
+  setMessage "Succesfully logged out"
   redirect $ HomeR

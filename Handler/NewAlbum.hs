@@ -15,7 +15,7 @@ getNewAlbumR = do
       defaultLayout $ do
         $(widgetFile "newAlbum")
     Nothing -> do
-      setMessage $ [shamlet|<pre>You need to be lgged in|]
+      setMessage "You need to be lgged in"
       redirect $ LoginR
 
 postNewAlbumR :: Handler Html
@@ -29,7 +29,7 @@ postNewAlbumR = do
         FormSuccess album -> do
           albumId <- runDB $ insert album
           liftIO $ createDirectory $ "data" </> (unpack $ extractKey userId) </> (unpack $ extractKey albumId)
-          setMessage $ [shamlet|<pre>Album successfully created|]
+          setMessage $ "Album successfully created"
           redirect $ ProfileR userId
 
 albumForm :: UserId -> Form Album

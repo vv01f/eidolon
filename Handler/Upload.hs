@@ -26,7 +26,7 @@ getUploadR = do
       defaultLayout $ do
         $(widgetFile "upload")
     Nothing -> do
-      setMessage $ [shamlet|<pre>You need to be logged in|]
+      setMessage "You need to be logged in"
       redirect $ LoginR
 
 postUploadR :: Handler Html
@@ -48,13 +48,13 @@ postUploadR = do
             (tempMediumTags temp)
             (tempMediumAlbum temp)
           mId <- runDB $ I.insert medium
-          setMessage $ [shamlet|<pre>Image succesfully uploaded|]
+          setMessage "Image succesfully uploaded"
           redirect $ HomeR
         _ -> do
-          setMessage $ [shamlet|<pre>There was an error uploading the file|]
+          setMessage "There was an error uploading the file"
           redirect $ UploadR
     Nothing -> do
-      setMessage $ [shamlet|<pre>You need to be logged in|]
+      setMessage "You need to be logged in"
       redirect $ LoginR
 
 writeOnDrive :: FileInfo -> Handler FilePath

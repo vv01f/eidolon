@@ -30,13 +30,13 @@ postSignupR = do
               To complete your sgnup please activate your account by visiting the following link
               <a href="#{activateLink}">#{activateLink}
             |]
-          setMessage $ [shamlet|<pre>User created|]
+          setMessage "User created"
           redirect $ HomeR
         False -> do
-          setMessage $ [shamlet|<pre>Username error|]
+          setMessage "Username error"
           redirect $ SignupR
     _ -> do
-      setMessage $ [shamlet|<pre>Please try again|]
+      setMessage "Please try again"
       redirect $ SignupR
 
 signupForm :: Form User

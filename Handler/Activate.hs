@@ -10,10 +10,10 @@ getActivateR token = do
   t <- runDB $ selectFirst [TokenToken ==. token] []
   case t of
     Nothing -> do
-      setMessage $ [shamlet|<pre>Invalid Token!|]
+      setMessage "Invalid Token!"
       redirect $ HomeR
     Just x -> do
       userId <- runDB $ insert $ tokenUser (entityVal x)
       liftIO $ createDirectory $ "data" </> (unpack $ extractKey userId)
-      setMessage $ [shamlet|<pre>User activated|]
+      setMessage $ "User activated"
       redirect $ HomeR
