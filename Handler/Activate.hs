@@ -14,6 +14,6 @@ getActivateR token = do
       redirect $ HomeR
     Just x -> do
       userId <- runDB $ insert $ tokenUser (entityVal x)
-      liftIO $ createDirectory $ "data" </> (unpack $ extractKey userId)
+      liftIO $ createDirectoryIfMissing True $ "data" </> (unpack $ extractKey userId)
       setMessage $ "User activated"
       redirect $ HomeR
