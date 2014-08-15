@@ -80,6 +80,8 @@ library
                  , blaze-html
                  , filepath
                  , time
+                 , yesod-persistent
+                 , transformers
 
 executable         eidolon
     if flag(library-only)
