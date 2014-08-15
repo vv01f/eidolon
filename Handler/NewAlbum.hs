@@ -37,3 +37,4 @@ albumForm userId = renderDivs $ Album
   <$> areq textField "Title" Nothing
   <*> pure userId
   <*> pure []
+  <*> pure Nothing
