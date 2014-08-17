@@ -1,12 +1,15 @@
 $newline always
 <h3>Profile of #{ownerName}
 
-$if null userAlbums
+$if null userAlbs
   This user has no albums yet
 $else
   Albums of this user:
-  $forall (Entity albumId album) <- userAlbums
+  $forall (Entity albumId album) <- userAlbs
     <div class="thumbnails">
+      <a href=@{AlbumR user albumId}>
+        <img width="200px" src="/static/img/album.jpg"><br>
+        #{albumTitle album}
 
 $if null recentMedia
   This user has not uploaded any images
