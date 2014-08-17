@@ -27,6 +27,7 @@ library
                      Handler.Profile
                      Handler.Upload
                      Handler.NewAlbum
+                     Handler.Album
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT
