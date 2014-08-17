@@ -37,7 +37,7 @@ postUploadR = do
       ((result, uploadWidget), enctype) <- runFormPost (uploadForm userId)
       case result of
         FormSuccess temp -> do
-          path <- writeOnDrive $ tempMediumFile temp
+          path <- writeOnDrive (tempMediumFile temp) userId (tempMediumAlbum temp)
           medium <- return $ Medium
             (tempMediumTitle temp)
             path
@@ -56,10 +56,13 @@ postUploadR = do
       setMessage "You need to be logged in"
       redirect $ LoginR
 
-writeOnDrive :: FileInfo -> Handler FilePath
-writeOnDrive file = do
+writeOnDrive :: FileInfo -> UserId -> AlbumId -> Handler FilePath
+writeOnDrive file userId albumId = do
   filename <- return $ fileName file
-  path <- return $ "static" </> (unpack filename)
+  path <- return $ "data"
+    </> (unpack $ extractKey userId)
+    </> (unpack $ extractKey albumId)
+    </> (unpack filename)
   liftIO $ fileMove file path
   return path
 
