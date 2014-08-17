@@ -8,7 +8,3 @@ getHomeR = do
   recentMedia <- runDB $ selectList [] [Desc MediumTime]
   defaultLayout $ do
     $(widgetFile "home")
-
-postHomeR :: Handler Html
-postHomeR = do
-  error "not yet implemented"

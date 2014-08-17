@@ -4,7 +4,6 @@ import Import as I
 import Data.Time
 import Data.Text
 import System.FilePath
-import Database.Persist.Types
 
 data TempMedium = TempMedium
   { tempMediumTitle :: Text
@@ -84,6 +83,7 @@ tagField = Field
   { fieldParse = \rawVals _ -> do
       case rawVals of
         [x] -> return $ Right $ Just $ splitOn " " x
+        _   -> return $ Left  $ error "unexpected tag list"
   , fieldView = \idAttr nameAttr _ eResult isReq ->
       [whamlet|<input id=#{idAttr} type="text" name=#{nameAttr}>|]
   , fieldEnctype = UrlEncoded

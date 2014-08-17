@@ -19,7 +19,6 @@ import Text.Jasmine (minifym)
 import Text.Hamlet (hamletFile)
 import Yesod.Core.Types (Logger)
 -- costom imports
-import Data.Maybe
 import Data.Text
 import Helper
 
@@ -73,7 +72,7 @@ instance Yesod App where
             uId <- return $ getUserIdFromText a
             user <- runDB $ getJust uId
             return $ userName user
-          otherwise -> do
+          Nothing -> do
             return ("" :: Text)
 
 
