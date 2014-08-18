@@ -18,3 +18,13 @@ getProfileR ownerId = do
       return False
   defaultLayout $ do
     $(widgetFile "profile")
+
+getUserR :: Text -> Handler Html
+getUserR ownerName = do
+  tempOwner <- runDB $ selectFirst [UserName ==. ownerName] []
+  case tempOwner of
+    Just (Entity ownerId owner) ->
+      getProfileR ownerId
+    Nothing -> do
+      setMessage "This user does not exist"
+      redirect $ HomeR
