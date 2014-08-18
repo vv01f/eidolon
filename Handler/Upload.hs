@@ -59,7 +59,7 @@ postUploadR = do
 writeOnDrive :: FileInfo -> UserId -> AlbumId -> Handler FilePath
 writeOnDrive file userId albumId = do
   filename <- return $ fileName file
-  path <- return $ "data"
+  path <- return $ "static" </> "data"
     </> (unpack $ extractKey userId)
     </> (unpack $ extractKey albumId)
     </> (unpack filename)

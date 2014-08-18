@@ -28,7 +28,7 @@ postNewAlbumR = do
       case result of
         FormSuccess album -> do
           albumId <- runDB $ insert album
-          liftIO $ createDirectory $ "data" </> (unpack $ extractKey userId) </> (unpack $ extractKey albumId)
+          liftIO $ createDirectory $ "static" </> "data" </> (unpack $ extractKey userId) </> (unpack $ extractKey albumId)
           setMessage $ "Album successfully created"
           redirect $ ProfileR userId
 
