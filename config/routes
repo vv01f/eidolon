@@ -11,4 +11,5 @@
 /user/#UserId			ProfileR	GET
 /upload				UploadR		GET POST
 /newalbum			NewAlbumR	GET POST
-/user/#UserId/album/#AlbumId 	AlbumR		GET
+/album/#AlbumId			AlbumR		GET
+/medium/#MediumId		MediumR		GET

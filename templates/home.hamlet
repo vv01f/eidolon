@@ -3,6 +3,6 @@ $if null recentMedia
 $else
   $forall (Entity mediumId medium) <- recentMedia
     <div class="thumbnails">
-      <a href=#{mediumPath medium}>
+      <a href=@{MediumR mediumId}>
         <img src=#{mediumPath medium}><br>
         #{mediumTitle medium}

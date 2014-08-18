@@ -7,7 +7,7 @@ $else
   Albums of this user:
   $forall (Entity albumId album) <- userAlbs
     <div class="thumbnails">
-      <a href=@{AlbumR ownerId albumId}>
+      <a href=@{AlbumR albumId}>
         <img width="200px" src="/static/img/album.jpg"><br>
         #{albumTitle album}
 
@@ -15,6 +15,7 @@ $if null recentMedia
   This user has not uploaded any images
 $else
   Newest images:
-  $forall (Entity mediaId medium) <- take 10 recentMedia
+  $forall (Entity mediumId medium) <- take 10 recentMedia
     <div class="thumbnails">
-      <img src=#{mediumPath medium}>
+      <a href=@{MediumR mediumId}>
+        <img src=#{mediumPath medium}>

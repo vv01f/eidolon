@@ -1,0 +1,9 @@
+<h3>#{mediumTitle medium}
+
+<div class="image">
+  <img src=#{mediumPath medium}>
+
+<div class="desc">
+  Uploaded on: #{formatTime defaultTimeLocale "%A %F %H:%M" (mediumTime medium)}
+  Description:<br>
+  #{mediumDescription medium}
