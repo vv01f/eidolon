@@ -17,7 +17,8 @@ getAlbumR albumId = do
           return (userId == ownerId)
         Nothing ->
          return False
-      media <- mapM (\a -> runDB $ getJust a) (albumContent album)
+--      media <- mapM (\a -> runDB $ getJust a) (albumContent album)
+      media <- runDB $ selectList [MediumAlbum ==. albumId] [Desc MediumTime]
       defaultLayout $ do
         $(widgetFile "album")
     Nothing -> do
