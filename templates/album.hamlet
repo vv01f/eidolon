@@ -1,0 +1,16 @@
+$newline never
+<h3>#{albumTitle album}
+by <a href=@{ProfileR ownerId}>#{ownerName}</a>
+<br>
+  $if presence == True
+    TODO: direct Upload to this album
+<br>
+  $if null media
+    This album is empty
+  $else
+    Images in this album:
+    $forall (medium) <- media
+      <div class="thumbnails">
+        <a href=#{mediumPath medium}>
+          <img src=#{mediumPath medium}><br>
+            #{mediumTitle medium}
