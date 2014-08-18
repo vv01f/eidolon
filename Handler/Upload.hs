@@ -38,15 +38,19 @@ postUploadR = do
       case result of
         FormSuccess temp -> do
           path <- writeOnDrive (tempMediumFile temp) userId (tempMediumAlbum temp)
+          inAlbumId <- return $ tempMediumAlbum temp
           medium <- return $ Medium
             (tempMediumTitle temp)
-            path
+            ('/' : path)
             (tempMediumTime temp)
             (tempMediumOwner temp)
             (tempMediumDesc temp)
             (tempMediumTags temp)
-            (tempMediumAlbum temp)
+            inAlbumId
           mId <- runDB $ I.insert medium
+          inAlbum <- runDB $ getJust inAlbumId
+          newMediaList <- return $ mId : (albumContent inAlbum)
+          runDB $ update inAlbumId [AlbumContent =. newMediaList]
           setMessage "Image succesfully uploaded"
           redirect $ HomeR
         _ -> do
