@@ -32,7 +32,7 @@ postLoginR = do
               setMessage $ "Login error"
               redirect $ LoginR
         Nothing -> do
-          setMessage $ [shamlet|<pre>User does not exist|]
+          setMessage "User does not exist"
           redirect $ LoginR
 
 loginForm :: Form Credentials

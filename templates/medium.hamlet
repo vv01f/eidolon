@@ -4,6 +4,6 @@
   <img src=#{mediumPath medium}>
 
 <div class="desc">
-  Uploaded on: #{formatTime defaultTimeLocale "%A %F %H:%M" (mediumTime medium)}
+  Uploaded on: #{formatTime defaultTimeLocale "%A %F %H:%M" (mediumTime medium)}<br>
   Description:<br>
   #{mediumDescription medium}
