@@ -4,18 +4,17 @@ import Import
 import Data.Maybe
 
 getProfileR :: UserId -> Handler Html
-getProfileR user = do
-  owner <- runDB $ get user
+getProfileR ownerId = do
+  owner <- runDB $ get ownerId
   ownerName <- lift $ pure $ userName $ fromJust owner
-  userAlbs <- runDB $ selectList [AlbumOwner ==. user] [Desc AlbumTitle]
-  recentMedia <- (runDB $ selectList [MediumOwner ==. user] [Desc MediumTime])
+  userAlbs <- runDB $ selectList [AlbumOwner ==. ownerId] [Desc AlbumTitle]
+  recentMedia <- (runDB $ selectList [MediumOwner ==. ownerId] [Desc MediumTime])
   msu <- lookupSession "userId"
-  case msu of
+  presence <- case msu of
     Just tempUserId -> do
       userId <- lift $ pure $ getUserIdFromText tempUserId
-      presence <- lift $ pure $ userId == user
-      defaultLayout $ do
-        $(widgetFile "profile")
+      return (userId == ownerId)
     Nothing ->
-      defaultLayout $ do
-        $(widgetFile "profile")
+      return False
+  defaultLayout $ do
+    $(widgetFile "profile")

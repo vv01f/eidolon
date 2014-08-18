@@ -7,7 +7,7 @@ $else
   Albums of this user:
   $forall (Entity albumId album) <- userAlbs
     <div class="thumbnails">
-      <a href=@{AlbumR user albumId}>
+      <a href=@{AlbumR ownerId albumId}>
         <img width="200px" src="/static/img/album.jpg"><br>
         #{albumTitle album}
 
