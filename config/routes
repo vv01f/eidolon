@@ -3,12 +3,12 @@
 /favicon.ico FaviconR GET
 /robots.txt RobotsR GET
 
-/				HomeR GET
-/signup				SignupR GET POST
-/login				LoginR GET POST
-/logout				LogoutR GET
-/activate/#Text			ActivateR GET
-/user/#UserId			ProfileR GET
-/upload				UploadR GET POST
-/newalbum			NewAlbumR GET POST
-/user/#UserId/album/#AlbumId 	AlbumR GET
+/				HomeR		GET
+/signup				SignupR		GET POST
+/login				LoginR		GET POST
+/logout				LogoutR		GET
+/activate/#Text			ActivateR	GET
+/user/#UserId			ProfileR	GET
+/upload				UploadR		GET POST
+/newalbum			NewAlbumR	GET POST
+/user/#UserId/album/#AlbumId 	AlbumR		GET
