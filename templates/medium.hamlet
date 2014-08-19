@@ -1,7 +1,11 @@
 <h3>#{mediumTitle medium}
 
+by <a href=@{UserR ownerName}>#{ownerName}</a>
+
+
 <div class="image">
   <img src=#{mediumPath medium}>
+
 
 <div class="desc">
   Uploaded on: #{formatTime defaultTimeLocale "%A %F %H:%M" (mediumTime medium)}<br>
