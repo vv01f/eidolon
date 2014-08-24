@@ -2,11 +2,18 @@ User
     name Text
     email Text
     password Text
+    salt ByteString
+    salted ByteString Maybe
     albums [AlbumId]
     deriving Typeable
-Token
+Activator
     token Text
     user User
+    deriving
+Token
+    token ByteString
+    kind Text
+    user UserId Maybe
     deriving
 Album
     title Text
@@ -20,7 +27,7 @@ Medium
     time UTCTime
     owner UserId
     description Textarea
-    tags [Text]
+    tags Texts
     album AlbumId
     deriving
 

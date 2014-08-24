@@ -5,6 +5,7 @@ import Data.Text (Text)
 import Database.Persist.Quasi
 import Data.Typeable (Typeable)
 import Data.Time (UTCTime)
+import Data.ByteString
 import System.FilePath (FilePath)
 
 -- You can define all of your database entities in the entities file.

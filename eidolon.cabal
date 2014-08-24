@@ -85,6 +85,9 @@ library
                  , yesod-persistent
                  , transformers
                  , old-locale
+                 , cereal
+                 , cryptohash-cryptoapi
+                 , crypto-api
 
 executable         eidolon
     if flag(library-only)
