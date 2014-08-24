@@ -34,7 +34,7 @@ $('#activate').click(function(ev) {
 	     url: '/activate/' + token,
 	     success: function(response) {
 		 if (response && response.welcome) {
-		     progress("Welcome to Bitlove!");
+		     progress("Welcome to Eidolon!");
 		     document.location = response.welcome;
 		 } else {
 		     fail((response && response.error) || "Cannot activate");
