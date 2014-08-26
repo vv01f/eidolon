@@ -3,7 +3,7 @@ $newline never
 by <a href=@{UserR ownerName}>#{ownerName}</a>
 <br>
   $if presence == True
-    TODO: direct Upload to this album
+    <a href=@{DirectUploadR albumId}>Upload image to this album
 <br>
   $if null media
     This album is empty
