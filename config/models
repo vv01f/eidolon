@@ -1,9 +1,9 @@
 User
     name Text
+    slug Text
     email Text
-    password Text
     salt ByteString
-    salted ByteString Maybe
+    salted ByteString
     albums [AlbumId]
     deriving Typeable
 Activator

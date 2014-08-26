@@ -74,6 +74,13 @@ instance Yesod App where
             return $ userName user
           Nothing -> do
             return ("" :: Text)
+        slug <- case msu of
+          Just a -> do
+            uId <- return $ getUserIdFromText a
+            user <- runDB $ getJust uId
+            return $ userSlug user
+          Nothing -> do
+            return ("" :: Text)
 
 
         -- We break up the default layout into two components:
