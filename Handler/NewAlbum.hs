@@ -15,7 +15,7 @@ getNewAlbumR = do
       defaultLayout $ do
         $(widgetFile "newAlbum")
     Nothing -> do
-      setMessage "You need to be lgged in"
+      setMessage "You need to be logged in"
       redirect $ LoginR
 
 postNewAlbumR :: Handler Html

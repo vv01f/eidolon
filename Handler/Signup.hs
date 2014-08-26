@@ -39,7 +39,7 @@ postSignupR = do
   case namesakes of
     [] -> do
       salt <- liftIO generateSalt
-      newUser <- return $ User newUserName (fromJust mEmail) "" salt Nothing []
+      newUser <- return $ User newUserName newUserName (fromJust mEmail) salt "" []
       activatorText <- liftIO generateString
       aId <- runDB $ insert $ Activator activatorText newUser
       tId <- runDB $ insert $ Token (encodeUtf8 activatorText) "activate" Nothing

@@ -48,11 +48,7 @@ fromHex :: String -> BL.ByteString
 fromHex = BL.pack . hexToWords
   where hexToWords (c:c':text) =
           let hex = [c, c']
-              word = case readHex hex of
-                     (d,_):_ -> d
-                     []      -> error "empty list"
-                     _       -> error "fuckup"
---              (word, _):_ = readHex hex
+              (word, _):_ = readHex hex
           in word : hexToWords text
         hexToWords _ = []
 

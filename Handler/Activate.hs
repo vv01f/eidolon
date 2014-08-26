@@ -23,7 +23,7 @@ getActivateR token = do
           defaultLayout $ do
             $(widgetFile "activate")
         _ -> do
-          returnJsonError "Invalid token!"
+          setMessage "Invalid token!"
           redirect $ ActivateR token
 
 postActivateR :: Text -> Handler RepJson
@@ -38,7 +38,7 @@ postActivateR token = do
         Just (Entity aId activ) -> do
           -- putting user in active state
           uId <- runDB $ insert $ activatorUser activ
-          runDB $ update uId [UserSalted =. (Just salted)]
+          runDB $ update uId [UserSalted =. salted]
           -- create user directory
           liftIO $ createDirectoryIfMissing True $ "static" </> "data" </> (unpack $ extractKey uId)
           -- cleanup
@@ -48,7 +48,8 @@ postActivateR token = do
           setSession "userId" (extractKey uId)
           welcomeLink <- ($ ProfileR uId) <$> getUrlRender
           returnJson ["welcome" .= welcomeLink]
-          -- redirect $ HomeR
+        Nothing -> do
+          returnJsonError "Invalid token"
     _ -> do
       returnJsonError "Invalid activation token!"
 

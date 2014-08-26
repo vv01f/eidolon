@@ -50,7 +50,7 @@ postLoginR = do
             savedUserId <- return $ tokenUser token
             queriedUser <- runDB $ getJust (fromJust savedUserId)
             salted <- return $ userSalted queriedUser
-            hexSalted <- return $ toHex $ fromJust salted
+            hexSalted <- return $ toHex salted
             expected <- return $ hmacSHA1 (tokenToken token) (encodeUtf8 hexSalted)
             case (fromHex' $ T.unpack hexResponse) == expected of
               True ->
