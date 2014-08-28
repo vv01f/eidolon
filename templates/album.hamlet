@@ -1,9 +1,11 @@
-$newline never
+$newline always
 <h3>#{albumTitle album}
 by <a href=@{UserR ownerName}>#{ownerName}</a>
 <br>
   $if presence == True
     <a href=@{DirectUploadR albumId}>Upload image to this album
+<br>
+    <a href=@{AlbumSettingsR albumId}>Change settings of your album
 <br>
   $if null media
     This album is empty

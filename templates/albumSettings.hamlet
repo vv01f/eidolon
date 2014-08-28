@@ -1,0 +1,7 @@
+$newline always
+<h3>Album settings
+
+<form method="post" enctype=#{enctype}>
+  ^{albumSettingsWidget}
+  <div>
+    <input type=submit value="Change settings">

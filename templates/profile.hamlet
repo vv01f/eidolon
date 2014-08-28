@@ -8,7 +8,10 @@ $else
   $forall (Entity albumId album) <- userAlbs
     <div class="thumbnails">
       <a href=@{AlbumR albumId}>
-        <img width="200px" src="/static/img/album.jpg"><br>
+        $if (albumSamplePic album) == Nothing
+          <img width="200px" src="/static/img/album.jpg"><br>
+        $else
+          <img width="200px" src=#{T.pack $ fromJust $ albumSamplePic album}><br>
         #{albumTitle album}
 
 $if null recentMedia

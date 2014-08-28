@@ -14,4 +14,5 @@
 /newalbum			NewAlbumR	GET POST
 /album/#AlbumId			AlbumR		GET
 /medium/#MediumId		MediumR		GET
-/album/#AlbumId/upload DirectUploadR GET POST
+/album/#AlbumId/upload		DirectUploadR	GET POST
+/album/#AlbumId/settings	AlbumSettingsR	GET POST
