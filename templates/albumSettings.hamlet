@@ -5,3 +5,5 @@ $newline always
   ^{albumSettingsWidget}
   <div>
     <input type=submit value="Change settings">
+
+<a href=@{AlbumDeleteR albumId}>Delete this album
