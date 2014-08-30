@@ -1,0 +1,8 @@
+$newline always
+<h3>Medium settings
+
+<form method="post" enctype=#{enctype}>
+  ^{mediumSettingsWidget}
+  <div>
+    <input type=submit value="Change settings">
+

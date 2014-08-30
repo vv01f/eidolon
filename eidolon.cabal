@@ -30,6 +30,7 @@ library
                      Handler.Album
                      Handler.Medium
                      Handler.AlbumSettings
+                     Handler.MediumSettings
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT

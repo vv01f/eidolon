@@ -17,3 +17,4 @@
 /album/#AlbumId/upload		DirectUploadR	GET POST
 /album/#AlbumId/settings	AlbumSettingsR	GET POST
 /album/#AlbumId/delete		AlbumDeleteR	GET POST
+/medium/#MediumId/settings	MediumSettingsR	GET POST

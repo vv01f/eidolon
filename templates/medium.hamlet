@@ -3,6 +3,7 @@
 by <a href=@{UserR ownerName}>#{ownerName}</a>
 
 
+
 <div class="image">
   <img src=#{mediumPath medium}>
 
@@ -11,3 +12,6 @@ by <a href=@{UserR ownerName}>#{ownerName}</a>
   Uploaded on: #{formatTime defaultTimeLocale "%A %F %H:%M" (mediumTime medium)}<br>
   Description:<br>
   #{mediumDescription medium}
+<br>
+$if presence == True
+  <a href=@{MediumSettingsR mediumId}>Change medium settings
