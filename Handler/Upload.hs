@@ -168,14 +168,3 @@ dUploadForm userId albumId = renderDivs $ TempMedium
   <*> areq textareaField "Description" Nothing
   <*> areq tagField "Enter tags" Nothing
   <*> pure albumId
-
-tagField :: Field Handler [Text]
-tagField = Field
-  { fieldParse = \rawVals _ -> do
-      case rawVals of
-        [x] -> return $ Right $ Just $ splitOn " " x
-        _   -> return $ Left  $ error "unexpected tag list"
-  , fieldView = \idAttr nameAttr _ eResult isReq ->
-      [whamlet|<input id=#{idAttr} type="text" name=#{nameAttr}>|]
-  , fieldEnctype = UrlEncoded
-  }
