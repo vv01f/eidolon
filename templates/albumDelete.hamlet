@@ -2,7 +2,7 @@ $newline always
 <h3>Delete Album #{albumTitle album}
 
 <p>
-  Do you wish ti delete this album and all its containing images?
+  Do you wish to delete this album and all its containing images?
 
 <form method="POST" action=@{AlbumDeleteR albumId}>
   <label for="confirm">Really delete this album
