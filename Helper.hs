@@ -16,6 +16,7 @@ import Model
 import Control.Applicative
 import Control.Monad.Trans.Class
 import Data.Maybe
+import Data.Either
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.ByteString.Char8 as BC
@@ -78,7 +79,7 @@ tagField = Field
       case rawVals of
         [x] -> return $ Right $ Just $ T.splitOn " " x
         _   -> return $ Left  $ error "unexpected tag list"
-  , fieldView = \idAttr nameAttr _ eResult isReq ->
-      [whamlet|<input id=#{idAttr} type="text" name=#{nameAttr}>|]
+  , fieldView = \idAttr nameAttr val eResult isReq ->
+      [whamlet|<input id=#{idAttr} type="text" name=#{nameAttr} value=#{either id (T.intercalate " ") eResult}>|]
   , fieldEnctype = UrlEncoded
   }
