@@ -6,3 +6,4 @@ $newline always
   <div>
     <input type=submit value="Change settings">
 
+<a href=@{MediumDeleteR mediumId}>Delete this image

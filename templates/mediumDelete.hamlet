@@ -1,0 +1,10 @@
+$newline always
+<h3>Delete Medium #{mediumTitle medium}
+
+<p>
+  Do you wish to delete this image?
+
+<form method="POST" action=@{MediumDeleteR mediumId}>
+  <label for="confirm">Really delete this medium
+  <input type="checkbox" id="confirm" name="confirm" value="confirm" required>
+  <input id="delete" type="submit" value="Delete medium">

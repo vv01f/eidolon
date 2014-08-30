@@ -133,7 +133,10 @@ postAlbumDeleteR albumId = do
                   liftIO $ removeDirectoryRecursive $ "static" </> "data" </> (T.unpack $ extractKey userId) </> (T.unpack $ extractKey albumId)
                   setMessage "Album deleted succesfully"
                   redirect $ HomeR
-            False -> do
+                _ -> do
+                  setMessage "You must confirm the deletion"
+                  redirect $ AlbumSettingsR albumId
+            _ -> do
               setMessage "You must own this album to delete it"
               redirect $ AlbumR albumId
         Nothing -> do

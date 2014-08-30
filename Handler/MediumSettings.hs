@@ -1,6 +1,9 @@
 module Handler.MediumSettings where
 
 import Import
+import System.Directory
+import System.FilePath
+import Data.List (tail)
 
 getMediumSettingsR :: MediumId -> Handler Html
 getMediumSettingsR mediumId = do
@@ -75,3 +78,63 @@ mediumSettingsForm medium = renderDivs $ Medium
   <*> areq textareaField "Description" (Just $ mediumDescription medium)
   <*> areq tagField "tags" (Just $ mediumTags medium)
   <*> pure (mediumAlbum medium)
+
+getMediumDeleteR :: MediumId -> Handler Html
+getMediumDeleteR mediumId = do
+  tempMedium <- runDB $ get mediumId
+  case tempMedium of
+    Just medium -> do
+      ownerId <- return $ mediumOwner medium
+      owner <- runDB $ getJust ownerId
+      msu <- lookupSession "userId"
+      case msu of
+        Just tempUserId -> do
+          userId <- return $ getUserIdFromText tempUserId
+          presence <- return (userId == ownerId)
+          case presence of
+            True -> do
+              defaultLayout $ do
+                $(widgetFile "mediumDelete")
+            False -> do
+              setMessage "You must own this medium to delete it"
+              redirect $ MediumR mediumId
+        Nothing -> do
+          setMessage "You must be logged in to delete media"
+          redirect $ LoginR
+    Nothing -> do
+      setMessage "This Medium does not exist"
+      redirect $ HomeR
+
+postMediumDeleteR :: MediumId -> Handler Html
+postMediumDeleteR mediumId = do
+  tempMedium <- runDB $ get mediumId
+  case tempMedium of
+    Just medium -> do
+      ownerId <- return $ mediumOwner medium
+      owner <- runDB $ getJust ownerId
+      msu <- lookupSession "userId"
+      case msu of
+        Just tempUserId -> do
+          userId <- return $ getUserIdFromText tempUserId
+          presence <- return (userId == ownerId)
+          case presence of
+            True -> do
+              confirm <- lookupPostParam "confirm"
+              case confirm of
+                Just "confirm" -> do
+                  liftIO $ removeFile (normalise $ tail $ mediumPath medium)
+                  runDB $ delete mediumId
+                  setMessage "Medium succesfully deleted"
+                  redirect $ HomeR
+                _ -> do
+                  setMessage "You must confirm the deletion"
+                  redirect $ MediumSettingsR mediumId
+            False -> do
+              setMessage "You must own this medium to delete it"
+              redirect $ MediumR mediumId
+        Nothing -> do
+          setMessage "You must be logged in to delete media"
+          redirect $ LoginR
+    Nothing -> do
+      setMessage "This Medium does not exist"
+      redirect $ HomeR
