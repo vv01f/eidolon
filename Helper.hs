@@ -8,6 +8,8 @@ module Helper
   , makeRandomToken
   , generateSalt
   , tagField
+  , sendMail
+  , generateString
   )
 where
 
@@ -29,6 +31,8 @@ import Yesod.Persist.Core
 import Yesod.Core.Types
 import Yesod
 import Numeric (readHex, showHex)
+import Network.Mail.Mime
+import Text.Blaze.Html.Renderer.Utf8
 
 getUserIdFromText :: T.Text -> UserId
 getUserIdFromText tempUserId =
@@ -83,3 +87,24 @@ tagField = Field
       [whamlet|<input id=#{idAttr} type="text" name=#{nameAttr} value=#{either id (T.intercalate " ") eResult}>|]
   , fieldEnctype = UrlEncoded
   }
+
+sendMail :: MonadIO m => T.Text -> T.Text -> Html -> m ()
+sendMail toEmail subject body =
+  liftIO $ renderSendMail
+    Mail
+      { mailFrom = Address Nothing "noreply" -- TODO: set sender Address
+      , mailTo = [Address Nothing toEmail]
+      , mailCc = []
+      , mailBcc = []
+      , mailHeaders = [("Subject", subject)]
+      , mailParts = [[Part
+        { partType = "text/html; charset=utf-8"
+        , partEncoding = None
+        , partFilename = Nothing
+        , partHeaders = []
+        , partContent = renderHtml body
+        }]]
+      }
+
+generateString :: IO T.Text
+generateString = (toHex . B.pack . take 16 . randoms) <$> newStdGen

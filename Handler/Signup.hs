@@ -56,35 +56,6 @@ postSignupR = do
       setMessage "This user already exists"
       redirect $ SignupR
 
---signupForm :: Form User
---signupForm = renderDivs $ User
---  <$> areq textField "Username" Nothing
---  <*> areq emailField "Email" Nothing
---  <*> areq passwordField "Password" Nothing
---  <*> pure ("" :: ByteString)
---  <*> pure []
-
 validateLen :: Text -> Bool
 validateLen a =
   (T.length a) > 3
-
-generateString :: IO T.Text
-generateString = (toHex . B.pack . I.take 16 . randoms) <$> newStdGen
-
-sendMail :: MonadIO m => Text -> Text -> Html -> m ()
-sendMail toEmail subject body =
-  liftIO $ renderSendMail
-    Mail
-      { mailFrom = Address Nothing "noreply" -- TODO: set sender Address
-      , mailTo = [Address Nothing toEmail]
-      , mailCc = []
-      , mailBcc = []
-      , mailHeaders = [("Subject", subject)]
-      , mailParts = [[Part
-        { partType = "text/html; charset=utf-8"
-        , partEncoding = None
-        , partFilename = Nothing
-        , partHeaders = []
-        , partContent = renderHtml body
-        }]]
-      }
