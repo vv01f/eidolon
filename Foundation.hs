@@ -57,6 +57,9 @@ type Form x = Html -> MForm (HandlerT App IO) (FormResult x, Widget)
 instance Yesod App where
     approot = ApprootMaster $ appRoot . settings
 
+    -- change maximum content length
+    maximumContentLength _ _ = Just $ 1024 ^ 5
+
     -- Store session data on the client in encrypted cookies,
     -- default session idle timeout is 120 minutes
     makeSessionBackend _ = fmap Just $ defaultClientSessionBackend
