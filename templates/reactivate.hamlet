@@ -1,0 +1,8 @@
+$newline always
+
+<h3>Reset Password
+
+<form method="post" enctype=#{enctype}>
+  ^{reactivateWidget}
+  <div>
+    <input type=submit value="Send">

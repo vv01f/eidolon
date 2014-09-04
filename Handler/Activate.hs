@@ -12,8 +12,16 @@ getActivateR token = do
   t <- runDB $ selectFirst [ActivatorToken ==. token] []
   case t of
     Nothing -> do
-      setMessage "Invalid Token!"
-      redirect $ HomeR
+      mToken <- runDB $ selectFirst [TokenToken ==. (encodeUtf8 token), TokenKind ==. "activate"] []
+      case mToken of
+        Just (Entity uTokenId uToken) -> do
+          user <- runDB $ getJust (fromJust $ tokenUser uToken)
+          hexSalt <- return $ toHex $ userSalt user
+          defaultLayout $ do
+            $(widgetFile "activate")
+        _ -> do
+          setMessage "Invalid token!"
+          redirect $ HomeR
     Just (Entity activatorKey activator) -> do
       uSalt <- return $ userSalt $ activatorUser activator
       mToken <- runDB $ selectFirst [TokenToken ==. (encodeUtf8 token), TokenKind ==. "activate"] []
@@ -33,23 +41,32 @@ postActivateR token = do
   mToken <- runDB $ selectFirst [TokenToken ==. (encodeUtf8 token), TokenKind ==. "activate"] []
   case mToken of
     Just (Entity uTokenId uToken) -> do
-      newUser <- runDB $ selectFirst [ActivatorToken ==. token] []
-      case newUser of
-        Just (Entity aId activ) -> do
-          -- putting user in active state
-          uId <- runDB $ insert $ activatorUser activ
-          runDB $ update uId [UserSalted =. salted]
-          -- create user directory
-          liftIO $ createDirectoryIfMissing True $ "static" </> "data" </> (unpack $ extractKey uId)
+      case tokenUser uToken == Nothing of
+        True -> do
+          newUser <- runDB $ selectFirst [ActivatorToken ==. token] []
+          case newUser of
+            Just (Entity aId activ) -> do
+              -- putting user in active state
+              uId <- runDB $ insert $ activatorUser activ
+              runDB $ update uId [UserSalted =. salted]
+              -- create user directory
+              liftIO $ createDirectoryIfMissing True $ "static" </> "data" </> (unpack $ extractKey uId)
+              -- cleanup
+              runDB $ delete aId
+              runDB $ delete uTokenId
+              -- login and redirect
+              setSession "userId" (extractKey uId)
+              welcomeLink <- ($ ProfileR uId) <$> getUrlRender
+              returnJson ["welcome" .= welcomeLink]
+            Nothing -> do
+              returnJsonError "Invalid token"
+        False -> do
+          runDB $ update (fromJust $ tokenUser uToken) [UserSalted =. salted]
           -- cleanup
-          runDB $ delete aId
           runDB $ delete uTokenId
-          -- login and redirect
-          setSession "userId" (extractKey uId)
-          welcomeLink <- ($ ProfileR uId) <$> getUrlRender
+          setSession "userId" (extractKey $ fromJust $ tokenUser uToken)
+          welcomeLink <- ($ ProfileR (fromJust $ tokenUser uToken)) <$> getUrlRender
           returnJson ["welcome" .= welcomeLink]
-        Nothing -> do
-          returnJsonError "Invalid token"
     _ -> do
       returnJsonError "Invalid activation token!"
 

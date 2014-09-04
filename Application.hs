@@ -38,6 +38,7 @@ import Handler.Album
 import Handler.Medium
 import Handler.AlbumSettings
 import Handler.MediumSettings
+import Handler.Reactivate
 
 -- This line actually creates our YesodDispatch instance. It is the second half
 -- of the call to mkYesodData which occurs in Foundation.hs. Please see the
