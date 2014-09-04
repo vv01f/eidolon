@@ -32,7 +32,7 @@ getActivateR token = do
             $(widgetFile "activate")
         _ -> do
           setMessage "Invalid token!"
-          redirect $ ActivateR token
+          redirect $ HomeR
 
 postActivateR :: Text -> Handler RepJson
 postActivateR token = do
