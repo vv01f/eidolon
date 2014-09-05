@@ -12,6 +12,8 @@ getMediumR mediumId = do
       ownerId <- return $ mediumOwner medium
       owner <- runDB $ getJust ownerId
       ownerName <- return $ userName owner
+      albumId <- return $ mediumAlbum medium
+      album <- runDB $ getJust albumId
       msu <- lookupSession "userId"
       presence <- case msu of
         Just tempUserId -> do

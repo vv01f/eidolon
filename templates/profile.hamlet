@@ -4,23 +4,29 @@ $if presence == True
   <a href=@{ProfileSettingsR ownerId}>Change your profile settings
 
 $if null userAlbs
-  This user has no albums yet
+  <ul class="noalbum">
+    <li>
+      This user has no albums yet
 $else
   Albums of this user:
   $forall (Entity albumId album) <- userAlbs
-    <div class="thumbnails">
-      <a href=@{AlbumR albumId}>
-        $if (albumSamplePic album) == Nothing
-          <img width="200px" src="/static/img/album.jpg"><br>
-        $else
-          <img width="200px" src=#{T.pack $ fromJust $ albumSamplePic album}><br>
-        #{albumTitle album}
+    <ul class="albums">
+      <li>
+        <div class="thumbnails">
+          <a href=@{AlbumR albumId}>
+            $if (albumSamplePic album) == Nothing
+              <img width="200px" src="/static/img/album.jpg"><br>
+            $else
+              <img width="200px" src=#{T.pack $ fromJust $ albumSamplePic album}><br>
+            #{albumTitle album}
 
 $if null recentMedia
   This user has not uploaded any images
 $else
   Newest images:
-  $forall (Entity mediumId medium) <- take 10 recentMedia
-    <div class="thumbnails">
-      <a href=@{MediumR mediumId}>
-        <img src=#{mediumPath medium}>
+  <ul class="media">
+    <li>
+      $forall (Entity mediumId medium) <- take 10 recentMedia
+        <div class="thumbnails">
+          <a href=@{MediumR mediumId}>
+            <img src=#{mediumPath medium}>

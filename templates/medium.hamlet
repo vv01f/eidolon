@@ -1,6 +1,6 @@
 <h3>#{mediumTitle medium}
 
-by <a href=@{UserR ownerName}>#{ownerName}</a>
+by <a href=@{UserR ownerName}>#{ownerName}</a> from album <a href=@{AlbumR albumId}>#{albumTitle album}</a>
 
 
 
