@@ -53,8 +53,9 @@ postLoginR = do
             hexSalted <- return $ toHex salted
             expected <- return $ hmacSHA1 (tokenToken token) (encodeUtf8 hexSalted)
             case (fromHex' $ T.unpack hexResponse) == expected of
-              True ->
+              True -> do
                 -- Success!!
+                runDB $ delete tokenId
                 return $ Right savedUserId
               _    ->
                 return $ Left ("Wrong password" :: T.Text)
