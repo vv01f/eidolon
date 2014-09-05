@@ -1,5 +1,7 @@
 $newline always
-<h3>Profile of #{ownerName}
+<h3>Profile of #{ownerSlug}
+$if presence == True
+  <a href=@{ProfileSettingsR ownerId}>Change your profile settings
 
 $if null userAlbs
   This user has no albums yet

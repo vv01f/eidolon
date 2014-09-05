@@ -32,6 +32,8 @@ library
                      Handler.AlbumSettings
                      Handler.MediumSettings
                      Handler.Reactivate
+                     Handler.ProfileSettings
+                     Handler.ProfileDelete
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT

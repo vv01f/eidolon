@@ -3,20 +3,22 @@
 /favicon.ico FaviconR GET
 /robots.txt RobotsR GET
 
-/				HomeR		GET
-/signup				SignupR		GET POST
-/login				LoginR		GET POST
-/logout				LogoutR		GET
-/activate/#Text			ActivateR	GET POST
-/profile/#UserId		ProfileR	GET
-/user/#Text			UserR		GET
-/upload				UploadR		GET POST
-/newalbum			NewAlbumR	GET POST
-/album/#AlbumId			AlbumR		GET
-/medium/#MediumId		MediumR		GET
-/album/#AlbumId/upload		DirectUploadR	GET POST
-/album/#AlbumId/settings	AlbumSettingsR	GET POST
-/album/#AlbumId/delete		AlbumDeleteR	GET POST
-/medium/#MediumId/settings	MediumSettingsR	GET POST
-/medium/#MediumId/delete	MediumDeleteR	GET POST
-/reactivate ReactivateR GET POST
+/				HomeR			GET
+/signup				SignupR			GET POST
+/login				LoginR			GET POST
+/logout				LogoutR			GET
+/activate/#Text			ActivateR		GET POST
+/profile/#UserId		ProfileR		GET
+/user/#Text			UserR			GET
+/upload				UploadR			GET POST
+/newalbum			NewAlbumR		GET POST
+/album/#AlbumId			AlbumR			GET
+/medium/#MediumId		MediumR			GET
+/album/#AlbumId/upload		DirectUploadR		GET POST
+/album/#AlbumId/settings	AlbumSettingsR		GET POST
+/album/#AlbumId/delete		AlbumDeleteR		GET POST
+/medium/#MediumId/settings	MediumSettingsR		GET POST
+/medium/#MediumId/delete	MediumDeleteR		GET POST
+/reactivate			ReactivateR		GET POST
+/profile/#UserId/settings	ProfileSettingsR	GET POST
+/profile/#UserId/delete		ProfileDeleteR		GET POST
