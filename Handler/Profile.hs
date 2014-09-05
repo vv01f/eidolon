@@ -7,7 +7,7 @@ import qualified Data.Text as T
 getProfileR :: UserId -> Handler Html
 getProfileR ownerId = do
   owner <- runDB $ get ownerId
-  ownerName <- lift $ pure $ userName $ fromJust owner
+  ownerSlug <- lift $ pure $ userSlug $ fromJust owner
   userAlbs <- runDB $ selectList [AlbumOwner ==. ownerId] [Desc AlbumTitle]
   recentMedia <- (runDB $ selectList [MediumOwner ==. ownerId] [Desc MediumTime])
   msu <- lookupSession "userId"
