@@ -1,0 +1,10 @@
+$newline always
+<h3>User profiles
+
+$if null profiles
+  There are no profiles yet (How can you even see this?)
+$else
+  $forall (Entity uId u) <- profiles
+    <ul>
+      <li>
+        <a href=@{AdminProfileSettingsR uId}>#{userSlug u}

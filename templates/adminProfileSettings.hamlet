@@ -1,0 +1,9 @@
+$newline always
+<h3>Profile settings
+
+<form method="post" enctype=#{enctype}>
+  ^{adminProfileSetWidget}
+  <div>
+    <input type=submit value="Change settings">
+
+<a href=@{AdminProfileDeleteR userId}>Delete user

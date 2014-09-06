@@ -5,6 +5,7 @@ User
     salt ByteString
     salted ByteString
     albums [AlbumId]
+    admin Bool
     deriving Typeable
 Activator
     token Text

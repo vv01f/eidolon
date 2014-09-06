@@ -34,6 +34,8 @@ library
                      Handler.Reactivate
                      Handler.ProfileSettings
                      Handler.ProfileDelete
+                     Handler.Admin
+                     Handler.AdminProfileSettings
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT

@@ -71,3 +71,4 @@ profileSettingsForm user = renderDivs $ User
   <*> pure (userSalt user)
   <*> pure (userSalted user)
   <*> pure (userAlbums user)
+  <*> pure (userAdmin user)
