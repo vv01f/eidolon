@@ -1,9 +1,17 @@
 $newline always
 <h3>Profile settings
 
-<form method="post" enctype=#{enctype}>
-  ^{adminProfileSetWidget}
-  <div>
-    <input type=submit value="Change settings">
+<div class="left">
+  <form method="post" enctype=#{enctype}>
+    ^{adminProfileSetWidget}
+    <div>
+      <input type=submit value="Change settings">
 
-<a href=@{AdminProfileDeleteR userId}>Delete user
+  <a href=@{AdminProfileDeleteR userId}>Delete user
+
+<div class="right">
+  <ul>
+    <li>
+      Albums of this user
+    <li>
+      Media of this user

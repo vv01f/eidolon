@@ -3,3 +3,9 @@ $newline always
 
 <p>
   Be careful with your actions here, every click will perform directly the advertised action.
+
+<ul>
+  <li>
+    <a href=@{AdminProfilesR}>User profiles
+  <li>
+    <a href=@{AdminAlbumsR}>Albums

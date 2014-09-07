@@ -36,6 +36,7 @@ library
                      Handler.ProfileDelete
                      Handler.Admin
                      Handler.AdminProfileSettings
+                     Handler.AdminAlbumSettings
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT

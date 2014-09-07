@@ -5,8 +5,8 @@ import qualified Data.Text as T
 import System.Directory
 import System.FilePath
 
-getAdminProfiles :: Handler Html
-getAdminProfiles = do
+getAdminProfilesR :: Handler Html
+getAdminProfilesR = do
   msu <- lookupSession "userId"
   case msu of
     Just tempUserId -> do
