@@ -53,14 +53,12 @@ postAlbumSettingsR albumId = do
                 FormSuccess temp -> do
                   aId <- runDB $ update albumId 
                     [ AlbumTitle =. albumTitle temp
-                    , AlbumOwner =. albumOwner temp
-                    , AlbumContent =. albumContent temp
                     , AlbumSamplePic =. albumSamplePic temp
                     ]
                   setMessage "Album settings changed succesfully"
                   redirect $ AlbumR albumId
                 _ -> do
-                  setMessage "There was an error changing the settings"
+                  setMessage "There was an error while changing the settings"
                   redirect $ AlbumSettingsR albumId
             False -> do
               setMessage "You must own this album to change its settings"
