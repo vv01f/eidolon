@@ -23,7 +23,7 @@ postNewAlbumR = do
   msu <- lookupSession "userId"
   case msu of
     Just tempUserId -> do
-      userId <- lift $ pure $ getUserIdFromText tempUserId
+      userId <- return $ getUserIdFromText tempUserId
       ((result, albumWidget), enctype) <- runFormPost (albumForm userId)
       case result of
         FormSuccess album -> do
@@ -39,6 +39,12 @@ postNewAlbumR = do
           -- outro
           setMessage $ "Album successfully created"
           redirect $ ProfileR userId
+        _ -> do
+          setMessage "There was an error creating the album"
+          redirect $ NewAlbumR
+    Nothing -> do
+      setMessage "You must be logged in to create albums"
+      redirect $ LoginR
 
 albumForm :: UserId -> Form Album
 albumForm userId = renderDivs $ Album
