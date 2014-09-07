@@ -122,6 +122,13 @@ postMediumDeleteR mediumId = do
               confirm <- lookupPostParam "confirm"
               case confirm of
                 Just "confirm" -> do
+                  -- delete references first
+                  albumId <- return $ mediumAlbum medium
+                  album <- runDB $ getJust albumId
+                  mediaList <- return $ albumContent album
+                  newMediaList <- return $ removeItem mediumId mediaList
+                  -- update reference List
+                  runDB $ update albumId [AlbumContent =. newMediaList]
                   liftIO $ removeFile (normalise $ tail $ mediumPath medium)
                   runDB $ delete mediumId
                   setMessage "Medium succesfully deleted"

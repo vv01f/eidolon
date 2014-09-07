@@ -10,6 +10,7 @@ module Helper
   , tagField
   , sendMail
   , generateString
+  , removeItem
   )
 where
 
@@ -108,3 +109,9 @@ sendMail toEmail subject body =
 
 generateString :: IO T.Text
 generateString = (toHex . B.pack . take 16 . randoms) <$> newStdGen
+
+removeItem :: Eq a => a -> [a] -> [a]
+removeItem _ [] = []
+removeItem x (y:ys)
+  | x == y    = removeItem x ys
+  | otherwise = y : removeItem x ys

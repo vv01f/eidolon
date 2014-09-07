@@ -27,8 +27,16 @@ postNewAlbumR = do
       ((result, albumWidget), enctype) <- runFormPost (albumForm userId)
       case result of
         FormSuccess album -> do
+          -- Put album in Database
           albumId <- runDB $ insert album
+          -- add album reference in user
+          user <- runDB $ getJust userId
+          albumList <- return $ userAlbums user
+          newAlbumList <- return $ albumId : albumList
+          runDB $ update userId [UserAlbums =. newAlbumList]
+          -- create folder
           liftIO $ createDirectory $ "static" </> "data" </> (unpack $ extractKey userId) </> (unpack $ extractKey albumId)
+          -- outro
           setMessage $ "Album successfully created"
           redirect $ ProfileR userId
 
