@@ -128,9 +128,17 @@ postAlbumDeleteR albumId = do
               confirm <- lookupPostParam "confirm"
               case confirm of
                 Just "confirm" -> do
+                  -- remove album reference from user
+                  albumList <- return $ userAlbums owner
+                  newAlbumList <- return $ removeItem albumId albumList
+                  runDB $ update ownerId [UserAlbums =. newAlbumList]
+                  -- delete album content
                   mapM (\a -> runDB $ delete a) (albumContent album)
+                  -- delete album
                   runDB $ delete albumId
+                  -- delete files
                   liftIO $ removeDirectoryRecursive $ "static" </> "data" </> (T.unpack $ extractKey userId) </> (T.unpack $ extractKey albumId)
+                  -- outro
                   setMessage "Album deleted succesfully"
                   redirect $ HomeR
                 _ -> do
