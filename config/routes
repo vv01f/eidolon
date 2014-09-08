@@ -25,6 +25,7 @@
 /admin				AdminR			GET
 /admin/profile			AdminProfilesR		GET
 /admin/profile/#UserId		AdminProfileSettingsR	GET POST
+/admin/profile/#UserId/albums	AdminUserAlbumsR	GET
 /admin/profile/#UserId/delete	AdminProfileDeleteR	GET
 /admin/album			AdminAlbumsR		GET
 /admin/album/#AlbumId		AdminAlbumSettingsR	GET POST

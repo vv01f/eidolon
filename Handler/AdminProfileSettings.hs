@@ -24,6 +24,30 @@ getAdminProfilesR = do
       setMessage "You must be logged in"
       redirect $ LoginR
 
+getAdminUserAlbumsR :: UserId -> Handler Html
+getAdminUserAlbumsR ownerId = do
+  msu <- lookupSession "userId"
+  case msu of
+    Just tempUserId -> do
+      userId <- return $ getUserIdFromText tempUserId
+      user <- runDB $ getJust userId
+      case userAdmin user of
+        True -> do
+          tempOwner <- runDB $ get ownerId
+          case tempOwner of
+            Just owner -> do
+              albums <- runDB $ selectList [AlbumOwner ==. ownerId] [Desc AlbumTitle]
+              defaultLayout $ do
+                $(widgetFile "adminUserAlbums")
+            Nothing -> do
+              setMessage "This user does not exist"
+              redirect $ AdminR
+        False -> do
+          setMessage "You are no admin"
+          redirect $ HomeR
+    Nothing -> do
+      setMessage "You must be kogged in"
+      redirect $ LoginR
 
 getAdminProfileSettingsR :: UserId -> Handler Html
 getAdminProfileSettingsR ownerId = do

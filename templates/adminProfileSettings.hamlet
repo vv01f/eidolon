@@ -12,6 +12,6 @@ $newline always
 <div class="right">
   <ul>
     <li>
-      Albums of this user
+      <a href=@{AdminUserAlbumsR ownerId}>Albums of this user
     <li>
       Media of this user
