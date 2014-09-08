@@ -46,7 +46,7 @@ getAdminUserAlbumsR ownerId = do
           setMessage "You are no admin"
           redirect $ HomeR
     Nothing -> do
-      setMessage "You must be kogged in"
+      setMessage "You must be logged in"
       redirect $ LoginR
 
 getAdminProfileSettingsR :: UserId -> Handler Html
