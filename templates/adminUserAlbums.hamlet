@@ -1,5 +1,5 @@
 $newline always
-<h3>Albums
+<h3>Albums of #{userSlug owner}
 
 $if null albums
   There are no albums yet
