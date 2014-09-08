@@ -26,41 +26,41 @@ getAdminAlbumsR = do
 
 getAdminAlbumSettingsR :: AlbumId -> Handler Html
 getAdminAlbumSettingsR albumId = do
-  tempAlbum <- runDB $ get albumId
-  case tempAlbum of
-    Just album -> do
-      msu <- lookupSession "userId"
-      case msu of
-        Just tempUserId -> do
-          userId <- return $ getUserIdFromText tempUserId
-          user <- runDB $ getJust userId
-          case userAdmin user of
-            True -> do
+  msu <- lookupSession "userId"
+  case msu of
+    Just tempUserId -> do
+      userId <- return $ getUserIdFromText tempUserId
+      user <- runDB $ getJust userId
+      case userAdmin user of
+        True -> do
+          tempAlbum <- runDB $ get albumId
+          case tempAlbum of
+            Just album -> do
               (adminAlbumSettingsWidget, enctype) <- generateFormPost $ adminAlbumSettingsForm album albumId
               defaultLayout $ do
                 $(widgetFile "adminAlbumSet")
-            False -> do
-              setMessage "You must be admin"
-              redirect $ HomeR
-        Nothing -> do
-          setMessage "You must be logged in"
-          redirect $ LoginR
+            Nothing -> do
+              setMessage "This album does not exist"
+              redirect $ AdminR
+        False -> do
+          setMessage "You are no admin"
+          redirect $ HomeR
     Nothing -> do
-      setMessage "This album does not exist"
-      redirect $ AdminR
+      setMessage "You must be logged in"
+      redirect $ LoginR
 
 postAdminAlbumSettingsR :: AlbumId -> Handler Html
 postAdminAlbumSettingsR albumId = do
-  tempAlbum <- runDB $ get albumId
-  case tempAlbum of
-    Just album -> do
-      msu <- lookupSession "userId"
-      case msu of
-        Just tempUserId -> do
-          userId <- return $ getUserIdFromText tempUserId
-          user <- runDB $ getJust userId
-          case userAdmin user of
-            True -> do
+  msu <- lookupSession "userId"
+  case msu of
+    Just tempUserId -> do
+      userId <- return $ getUserIdFromText tempUserId
+      user <- runDB $ getJust userId
+      case userAdmin user of
+        True -> do
+          tempAlbum <- runDB $ get albumId
+          case tempAlbum of
+            Just album -> do
               ((res, adminAlbumSettingsWidget), enctype) <- runFormPost $ adminAlbumSettingsForm album albumId
               case res of
                 FormSuccess temp -> do
@@ -73,15 +73,15 @@ postAdminAlbumSettingsR albumId = do
                 _ -> do
                   setMessage "There was an error while changing the settings"
                   redirect $ AdminAlbumSettingsR albumId
-            False -> do
-              setMessage "You must be admin"
-              redirect $ HomeR
-        Nothing -> do
-          setMessage "You must be logged in"
-          redirect $ LoginR
+            Nothing -> do
+              setMessage "This album does not exist"
+              redirect $ AdminR
+        False -> do
+          setMessage "You are no admin"
+          redirect $ HomeR
     Nothing -> do
-      setMessage "This album does not exist"
-      redirect $ AdminR
+      setMessage "You must be logged in"
+      redirect $ LoginR
 
 adminAlbumSettingsForm :: Album -> AlbumId -> Form Album
 adminAlbumSettingsForm album albumId = renderDivs $ Album
@@ -96,16 +96,16 @@ adminAlbumSettingsForm album albumId = renderDivs $ Album
 
 getAdminAlbumDeleteR :: AlbumId -> Handler Html
 getAdminAlbumDeleteR albumId = do
-  tempAlbum <- runDB $ get albumId
-  case tempAlbum of
-    Just album -> do
-      msu <- lookupSession "userId"
-      case msu of
-        Just tempUserId -> do
-          userId <- return $ getUserIdFromText tempUserId
-          user <- runDB $ getJust userId
-          case userAdmin user of
-            True -> do
+  msu <- lookupSession "userId"
+  case msu of
+    Just tempUserId -> do
+      userId <- return $ getUserIdFromText tempUserId
+      user <- runDB $ getJust userId
+      case userAdmin user of
+        True -> do
+          tempAlbum <- runDB $ get albumId
+          case tempAlbum of
+            Just album -> do
               -- remove reference from owner
               ownerId <- return $ albumOwner album
               owner <- runDB $ getJust ownerId
@@ -120,12 +120,12 @@ getAdminAlbumDeleteR albumId = do
               -- outro
               setMessage "Album deleted successfully"
               redirect $ AdminR
-            _ -> do
-              setMessage "You are no admin"
-              redirect $ HomeR
-        Nothing -> do
-          setMessage "You must be logged in"
-          redirect $ LoginR
+            Nothing -> do
+              setMessage "This album dies not exist"
+              redirect $ AdminR
+        False -> do
+          setMessage "You are no admin"
+          redirect $ HomeR
     Nothing -> do
-      setMessage "This Album does not exist"
-      redirect $ AdminR
+      setMessage "You must be logged in"
+      redirect $ LoginR
