@@ -31,6 +31,7 @@
 /admin/profile/#UserId/delete	AdminProfileDeleteR	GET
 /admin/album			AdminAlbumsR		GET
 /admin/album/#AlbumId		AdminAlbumSettingsR	GET POST
+/admin/album/#AlbumId/media	AdminAlbumMediaR	GET
 /admin/album/#AlbumId/delete	AdminAlbumDeleteR	GET
 /admin/medium			AdminMediaR		GET
 /admin/medium/#MediumId		AdminMediumSettingsR	GET POST
