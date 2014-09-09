@@ -12,4 +12,4 @@ $newline always
 <div class="right">
   <ul>
     <li>
-      <a href=@{AdminAlbumMediaR}>Media in this album
+      <a href=@{AdminAlbumMediaR albumId}>Media in this album
