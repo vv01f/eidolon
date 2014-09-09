@@ -22,11 +22,16 @@
 /reactivate			ReactivateR		GET POST
 /profile/#UserId/settings	ProfileSettingsR	GET POST
 /profile/#UserId/delete		ProfileDeleteR		GET POST
+
 /admin				AdminR			GET
 /admin/profile			AdminProfilesR		GET
 /admin/profile/#UserId		AdminProfileSettingsR	GET POST
 /admin/profile/#UserId/albums	AdminUserAlbumsR	GET
+/admin/profile/#UserId/media	AdminUserMediaR		GET
 /admin/profile/#UserId/delete	AdminProfileDeleteR	GET
 /admin/album			AdminAlbumsR		GET
 /admin/album/#AlbumId		AdminAlbumSettingsR	GET POST
 /admin/album/#AlbumId/delete	AdminAlbumDeleteR	GET
+/admin/medium			AdminMediaR		GET
+/admin/medium/#MediumId		AdminMediumSettingsR	GET POST
+/admin/meidum/#MediumId/delete	AdminMediumDeleteR	GET

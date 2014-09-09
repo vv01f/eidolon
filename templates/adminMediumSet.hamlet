@@ -1,0 +1,10 @@
+$newline always
+<h3>Meddium settings
+
+<div class="left">
+  <form method="post" enctype=#{enctype}>
+    ^{adminMediumSetWidget}
+    <div>
+      <input type=submit value="Change settings">
+
+  <a href=@{AdminMediumDeleteR mediumId}>Delete this medium

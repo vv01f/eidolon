@@ -2,7 +2,7 @@ $newline always
 <h3>Albums of #{userSlug owner}
 
 $if null albums
-  There are no albums yet
+  #{userSlug owner} has no albums yet
 $else
   $forall (Entity aId a) <- albums
     <ul>

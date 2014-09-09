@@ -14,4 +14,4 @@ $newline always
     <li>
       <a href=@{AdminUserAlbumsR ownerId}>Albums of this user
     <li>
-      Media of this user
+      <a href=@{AdminUserMediaR ownerId}>Media of this user

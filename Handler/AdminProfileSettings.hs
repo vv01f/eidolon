@@ -49,6 +49,31 @@ getAdminUserAlbumsR ownerId = do
       setMessage "You must be logged in"
       redirect $ LoginR
 
+getAdminUserMediaR :: UserId -> Handler Html
+getAdminUserMediaR ownerId = do
+  msu <- lookupSession "userId"
+  case msu of
+    Just tempUserId -> do
+      userId <- return $ getUserIdFromText tempUserId
+      user <- runDB $ getJust userId
+      case userAdmin user of
+        True -> do
+          tempOwner <- runDB $ get ownerId
+          case tempOwner of
+            Just owner -> do
+              media <- runDB $ selectList [MediumOwner ==. ownerId] [Desc MediumTitle]
+              defaultLayout $ do
+                $(widgetFile "adminUserMedia")
+            Nothing -> do
+              setMessage "This user does not exist"
+              redirect $ AdminR
+        False -> do
+          setMessage "You are no admin"
+          redirect $ HomeR
+    Nothing -> do
+      setMessage "You must be logged in"
+      redirect $ LoginR
+
 getAdminProfileSettingsR :: UserId -> Handler Html
 getAdminProfileSettingsR ownerId = do
   msu <- lookupSession "userId"

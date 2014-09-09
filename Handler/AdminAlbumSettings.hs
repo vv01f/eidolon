@@ -24,6 +24,31 @@ getAdminAlbumsR = do
       setMessage "You must be logged in"
       redirect $ LoginR
 
+getAdminAlbumMediaR :: AlbumId -> Handler Html
+getAdminAlbumMediaR albumId = do
+  msu <- lookupSession "userId"
+  case msu of
+    Just tempUserId -> do
+      userId <- return $ getUserIdFromText tempUserId
+      user <- runDB $ getJust userId
+      case userAdmin user of
+        True -> do
+          tempAlbum <- runDB $ get albumId
+          case tempAlbum of
+            Just album -> do
+              media <- runDB $ selectList [MediumAlbum ==. albumId] [Desc MediumTitle]
+              defaultLayout $ do
+                $(widgetFile "adminAlbumMedia")
+            Nothing -> do
+              setMessage "This album does not exist"
+              redirect $ AdminR
+        False -> do
+          setMessage "You are no admin"
+          redirect $ HomeR
+    Nothing -> do
+      setMessage "You must be logged in"
+      redirect $ LoginR
+
 getAdminAlbumSettingsR :: AlbumId -> Handler Html
 getAdminAlbumSettingsR albumId = do
   msu <- lookupSession "userId"

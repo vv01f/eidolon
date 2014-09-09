@@ -37,6 +37,7 @@ library
                      Handler.Admin
                      Handler.AdminProfileSettings
                      Handler.AdminAlbumSettings
+                     Handler.AdminMediumSettings
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT

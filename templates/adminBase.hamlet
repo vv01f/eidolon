@@ -9,3 +9,5 @@ $newline always
     <a href=@{AdminProfilesR}>User profiles
   <li>
     <a href=@{AdminAlbumsR}>Albums
+  <li>
+    <a href=@{AdminMediaR}>Media
