@@ -136,6 +136,7 @@ getAdminAlbumDeleteR albumId = do
               owner <- runDB $ getJust ownerId
               albumList <- return $ userAlbums owner
               newAlbumList <- return $ removeItem albumId albumList
+              runDB $ update ownerId [UserAlbums =. newAlbumList]
               -- delete album content
               mapM (\a -> runDB $ delete a) (albumContent album)
               -- delete album
