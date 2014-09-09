@@ -1,9 +1,15 @@
 $newline always
 <h3>Album settings
 
-<form method="post" enctype=#{enctype}>
-  ^{adminAlbumSettingsWidget}
-  <div>
-    <input type=submit value="Change settings">
+<div class="left">
+  <form method="post" enctype=#{enctype}>
+    ^{adminAlbumSettingsWidget}
+    <div>
+      <input type=submit value="Change settings">
 
-<a href=@{AdminAlbumDeleteR albumId}>Delete this album
+  <a href=@{AdminAlbumDeleteR albumId}>Delete this album
+
+<div class="right">
+  <ul>
+    <li>
+      Media in this album

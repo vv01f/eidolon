@@ -1,0 +1,10 @@
+$newline always
+<h3>Albums of #{userSlug owner}
+
+$if null media
+  #{userSlug owner} has no media yet
+$else
+  $forall (Entity mId m) <- media
+    <ul>
+      <li>
+        <a href=@{AdminMediumSettingsR mId}>#{mediumTitle m}

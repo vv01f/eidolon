@@ -1,0 +1,10 @@
+$newline always
+<h3>Media from #{albumTitle album}
+
+$if null media
+  #{albumTitle album} has no media yet
+$else
+  $forall (Entity mId m) <- media
+    <ul>
+      <li>
+        <a href=@{AdminMediumSettingsR mId}>#{mediumTitle m}
