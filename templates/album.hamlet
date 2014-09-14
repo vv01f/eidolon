@@ -11,10 +11,10 @@ by <a href=@{UserR ownerName}>#{ownerName}</a>
     This album is empty
   $else
     Images in this album:
-    <ul class="media">
-      <li>
-        $forall (Entity mediumId medium) <- media
-          <div class="thumbnails">
-            <a href=@{MediumR mediumId}>
-              <img src=#{mediumPath medium}><br>
-                #{mediumTitle medium}
+    <ul>
+      $forall (Entity mediumId medium) <- media
+        <li>
+          <a href=@{MediumR mediumId}>
+            <figure class="thumbnail">
+              <img src=#{mediumPath medium}>
+              <figcaption>#{mediumTitle medium}
