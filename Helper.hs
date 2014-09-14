@@ -82,7 +82,9 @@ generateSalt = (B.pack . take 8 . randoms) <$> getStdGen
 tagField = Field
   { fieldParse = \rawVals _ -> do
       case rawVals of
-        [x] -> return $ Right $ Just $ T.splitOn " " x
+        [x] -> case null [x] of
+          False -> return $ Right $ Just $ T.splitOn " " x
+          True -> return $ Right $ Nothing
         _   -> return $ Left  $ error "unexpected tag list"
   , fieldView = \idAttr nameAttr val eResult isReq ->
       [whamlet|<input id=#{idAttr} type="text" name=#{nameAttr} value=#{either id (T.intercalate " ") eResult}>|]
