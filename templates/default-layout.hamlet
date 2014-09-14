@@ -2,7 +2,7 @@
   <div id="top-nav">
   <ul id="user-nav">
     $maybe userId <- msu
-      Logged in as <a href=@{UserR username}>#{slug}
+      Logged in as <a href=@{UserR username}>#{slug}<br>
       <li>
         <a href=@{LogoutR}>Logout
       <li>
