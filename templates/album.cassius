@@ -1,0 +1,14 @@
+.thumbnail
+  border: 1px solid #ddd
+  border-radius: 6px
+  box-shadow: 0 0 3px #c4c4c4
+
+.thumbnail img
+  width: 250px
+  margin: 0
+
+ul
+  list-style-type: none
+
+li
+  display: inline-block

@@ -27,6 +27,6 @@ $else
   <ul class="media">
     <li>
       $forall (Entity mediumId medium) <- take 10 recentMedia
-        <div class="thumbnails">
+        <div class="thumbnail">
           <a href=@{MediumR mediumId}>
             <img src=#{mediumPath medium}>
