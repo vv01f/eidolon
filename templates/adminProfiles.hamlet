@@ -4,7 +4,7 @@ $newline always
 $if null profiles
   There are no profiles yet (How can you even see this?)
 $else
+  <ul>
   $forall (Entity uId u) <- profiles
-    <ul>
-      <li>
-        <a href=@{AdminProfileSettingsR uId}>#{userSlug u}
+    <li>
+      <a href=@{AdminProfileSettingsR uId}>#{userSlug u}

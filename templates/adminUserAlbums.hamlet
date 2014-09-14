@@ -4,7 +4,7 @@ $newline always
 $if null albums
   #{userSlug owner} has no albums yet
 $else
+  <ul>
   $forall (Entity aId a) <- albums
-    <ul>
-      <li>
-        <a href=@{AdminAlbumSettingsR aId}>#{albumTitle a}
+    <li>
+      <a href=@{AdminAlbumSettingsR aId}>#{albumTitle a}

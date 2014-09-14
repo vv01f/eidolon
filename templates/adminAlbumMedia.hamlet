@@ -4,7 +4,7 @@ $newline always
 $if null media
   #{albumTitle album} has no media yet
 $else
+  <ul>
   $forall (Entity mId m) <- media
-    <ul>
-      <li>
-        <a href=@{AdminMediumSettingsR mId}>#{mediumTitle m}
+    <li>
+      <a href=@{AdminMediumSettingsR mId}>#{mediumTitle m}
