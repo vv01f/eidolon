@@ -24,9 +24,10 @@ $if null recentMedia
   This user has not uploaded any images
 $else
   Newest images:
-  <ul class="media">
-    <li>
-      $forall (Entity mediumId medium) <- take 10 recentMedia
-        <div class="thumbnail">
-          <a href=@{MediumR mediumId}>
+  <ul>
+    $forall (Entity mediumId medium) <- take 10 recentMedia
+      <li>
+        <a href=@{MediumR mediumId}>
+          <figure class="thumbnail">
             <img src=#{mediumPath medium}>
+            <figcaption>#{mediumTitle medium}
