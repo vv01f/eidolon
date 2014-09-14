@@ -9,16 +9,16 @@ $if null userAlbs
       This user has no albums yet
 $else
   Albums of this user:
-  $forall (Entity albumId album) <- userAlbs
-    <ul class="albums">
+  <ul>
+    $forall (Entity albumId album) <- userAlbs
       <li>
-        <div class="thumbnails">
-          <a href=@{AlbumR albumId}>
+        <a href=@{AlbumR albumId}>
+          <figure class="thumbnail">
             $if (albumSamplePic album) == Nothing
-              <img width="200px" src="/static/img/album.jpg"><br>
+              <img src="/static/img/album.jpg"><br>
             $else
-              <img width="200px" src=#{T.pack $ fromJust $ albumSamplePic album}><br>
-            #{albumTitle album}
+              <img src=#{T.pack $ fromJust $ albumSamplePic album}>
+            <figcaption>#{albumTitle album}
 
 $if null recentMedia
   This user has not uploaded any images
