@@ -4,7 +4,7 @@ by <a href=@{UserR ownerName}>#{ownerName}</a>
 <br>
   $if presence == True
     <a href=@{DirectUploadR albumId}>Upload image to this album
-<br>
+    <br>
     <a href=@{AlbumSettingsR albumId}>Change settings of your album
 <br>
   $if null media
