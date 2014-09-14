@@ -1,0 +1,13 @@
+$newline always
+
+<h3>#{tag}
+
+$if null media
+  There are no media tagged with #{tag}
+$else
+  <ul>
+  $forall Just (Entity mId m) <- media
+    <li>
+      <a href=@{MediumR mId}>
+        <img src=#{mediumPath m}>
+        #{mediumTitle m}

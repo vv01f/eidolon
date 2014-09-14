@@ -13,5 +13,14 @@ by <a href=@{UserR ownerName}>#{ownerName}</a> from album <a href=@{AlbumR album
   Description:<br>
   #{mediumDescription medium}
 <br>
+<div class="tags">
+  Tags:
+  <ul>
+    $if null (mediumTags medium)
+      none
+    $else
+      $forall tag <- mediumTags medium
+        <li>
+          <a href=@{TagR tag}>#{tag}
 $if presence == True
   <a href=@{MediumSettingsR mediumId}>Change medium settings

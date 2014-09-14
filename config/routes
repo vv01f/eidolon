@@ -36,3 +36,4 @@
 /admin/medium			AdminMediaR		GET
 /admin/medium/#MediumId		AdminMediumSettingsR	GET POST
 /admin/meidum/#MediumId/delete	AdminMediumDeleteR	GET
+/tag/#Text TagR GET
