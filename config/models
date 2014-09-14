@@ -6,22 +6,22 @@ User
     salted ByteString
     albums [AlbumId]
     admin Bool
-    deriving Typeable
+    deriving Typeable Eq Show
 Activator
     token Text
     user User
-    deriving
+    deriving Eq Show
 Token
     token ByteString
     kind Text
     user UserId Maybe
-    deriving
+    deriving Eq Show
 Album
     title Text
     owner UserId
     content [MediumId]
     samplePic FilePath Maybe
-    deriving
+    deriving Eq Show
 Medium
     title Text
     path FilePath
@@ -30,6 +30,6 @@ Medium
     description Textarea
     tags Texts
     album AlbumId
-    deriving
+    deriving Eq Show
 
  -- By default this file is used in Model.hs (which is imported by Foundation.hs)

@@ -3,10 +3,14 @@ module Model where
 import Yesod
 import Data.Text (Text)
 import Database.Persist.Quasi
+import Database.Persist
+import Database.Persist.TH
 import Data.Typeable (Typeable)
+import Data.Eq (Eq)
 import Data.Time (UTCTime)
 import Data.ByteString
 import Data.Bool
+import Text.Show (Show)
 import System.FilePath (FilePath)
 
 -- You can define all of your database entities in the entities file.
