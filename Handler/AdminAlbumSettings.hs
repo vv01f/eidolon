@@ -14,7 +14,7 @@ getAdminAlbumsR = do
       user <- runDB $ getJust userId
       case userAdmin user of
         True -> do
-          albums <- runDB $ selectList [] [Desc AlbumTitle]
+          albums <- runDB $ selectList [] [Asc AlbumTitle]
           defaultLayout $ do
             $(widgetFile "adminAlbums")
         False -> do
@@ -36,7 +36,7 @@ getAdminAlbumMediaR albumId = do
           tempAlbum <- runDB $ get albumId
           case tempAlbum of
             Just album -> do
-              media <- runDB $ selectList [MediumAlbum ==. albumId] [Desc MediumTitle]
+              media <- runDB $ selectList [MediumAlbum ==. albumId] [Asc MediumTitle]
               defaultLayout $ do
                 $(widgetFile "adminAlbumMedia")
             Nothing -> do

@@ -14,7 +14,7 @@ getAdminMediaR = do
       user <- runDB $ getJust userId
       case userAdmin user of
         True -> do
-          media <- runDB $ selectList [] [Desc MediumTitle]
+          media <- runDB $ selectList [] [Asc MediumTitle]
           defaultLayout $ do
             $(widgetFile "adminMedia")
         False -> do
