@@ -1,6 +1,8 @@
 <nav>
   <div id="top-nav">
   <ul id="user-nav">
+    <li>
+      <a href=@{HomeR}>Home
     $maybe userId <- msu
       Logged in as <a href=@{UserR username}>#{slug}<br>
       <li>
