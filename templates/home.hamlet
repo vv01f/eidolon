@@ -1,6 +1,7 @@
 $if null recentMedia
   <p>This gallery is still empty.
 $else
+  <p>Newest images:
   <ul>
     $forall (Entity mediumId medium) <- recentMedia
       <li>

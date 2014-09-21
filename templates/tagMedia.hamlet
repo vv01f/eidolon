@@ -1,6 +1,6 @@
 $newline always
 
-<h3>#{tag}
+<h3>Tag #{tag}
 
 $if null media
   There are no media tagged with #{tag}

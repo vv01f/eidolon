@@ -8,7 +8,7 @@ $if null userAlbs
     <li>
       This user has no albums yet
 $else
-  Albums of this user:
+  <p>Albums of this user:
   <ul>
     $forall (Entity albumId album) <- userAlbs
       <li>
@@ -23,7 +23,7 @@ $else
 $if null recentMedia
   This user has not uploaded any images
 $else
-  Newest images:
+  <p>Newest images:
   <ul>
     $forall (Entity mediumId medium) <- take 10 recentMedia
       <li>
