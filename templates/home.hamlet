@@ -3,7 +3,7 @@ $if null recentMedia
 $else
   <p>Newest images:
   <ul>
-    $forall (Entity mediumId medium) <- recentMedia
+    $forall (Entity mediumId medium) <- take 30 recentMedia
       <li>
         <a href=@{MediumR mediumId}>
           <figure class="thumbnail">
