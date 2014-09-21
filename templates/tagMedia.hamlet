@@ -9,5 +9,6 @@ $else
   $forall Just (Entity mId m) <- media
     <li>
       <a href=@{MediumR mId}>
-        <img src=#{mediumPath m}>
-        #{mediumTitle m}
+        <figure class="thumbnail">
+          <img src=#{mediumPath m}>
+          <figcapion>#{mediumTitle m}
