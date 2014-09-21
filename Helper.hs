@@ -83,7 +83,7 @@ tagField = Field
   { fieldParse = \rawVals _ -> do
       case rawVals of
         [x] -> case null [x] of
-          False -> return $ Right $ Just $ T.splitOn " " x
+          False -> return $ Right $ Just $ removeItem "" $ T.splitOn " " x
           True -> return $ Right $ Nothing
         _   -> return $ Left  $ error "unexpected tag list"
   , fieldView = \idAttr nameAttr val eResult isReq ->
