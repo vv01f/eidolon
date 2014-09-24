@@ -16,6 +16,7 @@ getAdminAlbumsR = do
         True -> do
           albums <- runDB $ selectList [] [Asc AlbumTitle]
           defaultLayout $ do
+            setTitle "Administration: Albums"
             $(widgetFile "adminAlbums")
         False -> do
           setMessage "You are no admin"
@@ -38,6 +39,7 @@ getAdminAlbumMediaR albumId = do
             Just album -> do
               media <- runDB $ selectList [MediumAlbum ==. albumId] [Asc MediumTitle]
               defaultLayout $ do
+                setTitle "Administration: Album media"
                 $(widgetFile "adminAlbumMedia")
             Nothing -> do
               setMessage "This album does not exist"
@@ -63,6 +65,7 @@ getAdminAlbumSettingsR albumId = do
             Just album -> do
               (adminAlbumSettingsWidget, enctype) <- generateFormPost $ adminAlbumSettingsForm album albumId
               defaultLayout $ do
+                setTitle "Administration: Album settings"
                 $(widgetFile "adminAlbumSet")
             Nothing -> do
               setMessage "This album does not exist"

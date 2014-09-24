@@ -12,6 +12,7 @@ getAdminR = do
       case userAdmin user of
         True -> do
           defaultLayout $ do
+            setTitle "Administration: Menu"
             $(widgetFile "adminBase")
         False -> do
           setMessage "You have no admin rights"

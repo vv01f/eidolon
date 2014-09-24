@@ -16,6 +16,7 @@ getProfileSettingsR userId = do
             True -> do
               (profileSettingsWidget, enctype) <- generateFormPost $ profileSettingsForm user
               defaultLayout $ do
+                setTitle "Eidolon :: Profile settings"
                 $(widgetFile "profileSettings")
             False -> do
               setMessage "You can only change your own profile settings"

@@ -2,7 +2,7 @@ module Handler.Upload where
 
 import Import as I
 import Data.Time
-import Data.Text
+import qualified Data.Text as T
 import System.FilePath
 
 data TempMedium = TempMedium
@@ -23,6 +23,7 @@ getUploadR = do
       userId <- lift $ pure $ getUserIdFromText tempUserId
       (uploadWidget, enctype) <- generateFormPost (uploadForm userId)
       defaultLayout $ do
+        setTitle "Eidolon :: Upload Medium"
         $(widgetFile "upload")
     Nothing -> do
       setMessage "You need to be logged in"
@@ -77,6 +78,7 @@ getDirectUploadR albumId = do
             True -> do
               (dUploadWidget, enctype) <- generateFormPost $ dUploadForm userId albumId
               defaultLayout $ do
+                setTitle $ toHtml ("Eidolon :: Upload medium to " `T.append` (albumTitle album))
                 $(widgetFile "dUpload")
             False -> do
               setMessage "You must own this album to upload"
@@ -138,9 +140,9 @@ writeOnDrive :: FileInfo -> UserId -> AlbumId -> Handler FilePath
 writeOnDrive file userId albumId = do
   filename <- return $ fileName file
   path <- return $ "static" </> "data"
-    </> (unpack $ extractKey userId)
-    </> (unpack $ extractKey albumId)
-    </> (unpack filename)
+    </> (T.unpack $ extractKey userId)
+    </> (T.unpack $ extractKey albumId)
+    </> (T.unpack filename)
   liftIO $ fileMove file path
   return path
 

@@ -14,6 +14,7 @@ getSignupR :: Handler Html
 getSignupR = do
 --  (signupWidget, enctype) <- generateFormPost signupForm
   defaultLayout $ do
+    setTitle "Eidolon :: Signup"
     $(widgetFile "signup")
 
 postSignupR :: Handler Html

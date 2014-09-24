@@ -8,6 +8,7 @@ getReactivateR :: Handler Html
 getReactivateR = do
   (reactivateWidget, enctype) <- generateFormPost reactivateForm
   defaultLayout $ do
+    setTitle "Eidolon :: Reactivate account"
     $(widgetFile "reactivate")
 
 postReactivateR :: Handler Html

@@ -1,6 +1,7 @@
 module Handler.Album where
 
 import Import
+import qualified Data.Text as T
 
 getAlbumR :: AlbumId -> Handler Html
 getAlbumR albumId = do
@@ -20,6 +21,7 @@ getAlbumR albumId = do
 --      media <- mapM (\a -> runDB $ getJust a) (albumContent album)
       media <- runDB $ selectList [MediumAlbum ==. albumId] [Desc MediumTime]
       defaultLayout $ do
+        setTitle $ toHtml ("Eidolon :: Album " `T.append` (albumTitle album))
         $(widgetFile "album")
     Nothing -> do
       setMessage "This album does not exist"

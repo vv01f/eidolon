@@ -19,6 +19,7 @@ getProfileDeleteR userId = do
           case loginId == userId of
             True -> do
               defaultLayout $ do
+                setTitle "Eidolon :: Delete user profile"
                 $(widgetFile "profileDelete")
             False -> do
               setMessage "You can only delete your own profile"

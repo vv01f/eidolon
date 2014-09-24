@@ -21,6 +21,7 @@ getMediumSettingsR mediumId = do
             True -> do
               (mediumSettingsWidget, enctype) <- generateFormPost $ mediumSettingsForm medium
               defaultLayout $ do
+                setTitle "Eidolon :: Medium Settings"
                 $(widgetFile "mediumSettings")
             False -> do
               setMessage "You must own this medium to change its settings"
@@ -94,6 +95,7 @@ getMediumDeleteR mediumId = do
           case presence of
             True -> do
               defaultLayout $ do
+                setTitle "Eidolon :: Delete Medium"
                 $(widgetFile "mediumDelete")
             False -> do
               setMessage "You must own this medium to delete it"

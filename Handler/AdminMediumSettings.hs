@@ -16,6 +16,7 @@ getAdminMediaR = do
         True -> do
           media <- runDB $ selectList [] [Asc MediumTitle]
           defaultLayout $ do
+            setTitle "Administration: Media"
             $(widgetFile "adminMedia")
         False -> do
           setMessage "You are no admin"
@@ -38,6 +39,7 @@ getAdminMediumSettingsR mediumId = do
             Just medium -> do
               (adminMediumSetWidget, enctype) <- generateFormPost $ adminMediumSetForm medium
               defaultLayout $ do
+                setTitle "Administration: Medium Settings"
                 $(widgetFile "adminMediumSet")
             Nothing -> do
               setMessage "This medium does not exist"

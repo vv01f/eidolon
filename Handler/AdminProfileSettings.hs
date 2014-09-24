@@ -16,6 +16,7 @@ getAdminProfilesR = do
         True -> do
           profiles <- runDB $ selectList [] [Desc UserName]
           defaultLayout $ do
+            setTitle "Administration: Profiles"
             $(widgetFile "adminProfiles")
         False -> do
           setMessage "You are no admin"
@@ -38,6 +39,7 @@ getAdminUserAlbumsR ownerId = do
             Just owner -> do
               albums <- runDB $ selectList [AlbumOwner ==. ownerId] [Desc AlbumTitle]
               defaultLayout $ do
+                setTitle "Administration: User albums"
                 $(widgetFile "adminUserAlbums")
             Nothing -> do
               setMessage "This user does not exist"
@@ -63,6 +65,7 @@ getAdminUserMediaR ownerId = do
             Just owner -> do
               media <- runDB $ selectList [MediumOwner ==. ownerId] [Desc MediumTitle]
               defaultLayout $ do
+                setTitle "Administration: User media"
                 $(widgetFile "adminUserMedia")
             Nothing -> do
               setMessage "This user does not exist"
@@ -88,6 +91,7 @@ getAdminProfileSettingsR ownerId = do
             Just owner -> do
               (adminProfileSetWidget, enctype) <- generateFormPost $ adminProfileForm owner
               defaultLayout $ do
+                setTitle "Administration: Profile settings"
                 $(widgetFile "adminProfileSettings")
             Nothing -> do
               setMessage "This user does not exist"

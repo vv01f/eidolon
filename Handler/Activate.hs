@@ -18,6 +18,7 @@ getActivateR token = do
           user <- runDB $ getJust (fromJust $ tokenUser uToken)
           hexSalt <- return $ toHex $ userSalt user
           defaultLayout $ do
+            setTitle "Activate your account"
             $(widgetFile "activate")
         _ -> do
           setMessage "Invalid token!"

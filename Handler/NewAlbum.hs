@@ -13,6 +13,7 @@ getNewAlbumR = do
       userId <- lift $ pure $ getUserIdFromText tempUserId
       (albumWidget, enctype) <- generateFormPost (albumForm userId)
       defaultLayout $ do
+        setTitle "Eidolon :: Create new Album"
         $(widgetFile "newAlbum")
     Nothing -> do
       setMessage "You need to be logged in"

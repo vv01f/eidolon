@@ -1,6 +1,7 @@
 module Handler.Tag where
 
 import Import
+import qualified Data.Text as T
 import Data.Maybe
 
 getTagR :: Text -> Handler Html
@@ -13,4 +14,5 @@ getTagR tag = do
       ) tempMedia
   media <- return $ removeItem Nothing almostMedia
   defaultLayout $ do
+    setTitle $ toHtml ("Eidolon :: Tag " `T.append` tag)
     $(widgetFile "tagMedia")

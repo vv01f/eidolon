@@ -22,6 +22,7 @@ getAlbumSettingsR albumId = do
             True -> do
               (albumSettingsWidget, enctype) <- generateFormPost $ albumSettingsForm album albumId
               defaultLayout $ do
+                setTitle "Eidolon :: Album Settings"
                 $(widgetFile "albumSettings")
             False -> do
               setMessage "You must own this album to change its settings"
@@ -97,6 +98,7 @@ getAlbumDeleteR albumId = do
           case presence of
             True -> do
               defaultLayout $ do
+                setTitle $ toHtml ("Eidolon :: Delete album" `T.append` (albumTitle album))
                 $(widgetFile "albumDelete")
             False -> do
               setMessage "You must own this album to delete it"

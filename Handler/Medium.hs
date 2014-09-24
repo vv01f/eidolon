@@ -2,6 +2,7 @@ module Handler.Medium where
 
 import Import
 import Data.Time
+import qualified Data.Text as T
 import System.Locale
 
 getMediumR :: MediumId -> Handler Html
@@ -22,6 +23,7 @@ getMediumR mediumId = do
         Nothing ->
           return False
       defaultLayout $ do
+        setTitle $ toHtml ("Eidolon :: Medium " `T.append` (mediumTitle medium))
         $(widgetFile "medium")
     Nothing -> do
       setMessage "This image does not exist"
