@@ -25,6 +25,7 @@ Album
 Medium
     title Text
     path FilePath
+    thumb FilePath
     time UTCTime
     owner UserId
     description Textarea

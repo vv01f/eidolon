@@ -74,6 +74,7 @@ mediumSettingsForm :: Medium -> Form Medium
 mediumSettingsForm medium = renderDivs $ Medium
   <$> areq textField "Title" (Just $ mediumTitle medium)
   <*> pure (mediumPath medium)
+  <*> pure (mediumThumb medium)
   <*> pure (mediumTime medium)
   <*> pure (mediumOwner medium)
   <*> areq textareaField "Description" (Just $ mediumDescription medium)
@@ -132,6 +133,7 @@ postMediumDeleteR mediumId = do
                   -- update reference List
                   runDB $ update albumId [AlbumContent =. newMediaList]
                   liftIO $ removeFile (normalise $ tail $ mediumPath medium)
+                  liftIO $ removeFile (normalise $ tail $ mediumThumb medium)
                   runDB $ delete mediumId
                   setMessage "Medium succesfully deleted"
                   redirect $ HomeR

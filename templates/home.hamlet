@@ -7,5 +7,5 @@ $else
       <li>
         <a href=@{MediumR mediumId}>
           <figure class="thumbnail">
-            <img src=#{mediumPath medium}>
+            <img src=#{mediumThumb medium}>
             <figcaption>#{mediumTitle medium}

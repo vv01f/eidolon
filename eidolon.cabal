@@ -98,6 +98,7 @@ library
                  , cereal
                  , cryptohash-cryptoapi
                  , crypto-api
+                 , hsmagick
 
 executable         eidolon
     if flag(library-only)

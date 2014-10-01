@@ -4,6 +4,11 @@ import Import as I
 import Data.Time
 import qualified Data.Text as T
 import System.FilePath
+import Graphics.Transform.Magick.Images
+import Graphics.Transform.Magick.Types
+import Foreign
+import Foreign.C.Types
+import Foreign.C.String
 
 data TempMedium = TempMedium
   { tempMediumTitle :: Text
@@ -39,10 +44,12 @@ postUploadR = do
       case result of
         FormSuccess temp -> do
           path <- writeOnDrive (tempMediumFile temp) userId (tempMediumAlbum temp)
+          thumbPath <- generateThumb path userId (tempMediumAlbum temp)
           inAlbumId <- return $ tempMediumAlbum temp
           medium <- return $ Medium
             (tempMediumTitle temp)
             ('/' : path)
+            ('/' : thumbPath)
             (tempMediumTime temp)
             (tempMediumOwner temp)
             (tempMediumDesc temp)
@@ -109,9 +116,11 @@ postDirectUploadR albumId = do
               case result of
                 FormSuccess temp -> do
                   path <- writeOnDrive (tempMediumFile temp) userId albumId
+                  thumbPath <- generateThumb path ownerId albumId
                   medium <- return $ Medium
                     (tempMediumTitle temp)
                     ('/' : path)
+                    ('/' : thumbPath)
                     (tempMediumTime temp)
                     (tempMediumOwner temp)
                     (tempMediumDesc temp)
@@ -136,13 +145,41 @@ postDirectUploadR albumId = do
       setMessage "This Album does not exist"
       redirect $ AlbumR albumId
 
+generateThumb :: FilePath -> UserId -> AlbumId -> Handler FilePath
+generateThumb path userId albumId = do
+  liftIO $ initializeMagick
+  image <- liftIO $ readImage path
+  case image of
+    HImage imag _ -> do
+      h1 <- liftIO $ withForeignPtr imag (\a -> do
+        himage <- peek a
+        r <- return $ rows himage
+        case r of CULong ro -> return ro
+        )
+      w1 <- liftIO $ withForeignPtr imag (\a -> do
+        himage <- peek a
+        c <- return $ columns himage
+        case c of CULong co -> return co
+        )
+      h2 <- return $ 220
+      w2 <- return $ (h1 `div` w1) * h2
+      error $ show w2
+      thumb <- return $ thumbnailImage (fromIntegral w2) (fromIntegral h2) image
+      newName <- return $ (takeBaseName path) ++ "_thumb" ++ (takeExtension path)
+      newPath <- return $ "static" </> "data" 
+        </> (T.unpack $ extractKey userId)
+        </> (T.unpack $ extractKey albumId)
+        </> newName
+      _ <- liftIO $ writeImage newPath thumb
+      return newPath
+
 writeOnDrive :: FileInfo -> UserId -> AlbumId -> Handler FilePath
 writeOnDrive file userId albumId = do
-  filename <- return $ fileName file
+  filen <- return $ fileName file
   path <- return $ "static" </> "data"
     </> (T.unpack $ extractKey userId)
     </> (T.unpack $ extractKey albumId)
-    </> (T.unpack filename)
+    </> (T.unpack filen)
   liftIO $ fileMove file path
   return path
 
