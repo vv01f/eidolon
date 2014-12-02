@@ -3,9 +3,11 @@ module Handler.Upload where
 import Import as I
 import Data.Time
 import qualified Data.Text as T
-import System.FilePath
-import Graphics.Transform.Magick.Images
-import Graphics.Transform.Magick.Types
+import qualified System.FilePath as FP
+import qualified Filesystem.Path as FSP
+import Filesystem.Path.CurrentOS
+import Graphics.ImageMagick.MagickWand
+import Control.Monad.Trans.Resource
 import Foreign
 import Foreign.C.Types
 import Foreign.C.String
@@ -145,42 +147,33 @@ postDirectUploadR albumId = do
       setMessage "This Album does not exist"
       redirect $ AlbumR albumId
 
-generateThumb :: FilePath -> UserId -> AlbumId -> Handler FilePath
+generateThumb :: FP.FilePath -> UserId -> AlbumId -> Handler FP.FilePath
 generateThumb path userId albumId = do
-  liftIO $ initializeMagick
-  image <- liftIO $ readImage path
-  case image of
-    HImage imag _ -> do
-      h1 <- liftIO $ withForeignPtr imag (\a -> do
-        himage <- peek a
-        r <- return $ rows himage
-        case r of CULong ro -> return ro
-        )
-      w1 <- liftIO $ withForeignPtr imag (\a -> do
-        himage <- peek a
-        c <- return $ columns himage
-        case c of CULong co -> return co
-        )
-      h2 <- return $ 220
-      w2 <- return $ (h1 `div` w1) * h2
-      error $ show w2
-      thumb <- return $ thumbnailImage (fromIntegral w2) (fromIntegral h2) image
-      newName <- return $ (takeBaseName path) ++ "_thumb" ++ (takeExtension path)
-      newPath <- return $ "static" </> "data" 
-        </> (T.unpack $ extractKey userId)
-        </> (T.unpack $ extractKey albumId)
-        </> newName
-      _ <- liftIO $ writeImage newPath thumb
-      return newPath
+  newName <- return $ (FP.takeBaseName path) ++ "_thumb" ++ (FP.takeExtension path)
+  newPath <- return $ "static" FP.</> "data"
+    FP.</> (T.unpack $ extractKey userId)
+    FP.</> (T.unpack $ extractKey albumId)
+    FP.</> newName
+  liftIO $ withMagickWandGenesis $ do
+    (_ , w) <- magickWand
+    readImage w (decodeString path)
+    w1 <- getImageWidth w
+    h1 <- getImageHeight w
+    h2 <- return 220
+    w2 <- return $ floor (((fromIntegral w1) / (fromIntegral h1)) * (fromIntegral h2))
+    resizeImage w w2 h2 lanczosFilter 1
+    setImageCompressionQuality w 95
+    writeImage w (Just (decodeString newPath))
+  return newPath
 
-writeOnDrive :: FileInfo -> UserId -> AlbumId -> Handler FilePath
-writeOnDrive file userId albumId = do
-  filen <- return $ fileName file
-  path <- return $ "static" </> "data"
-    </> (T.unpack $ extractKey userId)
-    </> (T.unpack $ extractKey albumId)
-    </> (T.unpack filen)
-  liftIO $ fileMove file path
+writeOnDrive :: FileInfo -> UserId -> AlbumId -> Handler FP.FilePath
+writeOnDrive fil userId albumId = do
+  filen <- return $ fileName fil
+  path <- return $ "static" FP.</> "data"
+    FP.</> (T.unpack $ extractKey userId)
+    FP.</> (T.unpack $ extractKey albumId)
+    FP.</> (T.unpack filen)
+  liftIO $ fileMove fil path
   return path
 
 uploadForm :: UserId -> Form TempMedium

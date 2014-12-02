@@ -91,6 +91,7 @@ library
                  , mime-mail
                  , blaze-html
                  , filepath
+                 , system-filepath
                  , time
                  , yesod-persistent
                  , transformers
@@ -98,7 +99,8 @@ library
                  , cereal
                  , cryptohash-cryptoapi
                  , crypto-api
-                 , hsmagick
+                 , imagemagick
+                 , resourcet
 
 executable         eidolon
     if flag(library-only)
