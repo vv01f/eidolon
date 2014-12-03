@@ -120,4 +120,4 @@ removeItem x (y:ys)
   | otherwise = y : removeItem x ys
 
 acceptedTypes :: [T.Text]
-acceptedTypes = ["image/jpeg", "image/png", "image/x-ms-bmp", "image/x-bmp", "image/bmp", "image/tiff", "image/tiff-fx"]
+acceptedTypes = ["image/jpeg", "image/jpg", "image/png", "image/x-ms-bmp", "image/x-bmp", "image/bmp", "image/tiff", "image/tiff-fx"]
