@@ -80,7 +80,7 @@ albumSettingsForm album albumId = renderDivs $ Album
   where
     media = do
       entities <- runDB $ selectList [MediumAlbum ==. albumId] [Desc MediumTitle]
-      optionsPairs $ map (\med -> (mediumTitle $ entityVal med, mediumPath (entityVal med))) entities
+      optionsPairs $ map (\med -> (mediumTitle $ entityVal med, mediumThumb (entityVal med))) entities
 
 getAlbumDeleteR :: AlbumId -> Handler Html
 getAlbumDeleteR albumId = do
