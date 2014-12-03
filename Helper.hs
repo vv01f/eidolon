@@ -11,6 +11,7 @@ module Helper
   , sendMail
   , generateString
   , removeItem
+  , acceptedTypes
   )
 where
 
@@ -117,3 +118,6 @@ removeItem _ [] = []
 removeItem x (y:ys)
   | x == y    = removeItem x ys
   | otherwise = y : removeItem x ys
+
+acceptedTypes :: [T.Text]
+acceptedTypes = ["image/jpeg", "image/png", "image/x-ms-bmp", "image/x-bmp", "image/bmp", "image/tiff", "image/tiff-fx"]

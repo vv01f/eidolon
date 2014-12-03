@@ -11,6 +11,7 @@ import Control.Monad.Trans.Resource
 import Foreign
 import Foreign.C.Types
 import Foreign.C.String
+import Helper
 
 data TempMedium = TempMedium
   { tempMediumTitle :: Text
@@ -45,24 +46,30 @@ postUploadR = do
       ((result, uploadWidget), enctype) <- runFormPost (uploadForm userId)
       case result of
         FormSuccess temp -> do
-          path <- writeOnDrive (tempMediumFile temp) userId (tempMediumAlbum temp)
-          thumbPath <- generateThumb path userId (tempMediumAlbum temp)
-          inAlbumId <- return $ tempMediumAlbum temp
-          medium <- return $ Medium
-            (tempMediumTitle temp)
-            ('/' : path)
-            ('/' : thumbPath)
-            (tempMediumTime temp)
-            (tempMediumOwner temp)
-            (tempMediumDesc temp)
-            (tempMediumTags temp)
-            inAlbumId
-          mId <- runDB $ I.insert medium
-          inAlbum <- runDB $ getJust inAlbumId
-          newMediaList <- return $ mId : (albumContent inAlbum)
-          runDB $ update inAlbumId [AlbumContent =. newMediaList]
-          setMessage "Image succesfully uploaded"
-          redirect $ HomeR
+          fil <- return $ tempMediumFile temp
+          case (fileContentType fil) `elem` acceptedTypes of
+            True -> do
+              path <- writeOnDrive fil userId (tempMediumAlbum temp)
+              thumbPath <- generateThumb path userId (tempMediumAlbum temp)
+              inAlbumId <- return $ tempMediumAlbum temp
+              medium <- return $ Medium
+                (tempMediumTitle temp)
+                ('/' : path)
+                ('/' : thumbPath)
+                (tempMediumTime temp)
+                (tempMediumOwner temp)
+                (tempMediumDesc temp)
+                (tempMediumTags temp)
+                inAlbumId
+              mId <- runDB $ I.insert medium
+              inAlbum <- runDB $ getJust inAlbumId
+              newMediaList <- return $ mId : (albumContent inAlbum)
+              runDB $ update inAlbumId [AlbumContent =. newMediaList]
+              setMessage "Image succesfully uploaded"
+              redirect $ HomeR
+            _ -> do
+              setMessage "This filetype is not supported"
+              redirect $ UploadR
         _ -> do
           setMessage "There was an error uploading the file"
           redirect $ UploadR
@@ -117,23 +124,29 @@ postDirectUploadR albumId = do
               ((result, dUploadWidget), enctype) <- runFormPost (dUploadForm userId albumId)
               case result of
                 FormSuccess temp -> do
-                  path <- writeOnDrive (tempMediumFile temp) userId albumId
-                  thumbPath <- generateThumb path ownerId albumId
-                  medium <- return $ Medium
-                    (tempMediumTitle temp)
-                    ('/' : path)
-                    ('/' : thumbPath)
-                    (tempMediumTime temp)
-                    (tempMediumOwner temp)
-                    (tempMediumDesc temp)
-                    (tempMediumTags temp)
-                    albumId
-                  mId <- runDB $ insert medium
-                  inAlbum <- runDB $ getJust albumId
-                  newMediaList <- return $ mId : (albumContent inAlbum)
-                  runDB $ update albumId [AlbumContent =. newMediaList]
-                  setMessage "Image successfully uploaded"
-                  redirect $ AlbumR albumId
+                  fil <- return $ tempMediumFile temp
+                  case (fileContentType fil) `elem` acceptedTypes of
+                    True -> do
+                      path <- writeOnDrive fil userId albumId
+                      thumbPath <- generateThumb path ownerId albumId
+                      medium <- return $ Medium
+                        (tempMediumTitle temp)
+                        ('/' : path)
+                        ('/' : thumbPath)
+                        (tempMediumTime temp)
+                        (tempMediumOwner temp)
+                        (tempMediumDesc temp)
+                        (tempMediumTags temp)
+                        albumId
+                      mId <- runDB $ insert medium
+                      inAlbum <- runDB $ getJust albumId
+                      newMediaList <- return $ mId : (albumContent inAlbum)
+                      runDB $ update albumId [AlbumContent =. newMediaList]
+                      setMessage "Image successfully uploaded"
+                      redirect $ AlbumR albumId
+                    _ -> do
+                      setMessage "This filetype is not supported"
+                      redirect $ DirectUploadR albumId
                 _ -> do
                   setMessage "There was an error uploading the file"
                   redirect $ DirectUploadR albumId
