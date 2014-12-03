@@ -181,11 +181,14 @@ generateThumb path userId albumId = do
 
 writeOnDrive :: FileInfo -> UserId -> AlbumId -> Handler FP.FilePath
 writeOnDrive fil userId albumId = do
-  filen <- return $ fileName fil
+  --filen <- return $ fileName fil
+  album <- runDB $ getJust albumId
+  filen <- return $ show $ (length $ albumContent album) + 1
+  ext <- return $ FP.takeExtension $ T.unpack $ fileName fil
   path <- return $ "static" FP.</> "data"
     FP.</> (T.unpack $ extractKey userId)
     FP.</> (T.unpack $ extractKey albumId)
-    FP.</> (T.unpack filen)
+    FP.</> filen ++ ext
   liftIO $ fileMove fil path
   return path
 
