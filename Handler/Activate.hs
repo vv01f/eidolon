@@ -47,18 +47,27 @@ postActivateR token = do
           newUser <- runDB $ selectFirst [ActivatorToken ==. token] []
           case newUser of
             Just (Entity aId activ) -> do
-              -- putting user in active state
-              uId <- runDB $ insert $ activatorUser activ
-              runDB $ update uId [UserSalted =. salted]
-              -- create user directory
-              liftIO $ createDirectoryIfMissing True $ "static" </> "data" </> (unpack $ extractKey uId)
-              -- cleanup
-              runDB $ delete aId
-              runDB $ delete uTokenId
-              -- login and redirect
-              setSession "userId" (extractKey uId)
-              welcomeLink <- ($ ProfileR uId) <$> getUrlRender
-              returnJson ["welcome" .= welcomeLink]
+              namesakes <- runDB $ selectList [UserName ==. (userName $ activatorUser activ)] []
+              case namesakes == [] of
+                True -> do
+                  -- putting user in active state
+                  uId <- runDB $ insert $ activatorUser activ
+                  runDB $ update uId [UserSalted =. salted]
+                  -- create user directory
+                  liftIO $ createDirectoryIfMissing True $
+                    "static" </> "data" </> (unpack $ extractKey uId)
+                  -- cleanup
+                  runDB $ delete aId
+                  runDB $ delete uTokenId
+                  -- login and redirect
+                  setSession "userId" (extractKey uId)
+                  welcomeLink <- ($ ProfileR uId) <$> getUrlRender
+                  returnJson ["welcome" .= welcomeLink]
+                False -> do
+                  -- cleanup
+                  runDB $ delete aId
+                  runDB $ delete uTokenId
+                  returnJsonError "Somebody already activated your username. Your token has been deleted"
             Nothing -> do
               returnJsonError "Invalid token"
         False -> do
