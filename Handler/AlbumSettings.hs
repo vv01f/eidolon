@@ -4,6 +4,7 @@ import Import
 import qualified Data.Text as T
 import System.Directory
 import System.FilePath
+import qualified Data.List as L
 
 getAlbumSettingsR :: AlbumId -> Handler Html
 getAlbumSettingsR albumId = do
@@ -58,9 +59,27 @@ postAlbumSettingsR albumId = do
               ((result, albumSettingsWidget), enctype) <- runFormPost $ albumSettingsForm album albumId users
               case result of
                 FormSuccess temp -> do
+                  newShares <- return (L.sort $ albumShares temp)
+                  oldShares <- return (L.sort $ albumShares album)
+                  case newShares /= oldShares of
+                    True -> do
+                      rcptIds <- return $ L.nub $ newShares L.\\ oldShares
+                      rcptMails <- mapM (\uId -> do
+                        user <- runDB $ getJust uId
+                        return $ userEmail user
+                        ) rcptIds
+                      mapM (\addr -> sendMail addr "A new album was shared with you" $
+                        [shamlet|
+                          <h1>Hi there!
+                          #{ownerName} was so kind to share his album #{albumTitle album} with you.
+                          |]
+                        ) rcptMails
+                    False -> do
+                      return [()]
+                      -- nothing to do here
                   aId <- runDB $ update albumId 
                     [ AlbumTitle =. albumTitle temp
-                    , AlbumShares =. albumShares temp
+                    , AlbumShares =. newShares
                     , AlbumSamplePic =. albumSamplePic temp
                     ]
                   setMessage "Album settings changed succesfully"
