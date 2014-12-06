@@ -2,6 +2,7 @@ module Handler.Upload where
 
 import Import as I
 import Data.Time
+import Data.Maybe
 import qualified Data.Text as T
 import qualified System.FilePath as FP
 import qualified Filesystem.Path as FSP
@@ -89,8 +90,8 @@ getDirectUploadR albumId = do
       case msu of -- is anybody logged in
         Just tempUserId -> do
           userId <- return $ getUserIdFromText tempUserId
-          presence <- return (userId == ownerId)
-          case presence of -- is the owner present
+          presence <- return $ (userId == ownerId) || (userId `elem` (albumShares album))
+          case presence of -- is the owner present or a user with whom the album is shared
             True -> do
               (dUploadWidget, enctype) <- generateFormPost $ dUploadForm userId albumId
               defaultLayout $ do
@@ -118,8 +119,8 @@ postDirectUploadR albumId = do
       case msu of -- is anybody logged in
         Just tempUserId -> do
           userId <- return $ getUserIdFromText tempUserId
-          presence <- return (userId == ownerId)
-          case presence of -- is the logged in user the owner
+          presence <- return $ (userId == ownerId) || (userId `elem` (albumShares album))
+          case presence of -- is the logged in user the owner or is the album shared with him
             True -> do
               ((result, dUploadWidget), enctype) <- runFormPost (dUploadForm userId albumId)
               case result of
@@ -193,18 +194,27 @@ writeOnDrive fil userId albumId = do
   return path
 
 uploadForm :: UserId -> Form TempMedium
-uploadForm userId = renderDivs $ TempMedium
-  <$> areq textField "Title" Nothing
+uploadForm userId = renderDivs $ (\a b c d e f g -> TempMedium b c d e f g a)
+  <$> areq (selectField albums) "Album" Nothing
+  <*> areq textField "Title" Nothing
   <*> areq fileField "Select file" Nothing
   <*> lift (liftIO getCurrentTime)
   <*> pure userId
   <*> areq textareaField "Description" Nothing
   <*> areq tagField "Enter tags" Nothing
-  <*> areq (selectField albums) "Album" Nothing
   where
 --    albums :: GHandler App App (OptionList AlbumId)
     albums = do
-      entities <- runDB $ selectList [AlbumOwner ==. userId] [Desc AlbumTitle]
+      allEnts <- runDB $ selectList [] [Desc AlbumTitle]
+      entities <- return $
+        map fromJust $
+        removeItem Nothing $ map
+          (\ent -> do
+            case (userId == (albumOwner $ entityVal ent)) || (userId `elem` (albumShares $ entityVal ent)) of
+              True -> Just ent
+              False -> Nothing
+            ) allEnts
+--      entities <- runDB $ selectList [AlbumOwner ==. userId] [Desc AlbumTitle]
       optionsPairs $ I.map (\alb -> (albumTitle $ entityVal alb, entityKey alb)) entities
 
 dUploadForm :: UserId -> AlbumId -> Form TempMedium

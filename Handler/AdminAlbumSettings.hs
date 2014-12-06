@@ -63,7 +63,9 @@ getAdminAlbumSettingsR albumId = do
           tempAlbum <- runDB $ get albumId
           case tempAlbum of
             Just album -> do
-              (adminAlbumSettingsWidget, enctype) <- generateFormPost $ adminAlbumSettingsForm album albumId
+              entities <- runDB $ selectList [UserId !=. (albumOwner album)] [Desc UserName]
+              users <- return $ map (\u -> (userName $ entityVal u, entityKey u)) entities
+              (adminAlbumSettingsWidget, enctype) <- generateFormPost $ adminAlbumSettingsForm album albumId users
               defaultLayout $ do
                 setTitle "Administration: Album settings"
                 $(widgetFile "adminAlbumSet")
@@ -89,11 +91,14 @@ postAdminAlbumSettingsR albumId = do
           tempAlbum <- runDB $ get albumId
           case tempAlbum of
             Just album -> do
-              ((res, adminAlbumSettingsWidget), enctype) <- runFormPost $ adminAlbumSettingsForm album albumId
+              entities <- runDB $ selectList [UserId !=. (albumOwner album)] [Desc UserName]
+              users <- return $ map (\u -> (userName $ entityVal u, entityKey u)) entities
+              ((res, adminAlbumSettingsWidget), enctype) <- runFormPost $ adminAlbumSettingsForm album albumId users
               case res of
                 FormSuccess temp -> do
                   aId <- runDB $ update albumId
                     [ AlbumTitle =. albumTitle temp
+                    , AlbumShares =. albumShares temp
                     , AlbumSamplePic =. albumSamplePic temp
                     ]
                   setMessage "Album settings changed successfully"
@@ -111,16 +116,20 @@ postAdminAlbumSettingsR albumId = do
       setMessage "You must be logged in"
       redirect $ LoginR
 
-adminAlbumSettingsForm :: Album -> AlbumId -> Form Album
-adminAlbumSettingsForm album albumId = renderDivs $ Album
+adminAlbumSettingsForm :: Album -> AlbumId -> [(Text, UserId)] -> Form Album
+adminAlbumSettingsForm album albumId users = renderDivs $ Album
   <$> areq textField "Title" (Just $ albumTitle album)
   <*> pure (albumOwner album)
+  <*> areq (userField users) "This album shared with" (Just $ albumShares album)
   <*> pure (albumContent album)
   <*> aopt (selectField media) "Sample picture" (Just $ albumSamplePic album)
   where
     media = do
       entities <- runDB $ selectList [MediumAlbum ==. albumId] [Desc MediumTitle]
       optionsPairs $ map (\med -> (mediumTitle $ entityVal med, mediumPath (entityVal med))) entities
+--    userNames =
+--      let entities = runDB $ selectList [UserId !=. (albumOwner album)] [Desc UserName]
+--      in map (\ent -> (userName $ entityVal ent, entityKey ent)) entities
 
 getAdminAlbumDeleteR :: AlbumId -> Handler Html
 getAdminAlbumDeleteR albumId = do

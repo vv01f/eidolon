@@ -11,6 +11,13 @@ getProfileR ownerId = do
     Just owner -> do
       ownerSlug <- lift $ pure $ userSlug owner
       userAlbs <- runDB $ selectList [AlbumOwner ==. ownerId] [Asc AlbumTitle]
+      allAlbs <- runDB $ selectList [] [Asc AlbumTitle]
+      almostAlbs <- mapM (\alb -> do
+        case ownerId `elem` (albumShares $ entityVal alb) of
+          True -> return $ Just alb
+          False -> return Nothing
+        ) allAlbs
+      sharedAlbs <- return $ removeItem Nothing almostAlbs
       recentMedia <- (runDB $ selectList [MediumOwner ==. ownerId] [Desc MediumTime])
       msu <- lookupSession "userId"
       presence <- case msu of

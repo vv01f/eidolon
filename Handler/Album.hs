@@ -15,9 +15,9 @@ getAlbumR albumId = do
       presence <- case msu of
         Just tempUserId -> do
           userId <- return $ getUserIdFromText tempUserId
-          return (userId == ownerId)
+          return $ (userId == ownerId) || (userId `elem` (albumShares album))
         Nothing ->
-         return False
+          return False
 --      media <- mapM (\a -> runDB $ getJust a) (albumContent album)
       media <- runDB $ selectList [MediumAlbum ==. albumId] [Desc MediumTime]
       defaultLayout $ do

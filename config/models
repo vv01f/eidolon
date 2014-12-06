@@ -19,6 +19,7 @@ Token
 Album
     title Text
     owner UserId
+    shares [UserId]
     content [MediumId]
     samplePic FilePath Maybe
     deriving Eq Show

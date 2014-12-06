@@ -8,6 +8,7 @@ module Helper
   , makeRandomToken
   , generateSalt
   , tagField
+  , userField
   , sendMail
   , generateString
   , removeItem
@@ -79,7 +80,7 @@ makeRandomToken = (T.pack . take 16 . randoms) `fmap` newStdGen
 generateSalt :: IO B.ByteString
 generateSalt = (B.pack . take 8 . randoms) <$> getStdGen
 
--- tagField :: Field Handler [T.Text]
+tagField :: Monad m => Field m [T.Text]
 tagField = Field
   { fieldParse = \rawVals _ -> do
       case rawVals of
@@ -91,6 +92,26 @@ tagField = Field
       [whamlet|<input id=#{idAttr} type="text" name=#{nameAttr} value=#{either id (T.intercalate " ") eResult}>|]
   , fieldEnctype = UrlEncoded
   }
+
+userField :: Monad m => [(T.Text, UserId)] -> Field m [UserId]
+userField users = Field
+  { fieldParse = \rawVals _ -> do
+      case rawVals of
+        [x] -> case x == "" of
+          False ->
+            -- clean = removeItem "" $ T.splitOn " " x
+            let ids = map (\u -> lookup u users) (removeItem "" $ T.splitOn " " x)
+            in case Nothing `elem` ids of
+                False -> return $ Right $ Just $ map fromJust ids
+                True -> return $ Left $ error "Invalid username list"
+          True -> return $ Right $ Just $ []
+        _ -> return $ Left $ error "unexpected username list"
+  , fieldView = \idAttr nameAttr val eResult isReq ->
+      [whamlet|<input id=#{idAttr} type="text" name=#{nameAttr} value=#{either id (getUsersFromResult users) eResult}>|]
+  , fieldEnctype = UrlEncoded
+  }
+
+getUsersFromResult users res = T.intercalate " " $ map (\x -> fromMaybe "" $ reverseLookup x users) res
 
 sendMail :: MonadIO m => T.Text -> T.Text -> Html -> m ()
 sendMail toEmail subject body =
@@ -118,6 +139,12 @@ removeItem _ [] = []
 removeItem x (y:ys)
   | x == y    = removeItem x ys
   | otherwise = y : removeItem x ys
+
+reverseLookup :: Eq b => b -> [(a, b)] -> Maybe a
+reverseLookup s ((x, y):zs)
+  | s == y    = Just x
+  | s /= y    = reverseLookup s zs
+  | otherwise = Nothing
 
 acceptedTypes :: [T.Text]
 acceptedTypes = ["image/jpeg", "image/jpg", "image/png", "image/x-ms-bmp", "image/x-bmp", "image/bmp", "image/tiff", "image/tiff-fx"]

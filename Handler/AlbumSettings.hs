@@ -17,10 +17,13 @@ getAlbumSettingsR albumId = do
       case msu of
         Just tempUserId -> do
           userId <- return $ getUserIdFromText tempUserId
-          presence <- return (userId == ownerId)
-          case presence of
+          ownerPresence <- return (userId == ownerId)
+          presence <- return $ userId `elem` (albumShares album)
+          case ownerPresence || presence of
             True -> do
-              (albumSettingsWidget, enctype) <- generateFormPost $ albumSettingsForm album albumId
+              entities <- runDB $ selectList [UserId !=. (albumOwner album)] [Desc UserName]
+              users <- return $ map (\u -> (userName $ entityVal u, entityKey u)) entities
+              (albumSettingsWidget, enctype) <- generateFormPost $ albumSettingsForm album albumId users
               defaultLayout $ do
                 setTitle "Eidolon :: Album Settings"
                 $(widgetFile "albumSettings")
@@ -46,14 +49,18 @@ postAlbumSettingsR albumId = do
       case msu of
         Just tempUserId -> do
           userId <- return $ getUserIdFromText tempUserId
-          presence <- return (userId == ownerId)
-          case presence of
+          ownerPresence <- return (userId == ownerId)
+          presence <- return $ userId `elem` (albumShares album)
+          case ownerPresence || presence of
             True -> do
-              ((result, albumSettingsWidget), enctype) <- runFormPost $ albumSettingsForm album albumId
+              entities <- runDB $ selectList [UserId !=. (albumOwner album)] [Desc UserName]
+              users <- return $ map (\u -> (userName $ entityVal u, entityKey u)) entities
+              ((result, albumSettingsWidget), enctype) <- runFormPost $ albumSettingsForm album albumId users
               case result of
                 FormSuccess temp -> do
                   aId <- runDB $ update albumId 
                     [ AlbumTitle =. albumTitle temp
+                    , AlbumShares =. albumShares temp
                     , AlbumSamplePic =. albumSamplePic temp
                     ]
                   setMessage "Album settings changed succesfully"
@@ -71,16 +78,20 @@ postAlbumSettingsR albumId = do
       setMessage "This album does not exist"
       redirect $ HomeR
 
-albumSettingsForm :: Album -> AlbumId -> Form Album
-albumSettingsForm album albumId = renderDivs $ Album
+albumSettingsForm :: Album -> AlbumId -> [(Text, UserId)]-> Form Album
+albumSettingsForm album albumId users = renderDivs $ Album
   <$> areq textField "Title" (Just $ albumTitle album)
   <*> pure (albumOwner album)
+  <*> areq (userField users) "Share this album with" (Just $ albumShares album)
   <*> pure (albumContent album)
   <*> aopt (selectField media) "Sample picture" (Just $ albumSamplePic album)
   where
     media = do
       entities <- runDB $ selectList [MediumAlbum ==. albumId] [Desc MediumTitle]
       optionsPairs $ map (\med -> (mediumTitle $ entityVal med, mediumThumb (entityVal med))) entities
+--    users = do
+--      entities <- runDB $ selectList [UserId !=. (albumOwner album)] [Desc UserName]
+--      return $ map (\u -> (userName $ entityVal u, entityKey u)) entities
 
 getAlbumDeleteR :: AlbumId -> Handler Html
 getAlbumDeleteR albumId = do

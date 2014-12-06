@@ -4,13 +4,25 @@ $if presence == True
   <a href=@{ProfileSettingsR ownerId}>Change your profile settings
 
 $if null userAlbs
-  <ul class="noalbum">
-    <li>
-      This user has no albums yet
+  <p>This user has no albums yet
 $else
   <p>Albums of this user:
   <ul>
     $forall (Entity albumId album) <- userAlbs
+      <li>
+        <a href=@{AlbumR albumId}>
+          <figure class="thumbnail">
+            $if (albumSamplePic album) == Nothing
+              <img src="/static/img/album.jpg"><br>
+            $else
+              <img src=#{T.pack $ fromJust $ albumSamplePic album}>
+            <figcaption>#{albumTitle album}
+
+$if null sharedAlbs
+$else
+  <p>Albums shared with this user:
+  <ul>
+    $forall Just (Entity albumId album) <- sharedAlbs
       <li>
         <a href=@{AlbumR albumId}>
           <figure class="thumbnail">
