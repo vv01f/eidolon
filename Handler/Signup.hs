@@ -34,7 +34,6 @@ postSignupR = do
     _ -> do
       setMessage "You need to agree to our terms."
       redirect $ SignupR
-
   -- create user
   namesakes <- runDB $ selectList [UserName ==. newUserName] []
   case namesakes of
