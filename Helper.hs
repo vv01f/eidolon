@@ -22,6 +22,7 @@ import Control.Applicative
 import Control.Monad.Trans.Class
 import Data.Maybe
 import Data.Either
+import Data.List
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.ByteString.Char8 as BC
@@ -102,7 +103,7 @@ userField users = Field
             -- clean = removeItem "" $ T.splitOn " " x
             let ids = map (\u -> lookup u users) (removeItem "" $ T.splitOn " " x)
             in case Nothing `elem` ids of
-                False -> return $ Right $ Just $ map fromJust ids
+                False -> return $ Right $ Just $ nub $ map fromJust ids
                 True -> return $ Left $ error "Invalid username list"
           True -> return $ Right $ Just $ []
         _ -> return $ Left $ error "unexpected username list"
