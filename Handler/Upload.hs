@@ -29,7 +29,7 @@ getUploadR = do
   msu <- lookupSession "userId"
   case msu of
     Just tempUserId -> do
-      userId <- lift $ pure $ getUserIdFromText tempUserId
+      userId <- return $ getUserIdFromText tempUserId
       (uploadWidget, enctype) <- generateFormPost (uploadForm userId)
       defaultLayout $ do
         setTitle "Eidolon :: Upload Medium"
@@ -50,8 +50,10 @@ postUploadR = do
           fil <- return $ tempMediumFile temp
           case (fileContentType fil) `elem` acceptedTypes of
             True -> do
-              path <- writeOnDrive fil userId (tempMediumAlbum temp)
-              thumbPath <- generateThumb path userId (tempMediumAlbum temp)
+              albRef <- runDB $ getJust (tempMediumAlbum temp)
+              ownerId <- return $ albumOwner albRef
+              path <- writeOnDrive fil ownerId (tempMediumAlbum temp)
+              thumbPath <- generateThumb path ownerId (tempMediumAlbum temp)
               inAlbumId <- return $ tempMediumAlbum temp
               medium <- return $ Medium
                 (tempMediumTitle temp)

@@ -16,8 +16,10 @@ getMediumSettingsR mediumId = do
       case msu of
         Just tempUserId -> do
           userId <- return $ getUserIdFromText tempUserId
+          album <- runDB $ getJust $ mediumAlbum medium
           presence <- return (userId == ownerId)
-          case presence of
+          albumOwnerPresence <- return (userId == (albumOwner album))
+          case presence || albumOwnerPresence of
             True -> do
               (mediumSettingsWidget, enctype) <- generateFormPost $ mediumSettingsForm medium
               defaultLayout $ do
@@ -44,8 +46,10 @@ postMediumSettingsR mediumId = do
       case msu of
         Just tempUserId -> do
           userId <- return $ getUserIdFromText tempUserId
+          album <- runDB $ getJust $ mediumAlbum medium
           presence <- return (userId == ownerId)
-          case presence of
+          albumOwnerPresence <- return (userId == (albumOwner album))
+          case presence || albumOwnerPresence of
             True -> do
               ((result, mediumSettingsWidget), enctype) <- runFormPost $ mediumSettingsForm medium
               case result of
