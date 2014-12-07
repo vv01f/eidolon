@@ -128,7 +128,62 @@ postCommentReplyR commentId = do
       redirect $ HomeR
 
 getCommentDeleteR :: CommentId -> Handler Html
-getCommentDeleteR commentId = error "Not yet implemented"
+getCommentDeleteR commentId = do
+  tempComment <- runDB $ get commentId
+  case tempComment of
+    Just comment -> do
+      msu <- lookupSession "userId"
+      case msu of
+        Just tempUserId -> do
+          userId <- return $ getUserIdFromText tempUserId
+          presence <- return $ (Just userId) == (commentAuthor comment)
+          case presence of
+            True -> do
+              defaultLayout $ do
+                setTitle "Eidolon :: Delete comment"
+                $(widgetFile "commentDelete")
+            False -> do
+              setMessage "You must be the author of this comment to delete it"
+              redirect $ MediumR $ commentOrigin comment
+        Nothing -> do
+          setMessage "You must be logged in to delete comments"
+          redirect $ LoginR
+    Nothing -> do
+      setMessage "This comment does not exist"
+      redirect $ HomeR
 
 postCommentDeleteR :: CommentId -> Handler Html
-postCommentDeleteR commentId = error "Not yet implemented"
+postCommentDeleteR commentId = do
+  tempComment <- runDB $ get commentId
+  case tempComment of
+    Just comment -> do
+      msu <- lookupSession "userId"
+      case msu of
+        Just tempUserId -> do
+          userId <- return $ getUserIdFromText tempUserId
+          presence <- return $ (Just userId) == (commentAuthor comment)
+          case presence of
+            True -> do
+              confirm <- lookupPostParam "confirm"
+              case confirm of
+                Just "confirm" -> do
+                  -- delete comment children
+                  childEnts <- runDB $ selectList [CommentParent ==. (Just commentId)] []
+                  mapM (\ent -> runDB $ delete $ entityKey ent) childEnts
+                  -- delete comment itself
+                  runDB $ delete commentId
+                  -- outro
+                  setMessage "Your comment has been deleted"
+                  redirect $ MediumR $ commentOrigin comment
+                _ -> do
+                  setMessage "You must confirm the deletion"
+                  redirect $ MediumR $ commentOrigin comment
+            False -> do
+              setMessage "You must be the author of this comment to delete it"
+              redirect $ MediumR $ commentOrigin comment
+        Nothing -> do
+          setMessage "You must be logged in to delete comments"
+          redirect $ LoginR
+    Nothing -> do
+      setMessage "This comment does not exist"
+      redirect $ HomeR
