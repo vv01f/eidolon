@@ -129,6 +129,9 @@ postMediumDeleteR mediumId = do
               confirm <- lookupPostParam "confirm"
               case confirm of
                 Just "confirm" -> do
+                  -- delete comments
+                  commEnts <- runDB $ selectList [CommentOrigin ==. mediumId] []
+                  mapM (\ent -> runDB $ delete $ entityKey ent) commEnts
                   -- delete references first
                   albumId <- return $ mediumAlbum medium
                   album <- runDB $ getJust albumId

@@ -162,8 +162,17 @@ postAlbumDeleteR albumId = do
                   albumList <- return $ userAlbums owner
                   newAlbumList <- return $ removeItem albumId albumList
                   runDB $ update ownerId [UserAlbums =. newAlbumList]
-                  -- delete album content
-                  mapM (\a -> runDB $ delete a) (albumContent album)
+                  -- delete album content and its comments
+                  mapM (\a -> do
+                    -- delete files
+                    medium <- runDB $ getJust a
+                    liftIO $ removeFile (normalise $ L.tail $ mediumPath medium)
+                    liftIO $ removeFile (normalise $ L.tail $ mediumThumb medium)
+                    -- delete comments
+                    commEnts <- runDB $ selectList [CommentOrigin ==. a] []
+                    mapM (\ent -> runDB $ delete $ entityKey ent) commEnts
+                    runDB $ delete a
+                    ) (albumContent album)
                   -- delete album
                   runDB $ delete albumId
                   -- delete files

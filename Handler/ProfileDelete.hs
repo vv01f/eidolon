@@ -3,6 +3,7 @@ module Handler.ProfileDelete where
 import Import
 import qualified Data.Text as T
 import Data.Maybe
+import qualified Data.List as L
 import System.Directory
 import System.FilePath
 
@@ -50,7 +51,14 @@ postProfileDeleteR userId = do
                   mapM (\albumId -> do
                     album <- runDB $ getJust albumId
                     mediaList <- return $ albumContent album
-                    mapM (\med -> runDB $ delete med) mediaList
+                    mapM (\med -> do
+                      commEnts <- runDB $ selectList [CommentOrigin ==. med] []
+                      mapM (\ent -> runDB $ delete $ entityKey ent) commEnts
+                      medium <- runDB $ getJust med
+                      liftIO $ removeFile (normalise $ L.tail $ mediumPath medium)
+                      liftIO $ removeFile (normalise $ L.tail $ mediumThumb medium)
+                      runDB $ delete med
+                      ) mediaList
                     runDB $ delete albumId
                     ) albumList
                   runDB $ delete userId
