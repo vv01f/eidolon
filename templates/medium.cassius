@@ -1,2 +1,5 @@
 img
   width: 100%
+
+.reply
+  margin-left: 50px
