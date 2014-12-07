@@ -130,7 +130,9 @@ postDirectUploadR albumId = do
                   fil <- return $ tempMediumFile temp
                   case (fileContentType fil) `elem` acceptedTypes of
                     True -> do
-                      path <- writeOnDrive fil userId albumId
+                      albRef <- runDB $ getJust (tempMediumAlbum temp)
+                      ownerId <- return $ albumOwner albRef
+                      path <- writeOnDrive fil ownerId albumId
                       thumbPath <- generateThumb path ownerId albumId
                       medium <- return $ Medium
                         (tempMediumTitle temp)
