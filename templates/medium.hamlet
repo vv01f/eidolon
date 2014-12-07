@@ -24,3 +24,27 @@ by <a href=@{UserR ownerName}>#{ownerName}</a> from album <a href=@{AlbumR album
           <a href=@{TagR tag}>#{tag}
 $if presence == True
   <a href=@{MediumSettingsR mediumId}>Change medium settings
+
+$if null comments
+  <p>There are no Comments yet
+$else
+  $forall (Entity commentId comment) <- comments
+    <pre>
+      <a href=@{ProfileR $ fromJust $ commentAuthor comment}>#{fromJust $ commentAuthorSlug comment}</a> wrote on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime comment}:
+      <hr>
+      #{commentContent comment}
+      $if userId /= Nothing
+        <hr>
+        <a href=@{CommentReplyR commentId}>Reply to this comment
+    $forall (Entity replyId reply) <- replies
+      $if commentParent reply == Just commentId
+        <pre class="reply">
+          <a href=@{ProfileR $ fromJust $ commentAuthor reply}>#{fromJust $ commentAuthorSlug reply}</a> wrote on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime reply}:
+          <hr>
+          #{commentContent reply}
+
+$if userId /= Nothing
+  <form method=post enctype=#{enctype}>
+    ^{commentWidget}
+    <div>
+      <input type=submit value="Post comment">

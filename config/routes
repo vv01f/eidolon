@@ -13,12 +13,14 @@
 /upload				UploadR			GET POST
 /newalbum			NewAlbumR		GET POST
 /album/#AlbumId			AlbumR			GET
-/medium/#MediumId		MediumR			GET
+/medium/#MediumId		MediumR			GET POST
 /album/#AlbumId/upload		DirectUploadR		GET POST
 /album/#AlbumId/settings	AlbumSettingsR		GET POST
 /album/#AlbumId/delete		AlbumDeleteR		GET POST
 /medium/#MediumId/settings	MediumSettingsR		GET POST
 /medium/#MediumId/delete	MediumDeleteR		GET POST
+/comment/#CommentId/reply	CommentReplyR		GET POST
+/comment/#CommentId/delcom	CommentDeleteR		GET POST
 /reactivate			ReactivateR		GET POST
 /profile/#UserId/settings	ProfileSettingsR	GET POST
 /profile/#UserId/delete		ProfileDeleteR		GET POST

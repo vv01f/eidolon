@@ -1,6 +1,7 @@
 module Model where
 
 import Yesod
+import Yesod.Markdown (Markdown)
 import Data.Text (Text)
 import Database.Persist.Quasi
 import Database.Persist

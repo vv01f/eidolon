@@ -101,6 +101,7 @@ library
                  , crypto-api
                  , imagemagick
                  , resourcet
+                 , yesod-markdown                >= 0.8
 
 executable         eidolon
     if flag(library-only)

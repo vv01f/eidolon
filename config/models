@@ -33,5 +33,13 @@ Medium
     tags Texts
     album AlbumId
     deriving Eq Show
+Comment
+    author UserId Maybe
+    authorSlug Text Maybe
+    origin MediumId
+    parent CommentId Maybe
+    time UTCTime
+    content Markdown
+    deriving Show
 
  -- By default this file is used in Model.hs (which is imported by Foundation.hs)
