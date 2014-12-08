@@ -63,17 +63,21 @@ postAlbumSettingsR albumId = do
                   oldShares <- return (L.sort $ albumShares album)
                   case newShares /= oldShares of
                     True -> do
+                      link <- ($ AlbumR albumId) <$> getUrlRender
                       rcptIds <- return $ L.nub $ newShares L.\\ oldShares
-                      rcptMails <- mapM (\uId -> do
+                      mapM (\uId -> do
                         user <- runDB $ getJust uId
-                        return $ userEmail user
+                        addr <- return $ userEmail user
+                        sendMail addr "A new album was shared with you" $
+                          [shamlet|
+                            <h1>Hello #{userSlug user}!
+                            <p>#{ownerName} was so kind to share his album #{albumTitle album} with you.
+                            <p>You can find it
+                              <a href=#{link}>
+                                here
+                              .
+                            |]
                         ) rcptIds
-                      mapM (\addr -> sendMail addr "A new album was shared with you" $
-                        [shamlet|
-                          <h1>Hi there!
-                          #{ownerName} was so kind to share his album #{albumTitle album} with you.
-                          |]
-                        ) rcptMails
                     False -> do
                       return [()]
                       -- nothing to do here
