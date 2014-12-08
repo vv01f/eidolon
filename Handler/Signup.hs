@@ -2,13 +2,9 @@
 module Handler.Signup where
 
 import Import as I
-import System.Random
 import Data.Text as T
 import Data.Text.Encoding
-import Data.ByteString as B
 import Data.Maybe
-import Network.Mail.Mime
-import Text.Blaze.Html.Renderer.Utf8
 
 getSignupR :: Handler Html
 getSignupR = do

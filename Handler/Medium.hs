@@ -1,7 +1,6 @@
 module Handler.Medium where
 
 import Import
-import Helper
 import Data.Time
 import Data.Maybe
 import qualified Data.Text as T
@@ -24,14 +23,14 @@ getMediumR mediumId = do
           return $ Just $ getUserIdFromText tempUserId
         Nothing ->
           return Nothing
-      userSlug <- case userId of
+      userSl <- case userId of
         Just uId -> do
           u <- runDB $ getJust uId
           return $ Just $ userSlug u
         Nothing ->
           return Nothing
       presence <- return $ (userId == (Just ownerId) || userId == Just (albumOwner album))
-      (commentWidget, enctype) <- generateFormPost $ commentForm userId userSlug mediumId Nothing
+      (commentWidget, enctype) <- generateFormPost $ commentForm userId userSl mediumId Nothing
       comments <- runDB $ selectList [CommentOrigin ==. mediumId, CommentParent ==. Nothing] [Desc CommentTime]
       replies <- runDB $ selectList [CommentOrigin ==. mediumId, CommentParent !=. Nothing] [Desc CommentTime]
       defaultLayout $ do
