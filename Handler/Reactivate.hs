@@ -16,13 +16,11 @@ postReactivateR = do
   ((result, reactivateWidget), enctype) <- runFormPost reactivateForm
   case result of
     FormSuccess temp -> do
-      tempUsers <- runDB $ selectList [UserEmail ==. temp] []
-      case tempUsers of
-        users -> do
+      users <- runDB $ selectList [UserEmail ==. temp] []
+      case null users of
+        True -> do
           userTokens <- foldM (\userTokens (Entity userId user) -> do
             token <- liftIO $ generateString
---            aId <- runDB $ insert $ Activator token user
---            runDB $ delete userId
             tId <- runDB $ insert $ Token (encodeUtf8 token) "activate" (Just userId)
             return $ (user, token) : userTokens
             ) [] users
@@ -34,7 +32,7 @@ postReactivateR = do
                 activateLink <- ($ ActivateR token) <$> getUrlRender
                 sendMail (userEmail user) "Reset your password" $
                   [shamlet|
-                    <h1>Welcome again to Eidolon
+                    <h1>Welcome again to Eidolon #{userName user}
                     To reset your password visit the following link:
                     <a href="#{activateLink}">#{activateLink}
 
@@ -42,11 +40,14 @@ postReactivateR = do
                   |]
                 return True
             ) True userTokens
-          setMessage "Your new passwort will arrive in your e-mail"
+          setMessage "Your new password activation will arrive in your e-mail"
           redirect $ HomeR
-        [] -> do
+        False -> do
           setMessage "No user mith this Email"
           redirect $ LoginR
+    _ -> do
+      setMessage "There is something wrong with your email"
+      redirect $ ReactivateR
 
 reactivateForm :: Form Text
 reactivateForm = renderDivs $ (\a -> a)
