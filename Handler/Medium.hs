@@ -1,6 +1,7 @@
 module Handler.Medium where
 
 import Import
+import Helper
 import Data.Time
 import Data.Maybe
 import qualified Data.Text as T
@@ -55,6 +56,18 @@ postMediumR mediumId = do
           case res of
             FormSuccess temp -> do
               cId <- runDB $ insert temp
+              --send mail to medium owner
+              owner <- runDB $ getJust $ mediumOwner medium
+              link <- ($ MediumR (commentOrigin temp)) <$> getUrlRender
+              sendMail (userEmail owner) ((fromJust $ commentAuthorSlug temp) `T.append` " commented on your medium")
+                [shamlet|
+                  <h1>Hello #{userSlug owner}
+                  <p>#{fromJust $ commentAuthorSlug temp} commented on your medium:
+                  <p>#{commentContent temp}
+                  <p>To follow the comment thread follow
+                    <a href=#{link}>
+                      this link
+                  |]
               setMessage "Your Comment has been posted"
               redirect $ MediumR mediumId
             _ -> do
@@ -115,6 +128,31 @@ postCommentReplyR commentId = do
           case res of
             FormSuccess temp -> do
               cId <- runDB $ insert temp
+              --send mail to parent author
+              parent <- runDB $ getJust $ fromJust $ commentParent temp
+              parAuth <- runDB $ getJust $ fromJust $ commentAuthor parent
+              link <- ($ MediumR (commentOrigin temp)) <$> getUrlRender
+              sendMail (userEmail parAuth) ((fromJust $ commentAuthorSlug temp) `T.append` " replied to your comment")
+                [shamlet|
+                  <h1>Hello #{userSlug parAuth}
+                  <p>#{fromJust $ commentAuthorSlug temp} replied to your comment:
+                  <p>#{commentContent temp}
+                  <p>To see the comment thread follow
+                    <a href=#{link}>
+                      this link
+                  |]
+              --send mail to medium owner
+              medium <- runDB $ getJust mediumId
+              owner <- runDB $ getJust $ mediumOwner medium
+              sendMail (userEmail owner) ((fromJust $ commentAuthorSlug temp) `T.append` " commented on your medium")
+                [shamlet|
+                  <h1>Hello #{userSlug owner}
+                  <p>#{fromJust $ commentAuthorSlug temp} commented your medium with:
+                  <p>#{commentContent temp}
+                  <p>To see the comment thread follow
+                    <a href=#{link}>
+                      this link
+                  |]
               setMessage "Your reply has been posted"
               redirect $ MediumR mediumId
             _ -> do
