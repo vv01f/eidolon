@@ -66,6 +66,7 @@ postMediumR mediumId = do
                   <p>To follow the comment thread follow
                     <a href=#{link}>
                       this link
+                    .
                   |]
               setMessage "Your Comment has been posted"
               redirect $ MediumR mediumId
@@ -139,6 +140,7 @@ postCommentReplyR commentId = do
                   <p>To see the comment thread follow
                     <a href=#{link}>
                       this link
+                    .
                   |]
               --send mail to medium owner
               medium <- runDB $ getJust mediumId
@@ -151,6 +153,7 @@ postCommentReplyR commentId = do
                   <p>To see the comment thread follow
                     <a href=#{link}>
                       this link
+                    .
                   |]
               setMessage "Your reply has been posted"
               redirect $ MediumR mediumId

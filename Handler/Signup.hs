@@ -48,7 +48,7 @@ postSignupR = do
       activateLink <- ($ ActivateR activatorText) <$> getUrlRender
       sendMail (userEmail newUser) "Please activate your account!" $
         [shamlet|
-          <h1> Welcome to Eidolon!
+          <h1>Hello #{userSlug newUser} and Welcome to Eidolon!
           To complete your sgnup please activate your account by visiting the following link:
           <a href="#{activateLink}">#{activateLink}
         |]
