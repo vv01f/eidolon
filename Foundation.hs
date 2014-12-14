@@ -84,7 +84,7 @@ instance Yesod App where
             return $ userSlug user
           Nothing -> do
             return ("" :: Text)
-
+        block <- fmap extraSignupBlocked getExtra
 
         -- We break up the default layout into two components:
         -- default-layout is the contents of the body tag, and

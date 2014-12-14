@@ -14,8 +14,9 @@
     $nothing
       <li>
         <a href=@{LoginR}>Login
-      <li>
-        <a href=@{SignupR}>Signup
+      $if block == False
+        <li>
+          <a href=@{SignupR}>Signup
 
 
 $maybe msg <- mmsg

@@ -8,7 +8,7 @@ import Data.Maybe
 
 getSignupR :: Handler Html
 getSignupR = do
-  block <- fmap extraSignupBlocked appExtra
+  block <- fmap extraSignupBlocked I.getExtra
   case block of
     False -> do
       defaultLayout $ do
@@ -20,7 +20,7 @@ getSignupR = do
 
 postSignupR :: Handler Html
 postSignupR = do
-  block <- fmap extraSignupBlocked appExtra
+  block <- fmap I.extraSignupBlocked I.getExtra
   case block of
     False -> do
       mUserName <- lookupPostParam "username"
