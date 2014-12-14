@@ -27,6 +27,7 @@ Medium
     title Text
     path FilePath
     thumb FilePath
+    mime Text
     time UTCTime
     owner UserId
     description Textarea

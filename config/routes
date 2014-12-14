@@ -39,3 +39,10 @@
 /admin/medium/#MediumId		AdminMediumSettingsR	GET POST
 /admin/meidum/#MediumId/delete	AdminMediumDeleteR	GET
 /tag/#Text TagR GET
+
+/feed/root/atom.xml		RootFeedAtomR		GET
+/feed/root/rss.xml		RootFeedRssR		GET
+/feed/album/#AlbumId/atom.xml	AlbumFeedAtomR		GET
+/feed/album/#AlbumId/rss.xml	AlbumFeedRssR		GET
+/feed/medium/#MediumId/atom.xml	CommentFeedAtomR	GET
+/feed/medium/#MediumId/rss.xml	CommentFeedRssR		GET

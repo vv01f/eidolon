@@ -79,6 +79,7 @@ mediumSettingsForm medium = renderDivs $ Medium
   <$> areq textField "Title" (Just $ mediumTitle medium)
   <*> pure (mediumPath medium)
   <*> pure (mediumThumb medium)
+  <*> pure (mediumMime medium)
   <*> pure (mediumTime medium)
   <*> pure (mediumOwner medium)
   <*> areq textareaField "Description" (Just $ mediumDescription medium)

@@ -18,3 +18,7 @@ by <a href=@{UserR ownerName}>#{ownerName}</a>
             <figure class="thumbnail">
               <img src=#{mediumThumb medium}>
               <figcaption>#{mediumTitle medium}
+
+get a feed from this:
+  <a href=@{AlbumFeedAtomR albumId}>Atom
+  <a href=@{AlbumFeedRssR albumId}>RSS

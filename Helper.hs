@@ -13,6 +13,9 @@ module Helper
   , generateString
   , removeItem
   , acceptedTypes
+  , iso8601
+  , localTimeToZonedTime
+  , rfc822
   )
 where
 
@@ -27,10 +30,13 @@ import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.ByteString.Char8 as BC
 import qualified Data.Text as T
+import Data.Time
+import Data.Char
 import Database.Persist
 import Database.Persist.Types
 import System.FilePath
 import System.Random
+import System.Locale
 import Yesod.Persist.Core
 import Yesod.Core.Types
 import Yesod
@@ -149,3 +155,22 @@ reverseLookup s ((x, y):zs)
 
 acceptedTypes :: [T.Text]
 acceptedTypes = ["image/jpeg", "image/jpg", "image/png", "image/x-ms-bmp", "image/x-bmp", "image/bmp", "image/tiff", "image/tiff-fx"]
+
+iso8601 :: FormatTime t => t -> String
+iso8601 time =
+  formatTime defaultTimeLocale (iso8601DateFormat $ Just "%H:%M:%S") time ++
+  zone
+  where zone = case formatTime defaultTimeLocale "%z" time of
+                 (sig:digits@(h1:h2:m1:m2))
+                   | sig `elem` "+-" &&
+                     all isDigit digits ->
+                       sig:h1:h2:':':m1:m2
+                 _ ->
+                   "Z"
+
+localTimeToZonedTime :: TimeZone -> LocalTime -> ZonedTime
+localTimeToZonedTime tz =
+  utcToZonedTime tz . localTimeToUTC tz
+
+--rfc822 :: LocalTime -> String
+rfc822 = formatTime defaultTimeLocale rfc822DateFormat

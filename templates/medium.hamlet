@@ -52,3 +52,7 @@ $if userId /= Nothing
     ^{commentWidget}
     <div>
       <input type=submit value="Post comment">
+
+get a feed from this:
+  <a href=@{CommentFeedAtomR mediumId}>Atom
+  <a href=@{CommentFeedRssR mediumId}>RSS

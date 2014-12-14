@@ -39,6 +39,7 @@ library
                      Handler.AdminAlbumSettings
                      Handler.AdminMediumSettings
                      Handler.Tag
+                     Handler.RootFeed
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT
@@ -102,6 +103,8 @@ library
                  , imagemagick
                  , resourcet
                  , yesod-markdown                >= 0.8
+                 , blaze-builder
+                 , either
 
 executable         eidolon
     if flag(library-only)

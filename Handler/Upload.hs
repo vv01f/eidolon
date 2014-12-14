@@ -48,7 +48,8 @@ postUploadR = do
       case result of
         FormSuccess temp -> do
           fil <- return $ tempMediumFile temp
-          case (fileContentType fil) `elem` acceptedTypes of
+          mime <- return $ (fileContentType fil)
+          case mime `elem` acceptedTypes of
             True -> do
               albRef <- runDB $ getJust (tempMediumAlbum temp)
               ownerId <- return $ albumOwner albRef
@@ -59,6 +60,7 @@ postUploadR = do
                 (tempMediumTitle temp)
                 ('/' : path)
                 ('/' : thumbPath)
+                mime
                 (tempMediumTime temp)
                 (tempMediumOwner temp)
                 (tempMediumDesc temp)
@@ -128,7 +130,8 @@ postDirectUploadR albumId = do
               case result of
                 FormSuccess temp -> do
                   fil <- return $ tempMediumFile temp
-                  case (fileContentType fil) `elem` acceptedTypes of
+                  mime <- return $ fileContentType fil
+                  case mime `elem` acceptedTypes of
                     True -> do
                       albRef <- runDB $ getJust (tempMediumAlbum temp)
                       ownerId <- return $ albumOwner albRef
@@ -138,6 +141,7 @@ postDirectUploadR albumId = do
                         (tempMediumTitle temp)
                         ('/' : path)
                         ('/' : thumbPath)
+                        mime
                         (tempMediumTime temp)
                         (tempMediumOwner temp)
                         (tempMediumDesc temp)
