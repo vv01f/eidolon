@@ -150,7 +150,7 @@ getRootFeedRssR = getRootFeedR
 
 getRootFeedR :: RepFeed a => Handler a
 getRootFeedR = do
-  recentMedia <- runDB $ selectList [] [Desc MediumTime, LimitTo 10]
+  recentMedia <- runDB $ selectList [] [Desc MediumTime, LimitTo 100]
   renderFeed Parameters
     { pTitle = "Eidolon :: Latest media"
     , pLink  = HomeR
@@ -167,7 +167,7 @@ getAlbumFeedR :: RepFeed a => AlbumId -> Handler a
 getAlbumFeedR albumId = do
   album <- runDB $ get404 albumId
   url <- getUrlRender
-  recentMedia <- runDB $ selectList [MediumAlbum ==. albumId] [Desc MediumTime, LimitTo 10]
+  recentMedia <- runDB $ selectList [MediumAlbum ==. albumId] [Desc MediumTime, LimitTo 100]
   renderFeed Parameters
     { pTitle = "Eidolon :: Latest media in album " `T.append` (albumTitle album)
     , pLink  = AlbumR albumId
