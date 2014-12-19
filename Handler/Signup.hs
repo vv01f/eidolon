@@ -57,7 +57,7 @@ postSignupR = do
           sendMail (userEmail newUser) "Please activate your account!" $
             [shamlet|
               <h1>Hello #{userSlug newUser} and Welcome to Eidolon!
-              To complete your sgnup please activate your account by visiting the following link:
+              To complete your signup please activate your account by visiting the following link:
               <a href="#{activateLink}">#{activateLink}
             |]
           setMessage "User pending activation"
