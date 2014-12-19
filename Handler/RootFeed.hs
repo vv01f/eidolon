@@ -2,8 +2,7 @@ module Handler.RootFeed where
 
 import Import
 import Yesod
-import Helper
-import qualified Data.ByteString.Lazy as LB
+import Yesod.Static
 import qualified Data.Text as T
 import Data.Maybe
 import Data.Time
@@ -46,9 +45,6 @@ instance RepFeed RepAtom where
         return $ Left $ map (\ent -> (entityKey ent, url $ MediumR $ commentOrigin $ entityVal ent)) commEnts
       Right mediaEnts ->
         return $ Right $ map (\ent -> (entityKey ent, url $ MediumR $ entityKey ent)) mediaEnts
---    media <- case items of
---      [Entity _ (Medium _ _ _ _ _ _ _ _ _)] -> return $ True
---      [Entity _ (Comment _ _ _ _ _ _)] -> return $ False
     return $ RepAtom $ toContent $ 
                [xhamlet|$newline always
                  <feed version="1.0"
@@ -76,11 +72,11 @@ instance RepFeed RepAtom where
                              <published>#{iso8601 $ utcToZonedTime tz $ mediumTime medium}
                              <summary>#{mediumDescription medium}
                              <link rel="icon"
-                               href=#{mediumThumb medium}
+                               href=#{url $ StaticR $ mediumStaticThumbRoute medium}
                                >
                              <link rel="enclosure"
                                type=#{mediumMime medium}
-                               href=#{fromJust $ lookup mediumId $ fromRight [] links}
+                               href=#{url $ StaticR $ mediumStaticImageRoute medium}
                                >
                        $of Left comments
                          $forall (Entity commentId comment) <- comments
@@ -93,7 +89,7 @@ instance RepFeed RepAtom where
                              <id>#{fromJust $ lookup commentId $ fromLeft [] links}
                              <published>#{iso8601 $ utcToZonedTime tz $ commentTime comment}
                              <summary>#{commentContent comment}
-                     |] url
+                    |] url
 
 newtype RepRss = RepRss Content
     deriving (ToContent)
@@ -134,8 +130,8 @@ instance RepFeed RepRss where
                              <pubDate>#{rfc822 $ mediumTime medium}
                              <image>
                                <url>#{fromJust $ lookup mediumId $ fromRight [] links}
-                             <enclosure type="#{mediumMime medium}"
-                                        url="#{fromJust $ lookup mediumId $ fromRight [] links}">
+                             <enclosure type=#{mediumMime medium}
+                                        url=#{url $ StaticR $ mediumStaticImageRoute medium}>
                        $of Left comments
                          $forall (Entity commentId comment) <- comments
                            <item>
@@ -170,11 +166,13 @@ getAlbumFeedRssR = getAlbumFeedR
 getAlbumFeedR :: RepFeed a => AlbumId -> Handler a
 getAlbumFeedR albumId = do
   album <- runDB $ get404 albumId
+  url <- getUrlRender
   recentMedia <- runDB $ selectList [MediumAlbum ==. albumId] [Desc MediumTime, LimitTo 10]
   renderFeed Parameters
     { pTitle = "Eidolon :: Latest media in album " `T.append` (albumTitle album)
     , pLink  = AlbumR albumId
-    , pImage = T.pack $ fromMaybe "" (albumSamplePic album)
+    , pImage = url $ StaticR $ StaticRoute
+        (drop 2 $ T.splitOn "/" $ T.pack $ fromMaybe "/static/img/album.jpg" $ albumSamplePic album) []
     } (Right recentMedia)
 
 getCommentFeedAtomR :: MediumId -> Handler RepAtom
@@ -186,9 +184,10 @@ getCommentFeedRssR = getCommentFeedR
 getCommentFeedR :: RepFeed a => MediumId -> Handler a
 getCommentFeedR mediumId = do
   medium <- runDB $ get404 mediumId
+  url <- getUrlRender
   recentComments <- runDB $ selectList [CommentOrigin ==. mediumId] [Desc CommentTime, LimitTo 10]
   renderFeed Parameters
     { pTitle = "Eidolon :: Newest comments on " `T.append` (mediumTitle medium)
     , pLink  = MediumR mediumId
-    , pImage = T.pack $ mediumThumb medium
+    , pImage = url $ StaticR $ mediumStaticThumbRoute medium
     } (Left recentComments)

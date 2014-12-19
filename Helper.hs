@@ -16,10 +16,13 @@ module Helper
   , iso8601
   , localTimeToZonedTime
   , rfc822
+  , mediumStaticImageRoute
+  , mediumStaticThumbRoute
   )
 where
 
 import Prelude
+import Yesod.Static
 import Model
 import Control.Applicative
 import Control.Monad.Trans.Class
@@ -174,3 +177,11 @@ localTimeToZonedTime tz =
 
 --rfc822 :: LocalTime -> String
 rfc822 = formatTime defaultTimeLocale rfc822DateFormat
+
+mediumStaticImageRoute :: Medium -> Route Static
+mediumStaticImageRoute medium =
+  StaticRoute (drop 2 $ T.splitOn "/" $ T.pack $ mediumPath medium) []
+
+mediumStaticThumbRoute :: Medium -> Route Static
+mediumStaticThumbRoute medium =
+  StaticRoute (drop 2 $ T.splitOn "/" $ T.pack $ mediumThumb medium) []
