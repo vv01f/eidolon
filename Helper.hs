@@ -57,14 +57,6 @@ extractKey = extractKey' . unKey
     extractKey' (PersistInt64 k) = T.pack $ show k
     extractKey' _ = ""
 
---getUserNameById :: UserId -> Text
---getUserNameById userId =
---  let
---    user = runDB $ getJust $ userId
---  in
---    userName user
-
-fromHex :: String -> BL.ByteString
 fromHex = BL.pack . hexToWords
   where hexToWords (c:c':text) =
           let hex = [c, c']
