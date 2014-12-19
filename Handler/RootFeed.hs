@@ -185,9 +185,25 @@ getCommentFeedR :: RepFeed a => MediumId -> Handler a
 getCommentFeedR mediumId = do
   medium <- runDB $ get404 mediumId
   url <- getUrlRender
-  recentComments <- runDB $ selectList [CommentOrigin ==. mediumId] [Desc CommentTime, LimitTo 10]
+  recentComments <- runDB $ selectList [CommentOrigin ==. mediumId] [Desc CommentTime, LimitTo 100]
   renderFeed Parameters
     { pTitle = "Eidolon :: Newest comments on " `T.append` (mediumTitle medium)
     , pLink  = MediumR mediumId
     , pImage = url $ StaticR $ mediumStaticThumbRoute medium
     } (Left recentComments)
+
+getUserFeedAtomR :: UserId -> Handler RepAtom
+getUserFeedAtomR = getUserFeedR
+
+getUserFeedRssR :: UserId -> Handler RepRss
+getUserFeedRssR = getUserFeedR
+
+getUserFeedR :: RepFeed a => UserId -> Handler a
+getUserFeedR userId = do
+  user <- runDB $ get404 userId
+  recentMedia <- runDB $ selectList [MediumOwner ==. userId] [Desc MediumTime, LimitTo 100]
+  renderFeed Parameters
+    { pTitle = "Eidolon :: Newest media of " `T.append` (userSlug user)
+    , pLink  = ProfileR userId
+    , pImage = ""
+    } (Right recentMedia)

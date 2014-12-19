@@ -46,3 +46,5 @@
 /feed/album/#AlbumId/rss.xml	AlbumFeedRssR		GET
 /feed/medium/#MediumId/atom.xml	CommentFeedAtomR	GET
 /feed/medium/#MediumId/rss.xml	CommentFeedRssR		GET
+/feed/user/#UserId/atom.xml	UserFeedAtomR		GET
+/feed/user/#UserId/rss.xml	UserFeedRssR		GET
