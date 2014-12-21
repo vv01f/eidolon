@@ -11,3 +11,5 @@ $newline always
     <a href=@{AdminAlbumsR}>Albums
   <li>
     <a href=@{AdminMediaR}>Media
+  <li>
+    <a href=@{AdminCommentR}>Comments

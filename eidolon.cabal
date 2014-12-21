@@ -38,6 +38,7 @@ library
                      Handler.AdminProfileSettings
                      Handler.AdminAlbumSettings
                      Handler.AdminMediumSettings
+                     Handler.AdminComments
                      Handler.Tag
                      Handler.RootFeed
 

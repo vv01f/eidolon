@@ -45,6 +45,7 @@ import Handler.Admin
 import Handler.AdminProfileSettings
 import Handler.AdminAlbumSettings
 import Handler.AdminMediumSettings
+import Handler.AdminComments
 import Handler.Tag
 import Handler.RootFeed
 

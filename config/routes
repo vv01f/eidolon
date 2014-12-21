@@ -37,7 +37,10 @@
 /admin/album/#AlbumId/delete	AdminAlbumDeleteR	GET
 /admin/medium			AdminMediaR		GET
 /admin/medium/#MediumId		AdminMediumSettingsR	GET POST
-/admin/meidum/#MediumId/delete	AdminMediumDeleteR	GET
+/admin/medium/#MediumId/delete	AdminMediumDeleteR	GET
+/admin/comment			AdminCommentR		GET
+/admin/comment/#CommentId	AdminCommentDeleteR	GET
+
 /tag/#Text TagR GET
 
 /feed/root/atom.xml		RootFeedAtomR		GET

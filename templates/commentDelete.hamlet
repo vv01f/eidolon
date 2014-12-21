@@ -7,4 +7,4 @@ $newline always
 <form method="POST" action=@{CommentDeleteR commentId}>
   <label for="confirm">Really delete this comment
   <input type="checkbox" id="confirm" name="confirm" value="confirm" required>
-  <input id="delete" type="submit" value="Delete medium">
+  <input id="delete" type="submit" value="Delete comment">
