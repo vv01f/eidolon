@@ -2,6 +2,7 @@ module Handler.AdminProfileSettings where
 
 import Import
 import qualified Data.Text as T
+import qualified Data.List as L
 import System.Directory
 import System.FilePath
 
@@ -167,7 +168,17 @@ getAdminProfileDeleteR ownerId = do
               mapM (\albumId -> do
                 album <- runDB $ getJust albumId
                 mediaList <- return $ albumContent album
-                mapM (\med -> runDB $ delete med) mediaList
+                mapM (\med -> do
+                  -- delete comments
+                  commEnts <- runDB $ selectList [CommentOrigin ==. med] []
+                  mapM (\ent -> runDB $ delete $ entityKey ent) commEnts
+                  -- delete media files
+                  medium <- runDB $ getJust med
+                  liftIO $ removeFile (normalise $ L.tail $ mediumPath medium)
+                  liftIO $ removeFile (normalise $ L.tail $ mediumThumb medium)
+                  -- delete medium database entry
+                  runDB $ delete med
+                  ) mediaList
                 runDB $ delete albumId
                 ) albumList
               runDB $ delete ownerId

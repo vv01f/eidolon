@@ -116,9 +116,13 @@ getAdminMediumDeleteR mediumId = do
               mediaList <- return $ albumContent album
               newMediaList <- return $ removeItem mediumId mediaList
               runDB $ update albumId [AlbumContent =. newMediaList]
+              -- delete comments
+              commEnts <- runDB $ selectList [CommentOrigin ==. mediumId] []
+              mapM (\ent -> runDB $ delete $ entityKey ent) commEnts
               -- delete medium
               runDB $ delete mediumId
-              -- delete file
+              -- delete files
+              liftIO $ removeFile (normalise $ tail $ mediumPath medium)
               liftIO $ removeFile (normalise $ tail $ mediumPath medium)
               -- outro
               setMessage "Medium deleted successfully"
