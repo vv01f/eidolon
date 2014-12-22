@@ -11,6 +11,7 @@ import Data.Eq (Eq)
 import Data.Time (UTCTime)
 import Data.ByteString
 import Data.Bool
+import Data.Int
 import Text.Show (Show)
 import System.FilePath (FilePath)
 
@@ -18,5 +19,5 @@ import System.FilePath (FilePath)
 -- You can find more information on persistent and how to declare entities
 -- at:
 -- http://www.yesodweb.com/book/persistent/
-share [mkPersist sqlOnlySettings, mkMigrate "migrateAll"]
+share [mkPersist sqlSettings, mkMigrate "migrateAll"]
     $(persistFileWith lowerCaseSettings "config/models")

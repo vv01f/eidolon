@@ -1,7 +1,6 @@
 module Helper 
   ( getUserIdFromText
   , extractKey
---  , getUserNameById
   , fromHex
   , fromHex'
   , toHex
