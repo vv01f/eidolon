@@ -1,0 +1,25 @@
+$newline never
+<h3>Comments by medium
+
+$if null comments
+  <p>There are no comments yet
+$else
+  $forall (Entity mediumId medium) <- media
+    <pre>
+      <h4>#{mediumTitle medium}
+      <hr>
+      $forall (Entity commentId comment) <- comments
+        $if commentOrigin comment == mediumId
+          <pre>
+            #{fromJust $ commentAuthorSlug comment} wrote on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime comment}:
+            <hr>
+            #{commentContent comment}
+            <a href=@{AdminCommentDeleteR commentId}>Delete this comment
+        $forall (Entity replyId reply) <- replies
+          $if commentParent reply == Just commentId
+            $if commentOrigin reply == mediumId
+              <pre class="reply">
+                #{fromJust $ commentAuthorSlug comment} wrote on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime comment}:
+                <hr>
+                #{commentContent reply}
+                <a href=@{AdminCommentDeleteR replyId}>Delete this comment
