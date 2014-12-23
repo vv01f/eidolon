@@ -48,14 +48,22 @@ import Text.Blaze.Html.Renderer.Utf8
 
 getUserIdFromText :: T.Text -> UserId
 getUserIdFromText tempUserId =
-  Key $ PersistInt64 $ fromIntegral $ read $ T.unpack tempUserId
-
-extractKey :: KeyBackend backend entity -> T.Text
-extractKey = extractKey' . unKey
+  case key of
+    Left a ->
+      error $ T.unpack a
+    Right k ->
+      k
   where
-    extractKey' (PersistInt64 k) = T.pack $ show k
+    key = keyFromValues $ pInt64 : []
+    pInt64 = PersistInt64 $ fromIntegral $ read $ T.unpack tempUserId
+
+extractKey :: PersistEntity record => Key record -> T.Text
+extractKey = extractKey' . keyToValues
+  where
+    extractKey' [PersistInt64 k] = T.pack $ show k
     extractKey' _ = ""
 
+fromHex :: String -> BL.ByteString
 fromHex = BL.pack . hexToWords
   where hexToWords (c:c':text) =
           let hex = [c, c']
@@ -112,6 +120,7 @@ userField users = Field
   , fieldEnctype = UrlEncoded
   }
 
+getUsersFromResult :: Eq b => [(T.Text, b)] -> [b] -> T.Text
 getUsersFromResult users res = T.intercalate " " $ map (\x -> fromMaybe "" $ reverseLookup x users) res
 
 sendMail :: MonadIO m => T.Text -> T.Text -> Html -> m ()
@@ -166,7 +175,7 @@ localTimeToZonedTime :: TimeZone -> LocalTime -> ZonedTime
 localTimeToZonedTime tz =
   utcToZonedTime tz . localTimeToUTC tz
 
---rfc822 :: LocalTime -> String
+rfc822 :: FormatTime t => t -> String
 rfc822 = formatTime defaultTimeLocale rfc822DateFormat
 
 mediumStaticImageRoute :: Medium -> Route Static

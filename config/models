@@ -21,12 +21,12 @@ Album
     owner UserId
     shares [UserId]
     content [MediumId]
-    samplePic FilePath Maybe
+    samplePic FP.FilePath Maybe
     deriving Eq Show
 Medium
     title Text
-    path FilePath
-    thumb FilePath
+    path FP.FilePath
+    thumb FP.FilePath
     mime Text
     time UTCTime
     owner UserId
