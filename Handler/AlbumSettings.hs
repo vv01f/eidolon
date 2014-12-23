@@ -110,7 +110,7 @@ albumSettingsForm album albumId users = renderDivs $ Album
   <*> aopt (selectField media) "Sample picture" (Just $ albumSamplePic album)
   where
     media = do
-      entities <- runDB $ selectList [MediumAlbum ==. albumId] [Desc MediumTitle]
+      entities <- runDB $ selectList [MediumAlbum ==. albumId] [Asc MediumTitle]
       optionsPairs $ map (\med -> (mediumTitle $ entityVal med, mediumThumb (entityVal med))) entities
 --    users = do
 --      entities <- runDB $ selectList [UserId !=. (albumOwner album)] [Desc UserName]

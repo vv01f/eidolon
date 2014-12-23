@@ -126,8 +126,8 @@ adminAlbumSettingsForm album albumId users = renderDivs $ Album
   <*> aopt (selectField media) "Sample picture" (Just $ albumSamplePic album)
   where
     media = do
-      entities <- runDB $ selectList [MediumAlbum ==. albumId] [Desc MediumTitle]
-      optionsPairs $ map (\med -> (mediumTitle $ entityVal med, mediumPath (entityVal med))) entities
+      entities <- runDB $ selectList [MediumAlbum ==. albumId] [Asc MediumTitle]
+      optionsPairs $ map (\med -> (mediumTitle $ entityVal med, mediumThumb (entityVal med))) entities
 --    userNames =
 --      let entities = runDB $ selectList [UserId !=. (albumOwner album)] [Desc UserName]
 --      in map (\ent -> (userName $ entityVal ent, entityKey ent)) entities
