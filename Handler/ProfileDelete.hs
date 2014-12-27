@@ -1,7 +1,7 @@
 module Handler.ProfileDelete where
 
 import Import
-import Handler.Commons
+import Helper
 import qualified Data.Text as T
 import Data.Maybe
 import qualified Data.List as L

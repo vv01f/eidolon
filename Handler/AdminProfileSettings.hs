@@ -1,7 +1,7 @@
 module Handler.AdminProfileSettings where
 
 import Import
-import Handler.Commons
+import Helper
 import qualified Data.Text as T
 import qualified Data.List as L
 import Data.Maybe
