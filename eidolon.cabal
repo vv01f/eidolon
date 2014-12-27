@@ -41,6 +41,7 @@ library
                      Handler.AdminComments
                      Handler.Tag
                      Handler.RootFeed
+                     Handler.Commons
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT

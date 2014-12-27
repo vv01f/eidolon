@@ -1,22 +1,16 @@
 module Handler.Admin where
 
 import Import
+import Handler.Commons
 
 getAdminR :: Handler Html
 getAdminR = do
-  msu <- lookupSession "userId"
-  case msu of
-    Just tempUserId -> do
-      userId <- return $ getUserIdFromText tempUserId
-      user <- runDB $ getJust userId
-      case userAdmin user of
-        True -> do
-          defaultLayout $ do
-            setTitle "Administration: Menu"
-            $(widgetFile "adminBase")
-        False -> do
-          setMessage "You have no admin rights"
-          redirect $ HomeR
-    Nothing -> do
-      setMessage "You are not logged in"
-      redirect $ LoginR
+  adminCheck <- loginIsAdmin
+  case adminCheck of
+    Right _ -> do
+      defaultLayout $ do
+        setTitle "Administration: Menu"
+        $(widgetFile "adminBase")
+    Left (errorMsg, route) -> do
+      setMessage errorMsg
+      redirect $ route
