@@ -1,7 +1,7 @@
 module Handler.Admin where
 
 import Import
-import Helper
+import Handler.Commons
 
 getAdminR :: Handler Html
 getAdminR = do

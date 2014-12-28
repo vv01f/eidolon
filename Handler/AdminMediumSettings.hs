@@ -1,7 +1,7 @@
 module Handler.AdminMediumSettings where
 
 import Import
-import Helper
+import Handler.Commons
 import System.FilePath
 import System.Directory
 import Data.List (tail)

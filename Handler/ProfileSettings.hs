@@ -1,7 +1,7 @@
 module Handler.ProfileSettings where
 
 import Import
-import Helper
+import Handler.Commons
 
 getProfileSettingsR :: UserId -> Handler Html
 getProfileSettingsR userId = do
