@@ -5,12 +5,12 @@ $if null comments
   <p>There are no comments yet
 $else
   $forall (Entity mediumId medium) <- media
-    <pre>
+    <div #mediabox>
       <h4>#{mediumTitle medium}
       <hr>
       $forall (Entity commentId comment) <- comments
         $if commentOrigin comment == mediumId
-          <pre>
+          <div #comment>
             #{fromJust $ commentAuthorSlug comment} wrote on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime comment}:
             <hr>
             #{commentContent comment}
@@ -18,7 +18,7 @@ $else
         $forall (Entity replyId reply) <- replies
           $if commentParent reply == Just commentId
             $if commentOrigin reply == mediumId
-              <pre class="reply">
+              <div #comment class="reply">
                 #{fromJust $ commentAuthorSlug comment} wrote on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime comment}:
                 <hr>
                 #{commentContent reply}

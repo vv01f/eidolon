@@ -1,2 +1,17 @@
 .reply
   margin-left: 50px
+
+#mediabox
+  margin: 10px
+  padding: 5px
+  border: 1px solid #ddd
+  border-radius: 6px
+  box-shadow: 0 0 3px #c4c4c4
+
+#comment
+  margin-top: 5px
+  padding: 5px
+  border: 1px solid #ddd
+  border-radius: 6px
+  box-shadow: 0 0 3px #c4c4c4
+  background-color: #f5f5f5

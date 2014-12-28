@@ -29,7 +29,7 @@ $if null comments
   <p>There are no Comments yet
 $else
   $forall (Entity commentId comment) <- comments
-    <pre>
+    <div #comment>
       <a href=@{ProfileR $ fromJust $ commentAuthor comment}>#{fromJust $ commentAuthorSlug comment}</a> wrote on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime comment}:
       <hr>
       #{commentContent comment}
@@ -40,7 +40,7 @@ $else
           <a href=@{CommentDeleteR commentId}>Delete this comment
     $forall (Entity replyId reply) <- replies
       $if commentParent reply == Just commentId
-        <pre class="reply">
+        <div #comment class="reply">
           <a href=@{ProfileR $ fromJust $ commentAuthor reply}>#{fromJust $ commentAuthorSlug reply}</a> wrote on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime reply}:
           <hr>
           #{commentContent reply}
