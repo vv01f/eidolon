@@ -51,10 +51,10 @@ postMediumR mediumId = do
           userId <- return $ Just $ getUserIdFromText tempUserId
           u <- runDB $ getJust $ fromJust userId
           userSl <- return $ Just $ userSlug u
-          ((res, commentiwdget), enctype) <- runFormPost $ commentForm userId userSl mediumId Nothing
+          ((res, _), _) <- runFormPost $ commentForm userId userSl mediumId Nothing
           case res of
             FormSuccess temp -> do
-              cId <- runDB $ insert temp
+              _ <- runDB $ insert temp
               --send mail to medium owner
               owner <- runDB $ getJust $ mediumOwner medium
               link <- ($ MediumR (commentOrigin temp)) <$> getUrlRender
@@ -124,10 +124,10 @@ postCommentReplyR commentId = do
           u <- runDB $ getJust $ fromJust userId
           userSl <- return $ Just $ userSlug u
           mediumId <- return $ commentOrigin comment
-          ((res, commentWidget), enctype) <- runFormPost $ commentForm userId userSl mediumId (Just commentId)
+          ((res, _), _) <- runFormPost $ commentForm userId userSl mediumId (Just commentId)
           case res of
             FormSuccess temp -> do
-              cId <- runDB $ insert temp
+              _ <- runDB $ insert temp
               --send mail to parent author
               parent <- runDB $ getJust $ fromJust $ commentParent temp
               parAuth <- runDB $ getJust $ fromJust $ commentAuthor parent
@@ -209,7 +209,7 @@ postCommentDeleteR commentId = do
                 Just "confirm" -> do
                   -- delete comment children
                   childEnts <- runDB $ selectList [CommentParent ==. (Just commentId)] []
-                  mapM (\ent -> runDB $ delete $ entityKey ent) childEnts
+                  _ <- mapM (\ent -> runDB $ delete $ entityKey ent) childEnts
                   -- delete comment itself
                   runDB $ delete commentId
                   -- outro

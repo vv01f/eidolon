@@ -70,10 +70,10 @@ postAdminAlbumSettingsR albumId = do
         Just album -> do
           entities <- runDB $ selectList [UserId !=. (albumOwner album)] [Desc UserName]
           users <- return $ map (\u -> (userName $ entityVal u, entityKey u)) entities
-          ((res, adminAlbumSettingsWidget), enctype) <- runFormPost $ adminAlbumSettingsForm album albumId users
+          ((res, _), _) <- runFormPost $ adminAlbumSettingsForm album albumId users
           case res of
             FormSuccess temp -> do
-              aId <- runDB $ update albumId
+              _ <- runDB $ update albumId
                 [ AlbumTitle =. albumTitle temp
                 , AlbumShares =. albumShares temp
                 , AlbumSamplePic =. albumSamplePic temp
@@ -117,14 +117,14 @@ getAdminAlbumDeleteR albumId = do
           newAlbumList <- return $ removeItem albumId albumList
           runDB $ update ownerId [UserAlbums =. newAlbumList]
           -- delete album content and its comments
-          mapM (\a -> do
+          _ <- mapM (\a -> do
             -- delete files
             medium <- runDB $ getJust a
             liftIO $ removeFile (normalise $ L.tail $ mediumPath medium)
             liftIO $ removeFile (normalise $ L.tail $ mediumThumb medium)
             -- delete comments
             commEnts <- runDB $ selectList [CommentOrigin ==. a] []
-            mapM (\ent -> runDB $ delete $ entityKey ent) commEnts
+            _ <- mapM (\ent -> runDB $ delete $ entityKey ent) commEnts
             -- delete album database entry
             runDB $ delete a
             ) (albumContent album)

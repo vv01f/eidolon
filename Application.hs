@@ -7,18 +7,13 @@ module Application
     ) where
 
 import Import
-import Settings
 import Yesod.Static
 import Yesod.Default.Config2
-import Yesod.Default.Main
 import Yesod.Default.Handlers
-import qualified Database.Persist
 import Database.Persist.Sql (runMigration)
 import Network.HTTP.Client.Conduit (newManager)
-import Control.Concurrent (forkIO, threadDelay)
 import Control.Monad
-import System.Log.FastLogger (newStdoutLoggerSet, defaultBufSize, flushLogStr)
-import Network.Wai.Logger (clockDateCacher)
+import System.Log.FastLogger (newStdoutLoggerSet, defaultBufSize)
 import Data.Default (def)
 import Yesod.Core.Types (loggerSet)
 
@@ -34,8 +29,7 @@ import Network.Wai.Middleware.RequestLogger (Destination (Logger),
                                              IPAddrSource (..),
                                              OutputFormat (..), destination,
                                              mkRequestLogger, outputFormat)
-import System.Log.FastLogger                (defaultBufSize, newStdoutLoggerSet,
-                                             toLogStr)
+import System.Log.FastLogger                (toLogStr)
 
 -- Import all relevant handler modules here.
 -- Don't forget to add new modules to your cabal file!

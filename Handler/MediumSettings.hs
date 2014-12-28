@@ -24,10 +24,10 @@ postMediumSettingsR mediumId = do
   checkRes <- mediumCheck mediumId
   case checkRes of
     Right medium -> do
-      ((result, mediumSettingsWidget), enctype) <- runFormPost $ mediumSettingsForm medium
+      ((result, _), _) <- runFormPost $ mediumSettingsForm medium
       case result of
         FormSuccess temp -> do
-          mId <- runDB $ update mediumId
+          _ <- runDB $ update mediumId
             [ MediumTitle =. mediumTitle temp
             , MediumDescription =. mediumDescription temp
             , MediumTags =. mediumTags temp
@@ -75,7 +75,7 @@ postMediumDeleteR mediumId = do
         Just "confirm" -> do
           -- delete comments
           commEnts <- runDB $ selectList [CommentOrigin ==. mediumId] []
-          mapM (\ent -> runDB $ delete $ entityKey ent) commEnts
+          _ <- mapM (\ent -> runDB $ delete $ entityKey ent) commEnts
           -- delete references first
           albumId <- return $ mediumAlbum medium
           album <- runDB $ getJust albumId

@@ -46,7 +46,7 @@ postAdminMediumSettingsR mediumId = do
       tempMedium <- runDB $ get mediumId
       case tempMedium of
         Just medium -> do
-          ((res, adminMediumSetWidget), enctype) <- runFormPost $ adminMediumSetForm medium
+          ((res, _), _) <- runFormPost $ adminMediumSetForm medium
           case res of
             FormSuccess temp -> do
               runDB $ update mediumId
@@ -94,7 +94,7 @@ getAdminMediumDeleteR mediumId = do
           runDB $ update albumId [AlbumContent =. newMediaList]
           -- delete comments
           commEnts <- runDB $ selectList [CommentOrigin ==. mediumId] []
-          mapM (\ent -> runDB $ delete $ entityKey ent) commEnts
+          _ <- mapM (\ent -> runDB $ delete $ entityKey ent) commEnts
           -- delete medium
           runDB $ delete mediumId
           -- delete files

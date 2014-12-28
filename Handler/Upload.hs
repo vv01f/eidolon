@@ -5,14 +5,8 @@ import Data.Time
 import Data.Maybe
 import qualified Data.Text as T
 import qualified System.FilePath as FP
-import qualified Filesystem.Path as FSP
 import Filesystem.Path.CurrentOS
 import Graphics.ImageMagick.MagickWand
-import Control.Monad.Trans.Resource
-import Foreign
-import Foreign.C.Types
-import Foreign.C.String
-import Helper
 
 data TempMedium = TempMedium
   { tempMediumTitle :: Text
@@ -44,7 +38,7 @@ postUploadR = do
   case msu of
     Just tempUserId -> do
       userId <- lift $ pure $ getUserIdFromText tempUserId
-      ((result, uploadWidget), enctype) <- runFormPost (uploadForm userId)
+      ((result, _), _) <- runFormPost (uploadForm userId)
       case result of
         FormSuccess temp -> do
           fil <- return $ tempMediumFile temp
@@ -88,8 +82,6 @@ getDirectUploadR albumId = do
   case tempAlbum of -- does the requested album exist
     Just album -> do
       ownerId <- return $ albumOwner album
-      owner <- runDB $ getJust ownerId
-      ownerName <- return $ userName owner
       msu <- lookupSession "userId"
       case msu of -- is anybody logged in
         Just tempUserId -> do
@@ -117,8 +109,6 @@ postDirectUploadR albumId = do
   case tempAlbum of -- does the album exist
     Just album -> do
       ownerId <- return $ albumOwner album
-      owner <- runDB $ getJust ownerId
-      ownerName <- return $ userName owner
       msu <- lookupSession "userId"
       case msu of -- is anybody logged in
         Just tempUserId -> do
@@ -126,7 +116,7 @@ postDirectUploadR albumId = do
           presence <- return $ (userId == ownerId) || (userId `elem` (albumShares album))
           case presence of -- is the logged in user the owner or is the album shared with him
             True -> do
-              ((result, dUploadWidget), enctype) <- runFormPost (dUploadForm userId albumId)
+              ((result, _), _) <- runFormPost (dUploadForm userId albumId)
               case result of
                 FormSuccess temp -> do
                   fil <- return $ tempMediumFile temp
@@ -134,8 +124,8 @@ postDirectUploadR albumId = do
                   case mime `elem` acceptedTypes of
                     True -> do
                       albRef <- runDB $ getJust (tempMediumAlbum temp)
-                      ownerId <- return $ albumOwner albRef
-                      path <- writeOnDrive fil ownerId albumId
+                      refOwnerId <- return $ albumOwner albRef
+                      path <- writeOnDrive fil refOwnerId albumId
                       thumbPath <- generateThumb path ownerId albumId
                       medium <- return $ Medium
                         (tempMediumTitle temp)
@@ -182,7 +172,7 @@ generateThumb path userId albumId = do
     w1 <- getImageWidth w
     h1 <- getImageHeight w
     h2 <- return 220
-    w2 <- return $ floor (((fromIntegral w1) / (fromIntegral h1)) * (fromIntegral h2))
+    w2 <- return $ floor (((fromIntegral w1) / (fromIntegral h1)) * (fromIntegral h2) :: Double)
     resizeImage w w2 h2 lanczosFilter 1
     setImageCompressionQuality w 95
     writeImage w (Just (decodeString newPath))

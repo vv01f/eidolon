@@ -2,13 +2,13 @@ module Handler.Login where
 
 import Import hiding (returnJson)
 import qualified Data.Text as T
-import Yesod hiding (returnJson)
 import Crypto.HMAC
 import Crypto.Hash.CryptoAPI (SHA1)
-import qualified Data.ByteString as B
-import Data.Text.Encoding (decodeUtf8, encodeUtf8)
+import Data.Text.Encoding (encodeUtf8)
 import Data.Serialize (encode)
 import Data.Maybe
+import qualified Data.ByteString as B
+import Data.Aeson.Types
 
 data Credentials = Credentials
   { credentialsName   :: Text
@@ -37,7 +37,7 @@ postLoginR = do
         Just (Entity userId user) -> do
           salt <- return $ userSalt user
           token <- liftIO makeRandomToken
-          tokenId <- runDB $ insert $ Token (encodeUtf8 token) "login" (Just userId)
+          _ <- runDB $ insert $ Token (encodeUtf8 token) "login" (Just userId)
           returnJson ["salt" .= (toHex salt), "token" .= (toHex $ encodeUtf8 token)]
         Nothing ->
           returnJsonError ("No such user" :: T.Text)
@@ -85,10 +85,13 @@ getLogoutR = do
   setMessage "Succesfully logged out"
   redirect $ HomeR
 
+returnJson :: Monad m => [Pair] -> m RepJson
 returnJson = return . repJson . object
 
+returnJsonError :: (ToJSON a, Monad m) => a -> m RepJson
 returnJsonError = returnJson . (:[]) . ("error" .=)
 
+hmacSHA1 :: B.ByteString -> B.ByteString -> B.ByteString
 hmacSHA1 keyData msgData =
   let key = MacKey keyData
       sha1 :: SHA1

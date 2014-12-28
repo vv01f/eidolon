@@ -28,10 +28,10 @@ getAdminCommentDeleteR commentId = do
     Right _ -> do
       tempComment <- runDB $ get commentId
       case tempComment of
-        Just comment -> do
+        Just _ -> do
           -- delete comment children
           children <- runDB $ selectList [CommentParent ==. (Just commentId)] []
-          mapM (\ent -> runDB $ delete $ entityKey ent) children
+          _ <- mapM (\ent -> runDB $ delete $ entityKey ent) children
           -- delete comment itself
           runDB $ delete commentId
           setMessage "Comment deleted succesfully"

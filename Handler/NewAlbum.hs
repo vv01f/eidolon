@@ -25,7 +25,7 @@ postNewAlbumR = do
   case msu of
     Just tempUserId -> do
       userId <- return $ getUserIdFromText tempUserId
-      ((result, albumWidget), enctype) <- runFormPost (albumForm userId)
+      ((result, _), _) <- runFormPost (albumForm userId)
       case result of
         FormSuccess album -> do
           -- Put album in Database

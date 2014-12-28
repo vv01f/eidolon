@@ -4,23 +4,16 @@ import Prelude
 import Yesod.Static
 import Model
 import Control.Applicative
-import Control.Monad.Trans.Class
 import Data.Maybe
-import Data.Either
 import Data.List
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL
-import qualified Data.ByteString.Char8 as BC
 import qualified Data.Text as T
 import Data.Time
 import Data.Char
 import Database.Persist
-import Database.Persist.Types
-import System.FilePath
 import System.Random
 import System.Locale
-import Yesod.Persist.Core
-import Yesod.Core.Types
 import Yesod
 import Numeric (readHex, showHex)
 import Network.Mail.Mime
@@ -77,7 +70,7 @@ tagField = Field
           False -> return $ Right $ Just $ removeItem "" $ T.splitOn " " x
           True -> return $ Right $ Nothing
         _   -> return $ Left  $ error "unexpected tag list"
-  , fieldView = \idAttr nameAttr val eResult isReq ->
+  , fieldView = \idAttr nameAttr _ eResult _ ->
       [whamlet|<input id=#{idAttr} type="text" name=#{nameAttr} value=#{either id (T.intercalate " ") eResult}>|]
   , fieldEnctype = UrlEncoded
   }
@@ -95,7 +88,7 @@ userField users = Field
                 True -> return $ Left $ error "Invalid username list"
           True -> return $ Right $ Just $ []
         _ -> return $ Left $ error "unexpected username list"
-  , fieldView = \idAttr nameAttr val eResult isReq ->
+  , fieldView = \idAttr nameAttr _ eResult _ ->
       [whamlet|<input id=#{idAttr} type="text" name=#{nameAttr} value=#{either id (getUsersFromResult users) eResult}>|]
   , fieldEnctype = UrlEncoded
   }

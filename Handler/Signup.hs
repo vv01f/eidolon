@@ -53,8 +53,8 @@ postSignupR = do
             []
             False
           activatorText <- liftIO generateString
-          aId <- runDB $ insert $ Activator activatorText newUser
-          tId <- runDB $ insert $ Token (encodeUtf8 activatorText) "activate" Nothing
+          _ <- runDB $ insert $ Activator activatorText newUser
+          _ <- runDB $ insert $ Token (encodeUtf8 activatorText) "activate" Nothing
           activateLink <- ($ ActivateR activatorText) <$> getUrlRender
           sendMail (userEmail newUser) "Please activate your account!" $
             [shamlet|

@@ -3,7 +3,7 @@
   <ul id="user-nav">
     <li>
       <a href=@{HomeR}>Home
-    $maybe userId <- msu
+    $maybe _ <- msu
       Logged in as <a href=@{UserR username}>#{slug}<br>
       <li>
         <a href=@{LogoutR}>Logout

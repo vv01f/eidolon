@@ -13,7 +13,7 @@ getReactivateR = do
 
 postReactivateR :: Handler Html
 postReactivateR = do
-  ((result, reactivateWidget), enctype) <- runFormPost reactivateForm
+  ((result, _), _) <- runFormPost reactivateForm
   case result of
     FormSuccess temp -> do
       users <- runDB $ selectList [UserEmail ==. temp] []
@@ -21,10 +21,10 @@ postReactivateR = do
         True -> do
           userTokens <- foldM (\userTokens (Entity userId user) -> do
             token <- liftIO $ generateString
-            tId <- runDB $ insert $ Token (encodeUtf8 token) "activate" (Just userId)
+            _ <- runDB $ insert $ Token (encodeUtf8 token) "activate" (Just userId)
             return $ (user, token) : userTokens
             ) [] users
-          sent <- foldM (\sent (user, token) ->
+          _ <- foldM (\sent (user, token) ->
             case sent of
               False ->
                 return False

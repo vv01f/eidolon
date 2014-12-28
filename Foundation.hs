@@ -3,12 +3,8 @@ module Foundation where
 import Prelude
 import Yesod
 import Yesod.Static
-import Yesod.Default.Config2
 import Yesod.Default.Util (addStaticContentExternal)
 import Network.HTTP.Client.Conduit (Manager, HasHttpManager (getHttpManager))
-import qualified Settings
-import Settings.Development (development)
-import qualified Database.Persist
 import Database.Persist.Sql -- (ConnectionPool, runSqlPool)
 import Settings.StaticFiles
 import Settings
@@ -18,7 +14,6 @@ import Text.Hamlet (hamletFile)
 import Yesod.Core.Types
 -- costom imports
 import Data.Text
-import Data.Maybe
 import Helper
 
 -- | The site argument for your application. This can be a good place to
@@ -56,7 +51,7 @@ instance Yesod App where
     approot = ApprootMaster $ appRoot . appSettings
 
     -- change maximum content length
-    maximumContentLength _ _ = Just $ 1024 ^ 5
+    maximumContentLength _ _ = Just $ 1024 ^ (5 :: Int)
 
     -- Store session data on the client in encrypted cookies,
     -- default session idle timeout is 120 minutes

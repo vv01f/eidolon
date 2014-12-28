@@ -14,7 +14,7 @@ getActivateR token = do
     Nothing -> do
       mToken <- runDB $ selectFirst [TokenToken ==. (encodeUtf8 token), TokenKind ==. "activate"] []
       case mToken of
-        Just (Entity uTokenId uToken) -> do
+        Just (Entity _ uToken) -> do
           user <- runDB $ getJust (fromJust $ tokenUser uToken)
           hexSalt <- return $ toHex $ userSalt user
           defaultLayout $ do
@@ -23,11 +23,11 @@ getActivateR token = do
         _ -> do
           setMessage "Invalid token!"
           redirect $ HomeR
-    Just (Entity activatorKey activator) -> do
+    Just (Entity _ activator) -> do
       uSalt <- return $ userSalt $ activatorUser activator
       mToken <- runDB $ selectFirst [TokenToken ==. (encodeUtf8 token), TokenKind ==. "activate"] []
       case mToken of
-        Just (Entity uTokenId uToken) -> do
+        Just (Entity _ _) -> do
           hexSalt <- return $ toHex uSalt
           defaultLayout $ do
             $(widgetFile "activate")

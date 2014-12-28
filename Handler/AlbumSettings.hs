@@ -12,8 +12,6 @@ getAlbumSettingsR albumId = do
   case tempAlbum of
     Just album -> do
       ownerId <- return $ albumOwner album
-      owner <- runDB $ getJust ownerId
-      ownerName <- return $ userName owner
       msu <- lookupSession "userId"
       case msu of
         Just tempUserId -> do
@@ -56,12 +54,12 @@ postAlbumSettingsR albumId = do
             True -> do
               entities <- runDB $ selectList [UserId !=. (albumOwner album)] [Desc UserName]
               users <- return $ map (\u -> (userName $ entityVal u, entityKey u)) entities
-              ((result, albumSettingsWidget), enctype) <- runFormPost $ albumSettingsForm album albumId users
+              ((result, _), _) <- runFormPost $ albumSettingsForm album albumId users
               case result of
                 FormSuccess temp -> do
                   newShares <- return (L.sort $ albumShares temp)
                   oldShares <- return (L.sort $ albumShares album)
-                  case newShares /= oldShares of
+                  _ <- case newShares /= oldShares of
                     True -> do
                       link <- ($ AlbumR albumId) <$> getUrlRender
                       rcptIds <- return $ L.nub $ newShares L.\\ oldShares
@@ -81,7 +79,7 @@ postAlbumSettingsR albumId = do
                     False -> do
                       return [()]
                       -- nothing to do here
-                  aId <- runDB $ update albumId 
+                  _ <- runDB $ update albumId 
                     [ AlbumTitle =. albumTitle temp
                     , AlbumShares =. newShares
                     , AlbumSamplePic =. albumSamplePic temp
@@ -122,8 +120,6 @@ getAlbumDeleteR albumId = do
   case tempAlbum of
     Just album -> do
       ownerId <- return $ albumOwner album
-      owner <- runDB $ getJust ownerId
-      ownerName <- return $ userName owner
       msu <- lookupSession "userId"
       case msu of
         Just tempUserId -> do
@@ -151,7 +147,6 @@ postAlbumDeleteR albumId = do
     Just album -> do
       ownerId <- return $ albumOwner album
       owner <- runDB $ getJust ownerId
-      ownerName <- return $ userName owner
       msu <- lookupSession "userId"
       case msu of
         Just tempUserId -> do
@@ -167,14 +162,14 @@ postAlbumDeleteR albumId = do
                   newAlbumList <- return $ removeItem albumId albumList
                   runDB $ update ownerId [UserAlbums =. newAlbumList]
                   -- delete album content and its comments
-                  mapM (\a -> do
+                  _ <- mapM (\a -> do
                     -- delete files
                     medium <- runDB $ getJust a
                     liftIO $ removeFile (normalise $ L.tail $ mediumPath medium)
                     liftIO $ removeFile (normalise $ L.tail $ mediumThumb medium)
                     -- delete comments
                     commEnts <- runDB $ selectList [CommentOrigin ==. a] []
-                    mapM (\ent -> runDB $ delete $ entityKey ent) commEnts
+                    _ <- mapM (\ent -> runDB $ delete $ entityKey ent) commEnts
                     runDB $ delete a
                     ) (albumContent album)
                   -- delete album

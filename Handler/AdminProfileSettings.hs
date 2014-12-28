@@ -88,7 +88,7 @@ postAdminProfileSettingsR ownerId = do
       tempOwner <- runDB $ get ownerId
       case tempOwner of
         Just owner -> do
-          ((result, adminProfileSetWidget), enctype) <- runFormPost $ adminProfileForm owner
+          ((result, _), _) <- runFormPost $ adminProfileForm owner
           case result of
             FormSuccess temp -> do
               runDB $ update ownerId 
@@ -129,13 +129,13 @@ getAdminProfileDeleteR ownerId = do
       case tempOwner of
         Just owner -> do
           albumList <- return $ userAlbums owner
-          mapM (\albumId -> do
+          _ <- mapM (\albumId -> do
             album <- runDB $ getJust albumId
             mediaList <- return $ albumContent album
-            mapM (\med -> do
+            _ <- mapM (\med -> do
               -- delete comments
               commEnts <- runDB $ selectList [CommentOrigin ==. med] []
-              mapM (\ent -> runDB $ delete $ entityKey ent) commEnts
+              _ <- mapM (\ent -> runDB $ delete $ entityKey ent) commEnts
               -- delete media files
               medium <- runDB $ getJust med
               liftIO $ removeFile (normalise $ L.tail $ mediumPath medium)

@@ -37,7 +37,7 @@ getUserR :: Text -> Handler Html
 getUserR ownerName = do
   tempOwner <- runDB $ selectFirst [UserName ==. ownerName] []
   case tempOwner of
-    Just (Entity ownerId owner) ->
+    Just (Entity ownerId _) ->
       getProfileR ownerId
     Nothing -> do
       setMessage "This user does not exist"

@@ -44,7 +44,6 @@ mediumCheck mediumId = do
   case tempMedium of
     Just medium -> do
       ownerId <- return $ mediumOwner medium
-      owner <- runDB $ getJust ownerId
       msu <- lookupSession "userId"
       case msu of
         Just tempUserId -> do

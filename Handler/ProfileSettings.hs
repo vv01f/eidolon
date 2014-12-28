@@ -21,7 +21,7 @@ postProfileSettingsR userId = do
   checkRes <- profileCheck userId
   case checkRes of
     Right user -> do
-      ((result, profileSettingsWidget), enctype) <- runFormPost $ profileSettingsForm user
+      ((result, _), _) <- runFormPost $ profileSettingsForm user
       case result of
         FormSuccess temp -> do
          runDB $ update userId [
