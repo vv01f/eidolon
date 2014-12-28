@@ -136,7 +136,7 @@ postCommentReplyR commentId = do
                 [shamlet|
                   <h1>Hello #{userSlug parAuth}
                   <p>#{fromJust $ commentAuthorSlug temp} replied to your comment:
-                  <p>#{commentContent temp}
+                  #{commentContent temp}
                   <p>To see the comment thread follow
                     <a href=#{link}>
                       this link
@@ -149,7 +149,7 @@ postCommentReplyR commentId = do
                 [shamlet|
                   <h1>Hello #{userSlug owner}
                   <p>#{fromJust $ commentAuthorSlug temp} commented your medium with:
-                  <p>#{commentContent temp}
+                  #{commentContent temp}
                   <p>To see the comment thread follow
                     <a href=#{link}>
                       this link
