@@ -6,5 +6,4 @@ $newline always
   <div>
     <input type=submit value="Change settings">
 
-$if presence == True
-  <a href=@{MediumDeleteR mediumId}>Delete this image
+<a href=@{MediumDeleteR mediumId}>Delete this image
