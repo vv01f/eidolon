@@ -55,6 +55,6 @@ It may also be necessery to create a reverse proxy to your gallery. I would reco
 
 ##Starting
 
-You can start the gallery now by running the executable. You need to provide an environment argument, which can be `Development`, `Testing`, `Staging` or `Production`.
+You can start the gallery now by running the executable. You need to provide a settings file, normally found in `config/settings.yml`
 
 Since eidolon will block your console, I recommend wrapping a init-script around it. how you can do that is written in my [blog](http://nek0.eu/posts/2014-10-23-Daemonize-a-yesod-app.html).
