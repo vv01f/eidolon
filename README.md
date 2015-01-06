@@ -16,7 +16,7 @@ Additionally to Haskell and its dependencies you will need the following softwar
 
 * alex
 * happy
-* libmagick-dev
+* libmagick++-dev
 
 ###Building
 
