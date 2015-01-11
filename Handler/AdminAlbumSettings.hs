@@ -99,7 +99,7 @@ adminAlbumSettingsForm album albumId users = renderDivs $ Album
   <*> areq (userField users) "This album shared with" (Just $ albumShares album)
   <*> pure (albumContent album)
   <*> aopt (selectField media) "Sample picture" (Just $ albumSamplePic album)
-  <*> pure 220
+  <*> pure 230
   where
     media = do
       entities <- runDB $ selectList [MediumAlbum ==. albumId] [Asc MediumTitle]

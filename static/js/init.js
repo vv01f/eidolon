@@ -36,7 +36,7 @@ var parallelism = (function($) { var _ = {
 						introSpeed: 750,
 					
 					// Height (in px) of items.
-						itemHeight: 230,
+						itemHeight: 240,
 
 					// Default width (in px) of width.
 						itemWidth: 300,
@@ -48,10 +48,10 @@ var parallelism = (function($) { var _ = {
 						marginTop: 0,
 					
 					// Nudge the reel by this value (in px) after it's been vertically centered.
-						verticalNudge: -50,
+						verticalNudge: 60,
 						
 					// Maximum number of rows.
-						maxRows: 3,
+						maxRows: 5,
 						
 					// Minimum number of rows.
 						minRows: 1,
@@ -571,8 +571,8 @@ var parallelism = (function($) { var _ = {
 						reset: 'full',
 						prefix: '/static/css/style',
 						breakpoints: {
-							global: { range: '*', containers: '100%', grid: {gutters: 5} },
-							desktop: { range: '641-', containers: '100%', grid: {gutters: 5}, viewport: { width: 1280, scalable: false } },
+							global: { range: '*', containers: 1200, grid: {gutters: 5} },
+							desktop: { range: '641-', containers: 600, grid: {gutters: 5}, viewport: { width: 1280, scalable: false } },
 							mobile: { range: '-640', containers: '100%', grid: {gutters: 5}, viewport: { scalable: false } }
 						}
 					});
