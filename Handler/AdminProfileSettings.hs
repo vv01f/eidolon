@@ -70,7 +70,7 @@ getAdminProfileSettingsR ownerId = do
           tempUserId <- lookupSession "userId"
           userId <- return $ getUserIdFromText $ fromJust tempUserId
           (adminProfileSetWidget, enctype) <- generateFormPost $ adminProfileForm owner
-          defaultLayout $ do
+          formLayout $ do
             setTitle "Administration: Profile settings"
             $(widgetFile "adminProfileSettings")
         Nothing -> do

@@ -1,15 +1,27 @@
 $newline always
-<h3>Admin interface
+<div id="header" class="item" data-width="400">
+  <div class="inner">
+    <h1>Admin interface
+    <p>
+      Be careful with your actions here, every click will perform directly the advertised action.
 
-<p>
-  Be careful with your actions here, every click will perform directly the advertised action.
 
-<ul>
-  <li>
-    <a href=@{AdminProfilesR}>User profiles
-  <li>
-    <a href=@{AdminAlbumsR}>Albums
-  <li>
-    <a href=@{AdminMediaR}>Media
-  <li>
-    <a href=@{AdminCommentR}>Comments
+<div id="header" class="item" data-width="400">
+  <div class="inner">
+    <p>
+      <a href=@{AdminProfilesR}>User profiles
+
+<div id="header" class="item" data-width="400">
+  <div class="inner">
+    <p>
+      <a href=@{AdminAlbumsR}>Albums
+
+<div id="header" class="item" data-width="400">
+  <div class="inner">
+    <p>
+      <a href=@{AdminMediaR}>Media
+
+<div id="header" class="item" data-width="400">
+  <div class="inner">
+    <p>
+      <a href=@{AdminCommentR}>Comments

@@ -1,10 +1,12 @@
 $newline always
-<h3>User profiles
+<div id="header" class="item" data-width="400">
+  <div class="inner">
+    <h1>User profiles
+    $if null profiles
+      <p>
+        There are no profiles yet (How can you even see this?)
 
-$if null profiles
-  There are no profiles yet (How can you even see this?)
-$else
-  <ul>
-  $forall (Entity uId u) <- profiles
-    <li>
+$forall (Entity uId u) <- profiles
+  <div id="header" class="item" data-width="200">
+    <div class="inner">
       <a href=@{AdminProfileSettingsR uId}>#{userSlug u}

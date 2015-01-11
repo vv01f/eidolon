@@ -1,17 +1,17 @@
 $newline always
-<h3>Profile settings
-
-<div class="left">
-  <form method="post" enctype=#{enctype}>
+<div id="header" class="item" data-width="400">
+  <form class="inner" method="post" enctype=#{enctype}>
+    <h1>Profile Settings
     ^{adminProfileSetWidget}
     <div>
       <input type=submit value="Change settings">
 
   <a href=@{AdminProfileDeleteR userId}>Delete user
 
-<div class="right">
-  <ul>
-    <li>
-      <a href=@{AdminUserAlbumsR ownerId}>Albums of this user
-    <li>
-      <a href=@{AdminUserMediaR ownerId}>Media of this user
+<div id="header" class="item" data-width="200">
+  <div class="inner">
+    <ul>
+      <li>
+        <a href=@{AdminUserAlbumsR ownerId}>Albums of this user
+      <li>
+        <a href=@{AdminUserMediaR ownerId}>Media of this user

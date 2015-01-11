@@ -1,10 +1,13 @@
 $newline always
-<h3>Media of #{userSlug owner}
+<div id="header" class="item" data-width="400">
+  <div class="inner">
+    <h1>Media of #{userSlug owner}
+    $if null media
+      <p>
+        #{userSlug owner} has no media yet
 
-$if null media
-  #{userSlug owner} has no media yet
-$else
-  <ul>
-  $forall (Entity mId m) <- media
-    <li>
-      <a href=@{AdminMediumSettingsR mId}>#{mediumTitle m}
+$forall (Entity mId m) <- media
+  <div id="header" class="item" data-width="200">
+    <div class="inner">
+      <p>
+        <a href=@{AdminMediumSettingsR mId}>#{mediumTitle m}
