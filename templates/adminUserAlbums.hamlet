@@ -7,7 +7,11 @@ $newline always
           #{userSlug owner} has no albums yet
 
 $forall (Entity aId a) <- albums
-  <div id="header" class="item" data-width="200">
-    <div class="inner">
-      <p>
-        <a href=@{AdminAlbumSettingsR aId}>#{albumTitle a}
+  <article class="item" data-width=#{albumSampleWidth a}>
+    <a href=@{AdminAlbumSettingsR aId}>#{albumTitle a}
+      <figure class="thumbnail">
+        $if (albumSamplePic a) == Nothing
+          <img src="/static/img/album.jpg">
+        $else
+          <img src=#{T.pack $ fromJust $ albumSamplePic a}>
+        <figcaption>#{albumTitle a}

@@ -7,7 +7,8 @@ $newline always
         #{userSlug owner} has no media yet
 
 $forall (Entity mId m) <- media
-  <div id="header" class="item" data-width="200">
-    <div class="inner">
-      <p>
-        <a href=@{AdminMediumSettingsR mId}>#{mediumTitle m}
+  <article class="item" data-width=#{mediumThumbWidth m}>
+    <a href=@{AdminMediumSettingsR mId}>#{mediumTitle m}
+      <figure class="thumbnail">
+        <img src=#{mediumThumb m}>
+        <figcaption>#{mediumTitle m}

@@ -18,7 +18,7 @@ $forall (Entity albumId album) <- userAlbs
     <a href=@{AlbumR albumId}>
       <figure class="thumbnail">
         $if (albumSamplePic album) == Nothing
-          <img src="/static/img/album.jpg"><br>
+          <img src="/static/img/album.jpg">
         $else
           <img src=#{T.pack $ fromJust $ albumSamplePic album}>
         <figcaption>#{albumTitle album}
@@ -34,7 +34,7 @@ $else
       <a href=@{AlbumR albumId}>
         <figure class="thumbnail">
           $if (albumSamplePic album) == Nothing
-            <img src="/static/img/album.jpg"><br>
+            <img src="/static/img/album.jpg">
           $else
             <img src=#{T.pack $ fromJust $ albumSamplePic album}>
           <figcaption>#{albumTitle album}

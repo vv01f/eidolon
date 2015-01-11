@@ -4,6 +4,7 @@ import Import
 import Handler.Commons
 import qualified Data.Text as T
 import qualified Data.List as L
+import Data.Maybe
 import System.FilePath
 import System.Directory
 
@@ -50,7 +51,7 @@ getAdminAlbumSettingsR albumId = do
           entities <- runDB $ selectList [UserId !=. (albumOwner album)] [Desc UserName]
           users <- return $ map (\u -> (userName $ entityVal u, entityKey u)) entities
           (adminAlbumSettingsWidget, enctype) <- generateFormPost $ adminAlbumSettingsForm album albumId users
-          defaultLayout $ do
+          formLayout $ do
             setTitle "Administration: Album settings"
             $(widgetFile "adminAlbumSet")
         Nothing -> do
@@ -73,7 +74,7 @@ postAdminAlbumSettingsR albumId = do
           ((res, _), _) <- runFormPost $ adminAlbumSettingsForm album albumId users
           case res of
             FormSuccess temp -> do
-              width <- getThumbWidth $ albumSamplePic temp
+              width <- getThumbWidth $ Just $ L.tail $ fromMaybe ['a'] $ albumSamplePic temp
               _ <- runDB $ update albumId
                 [ AlbumTitle =. albumTitle temp
                 , AlbumShares =. albumShares temp

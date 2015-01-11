@@ -1,10 +1,13 @@
 $newline always
-<h3>Media
+<div id="header" class="item" data-width="400">
+  <div class="inner">
+    <h1>Media
+    $if null media
+       <p>There are no media yet
 
-$if null media
-  There are no media yet
-$else
-  <ul>
-  $forall (Entity mId m) <- media
-    <li>
-      <a href=@{AdminMediumSettingsR mId}>#{mediumTitle m}
+$forall (Entity mId m) <- media
+  <article class="item" data-width=#{mediumThumbWidth m}>
+    <a href=@{AdminMediumSettingsR mId}>#{mediumTitle m}
+      <figure class="thumbnail">
+        <img src=#{mediumThumb m}>
+        <figcaption>#{mediumTitle m}
