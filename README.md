@@ -4,6 +4,8 @@
 
 A image gallery service written in Haskell as a yesod webapp
 
+**Warning: This is still in early development and not to be used productively**
+
 ##Installation
 
 ###Dependencies
