@@ -1,9 +1,9 @@
 $newline always
-<h3>Album settings
-
-<form method="post" enctype=#{enctype}>
-  ^{albumSettingsWidget}
-  <div>
-    <input type=submit value="Change settings">
-$if ownerPresence == True
-  <a href=@{AlbumDeleteR albumId}>Delete this album
+<div id="header" class="item" data-width="300">
+  <form class="inner" method="post" enctype=#{enctype}>
+    <h3>Album settings
+      ^{albumSettingsWidget}
+      <div>
+        <input type=submit value="Change settings">
+    $if ownerPresence == True
+      <a href=@{AlbumDeleteR albumId}>Delete this album

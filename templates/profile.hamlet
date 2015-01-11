@@ -1,49 +1,59 @@
 $newline always
-<h3>Profile of #{ownerSlug}
-$if presence == True
-  <a href=@{ProfileSettingsR ownerId}>Change your profile settings
+<div id="header" class="item" data-width="400">
+  <div class="inner">
+    <h1>Profile of #{ownerSlug}
 
-$if null userAlbs
-  <p>This user has no albums yet
-$else
-  <p>Albums of this user:
+<div id="header" class="item" data-width="400">
+  <div class="inner">
+    $if null userAlbs
+      <p class="center">This user has no albums yet
+    $else
+      <h1>Albums
+      <p>Albums of this user:
   <ul>
-    $forall (Entity albumId album) <- userAlbs
-      <li>
-        <a href=@{AlbumR albumId}>
-          <figure class="thumbnail">
-            $if (albumSamplePic album) == Nothing
-              <img src="/static/img/album.jpg"><br>
-            $else
-              <img src=#{T.pack $ fromJust $ albumSamplePic album}>
-            <figcaption>#{albumTitle album}
+$forall (Entity albumId album) <- userAlbs
+  <article class="item" data-width=#{albumSampleWidth album}>
+    <a href=@{AlbumR albumId}>
+      <figure class="thumbnail">
+        $if (albumSamplePic album) == Nothing
+          <img src="/static/img/album.jpg"><br>
+        $else
+          <img src=#{T.pack $ fromJust $ albumSamplePic album}>
+        <figcaption>#{albumTitle album}
 
 $if null sharedAlbs
 $else
-  <p>Albums shared with this user:
-  <ul>
-    $forall Just (Entity albumId album) <- sharedAlbs
-      <li>
-        <a href=@{AlbumR albumId}>
-          <figure class="thumbnail">
-            $if (albumSamplePic album) == Nothing
-              <img src="/static/img/album.jpg"><br>
-            $else
-              <img src=#{T.pack $ fromJust $ albumSamplePic album}>
-            <figcaption>#{albumTitle album}
+  <div id="header" class="item" data-width="400">
+    <div class="inner">
+      <h1>Shared Albums
+      <p>Albums shared with this user:
+  $forall Just (Entity albumId album) <- sharedAlbs
+    <article class="shared item" data-width=#{albumSampleWidth album}>
+      <a href=@{AlbumR albumId}>
+        <figure class="thumbnail">
+          $if (albumSamplePic album) == Nothing
+            <img src="/static/img/album.jpg"><br>
+          $else
+            <img src=#{T.pack $ fromJust $ albumSamplePic album}>
+          <figcaption>#{albumTitle album}
 
 $if null recentMedia
-  This user has not uploaded any images
 $else
-  <p>Newest images:
-  <ul>
-    $forall (Entity mediumId medium) <- take 10 recentMedia
-      <li>
-        <a href=@{MediumR mediumId}>
-          <figure class="thumbnail">
-            <img src=#{mediumThumb medium}>
-            <figcaption>#{mediumTitle medium}
+  <div id="header" class="item" data-width="400">
+    <div class="inner">
+      <h1>Newest images
+      <p>recent uploads of #{ownerSlug}
+  $forall (Entity mediumId medium) <- take 10 recentMedia
+    <article class="recent item" data-width=#{mediumThumbWidth medium}>
+      <a href=@{MediumR mediumId}>
+        <figure class="thumbnail">
+          <img src=#{mediumThumb medium}>
+          <figcaption>#{mediumTitle medium}
 
-get a feed from this:
-  <a href=@{UserFeedAtomR ownerId}>Atom
-  <a href=@{UserFeedRssR ownerId}>RSS
+<div id="footer">
+  <div class="right">
+    get a feed from this:
+      <a href=@{UserFeedAtomR ownerId}>Atom
+      <a href=@{UserFeedRssR ownerId}>RSS
+    $if presence == True
+      <a href=@{ProfileSettingsR ownerId}>Change your profile settings

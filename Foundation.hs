@@ -45,6 +45,54 @@ mkYesodData "App" $(parseRoutesFile "config/routes")
 
 type Form x = Html -> MForm (HandlerT App IO) (FormResult x, Widget)
 
+renderLayout :: Widget -> Handler Html
+renderLayout widget = do
+    master <- getYesod
+    mmsg <- getMessage
+    msu <- lookupSession "userId"
+    username <- case msu of
+      Just a -> do
+        uId <- return $ getUserIdFromText a
+        user <- runDB $ getJust uId
+        return $ userName user
+      Nothing -> do
+        return ("" :: Text)
+    slug <- case msu of
+      Just a -> do
+        uId <- return $ getUserIdFromText a
+        user <- runDB $ getJust uId
+        return $ userSlug user
+      Nothing -> do
+        return ("" :: Text)
+    block <- return $ appSignupBlocked $ appSettings master
+
+    -- We break up the default layout into two components:
+    -- default-layout is the contents of the body tag, and
+    -- default-layout-wrapper is the entire page. Since the final
+    -- value passed to hamletToRepHtml cannot be a widget, this allows
+    -- you to use normal widget features in default-layout.
+
+    wc <- widgetToPageContent widget
+
+    pc <- widgetToPageContent $ do
+        -- add parallelism js files
+        $(combineScripts 'StaticR
+            [ js_jquery_min_js
+            , js_jquery_poptrox_min_js
+            , js_skel_min_js
+            , js_init_js
+            ])
+        $(combineStylesheets 'StaticR
+            [ css_normalize_css
+            , css_bootstrap_css
+            ])
+        $(widgetFile "default-layout")
+    withUrlRenderer $(hamletFile "templates/default-layout-wrapper.hamlet")
+
+formLayout :: Widget -> Handler Html
+formLayout widget = do
+    renderLayout $(widgetFile "form-widget")
+
 -- Please see the documentation for the Yesod typeclass. There are a number
 -- of settings which can be configured by overriding methods here.
 instance Yesod App where
@@ -60,38 +108,7 @@ instance Yesod App where
         "config/client_session_key.aes"
 
     defaultLayout widget = do
-        master <- getYesod
-        mmsg <- getMessage
-        msu <- lookupSession "userId"
-        username <- case msu of 
-          Just a -> do
-            uId <- return $ getUserIdFromText a
-            user <- runDB $ getJust uId
-            return $ userName user
-          Nothing -> do
-            return ("" :: Text)
-        slug <- case msu of
-          Just a -> do
-            uId <- return $ getUserIdFromText a
-            user <- runDB $ getJust uId
-            return $ userSlug user
-          Nothing -> do
-            return ("" :: Text)
-        block <- return $ appSignupBlocked $ appSettings master
-
-        -- We break up the default layout into two components:
-        -- default-layout is the contents of the body tag, and
-        -- default-layout-wrapper is the entire page. Since the final
-        -- value passed to hamletToRepHtml cannot be a widget, this allows
-        -- you to use normal widget features in default-layout.
-
-        pc <- widgetToPageContent $ do
-            $(combineStylesheets 'StaticR
-                [ css_normalize_css
-                , css_bootstrap_css
-                ])
-            $(widgetFile "default-layout")
-        withUrlRenderer $(hamletFile "templates/default-layout-wrapper.hamlet")
+      renderLayout $(widgetFile "default-widget")
 
     -- This is done to provide an optimization for serving static files from
     -- a separate domain. Please see the staticRoot setting in Settings.hs

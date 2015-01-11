@@ -73,10 +73,12 @@ postAdminAlbumSettingsR albumId = do
           ((res, _), _) <- runFormPost $ adminAlbumSettingsForm album albumId users
           case res of
             FormSuccess temp -> do
+              width <- getThumbWidth $ albumSamplePic temp
               _ <- runDB $ update albumId
                 [ AlbumTitle =. albumTitle temp
                 , AlbumShares =. albumShares temp
                 , AlbumSamplePic =. albumSamplePic temp
+                , AlbumSampleWidth =. width
                 ]
               setMessage "Album settings changed successfully"
               redirect $ AdminR
@@ -97,6 +99,7 @@ adminAlbumSettingsForm album albumId users = renderDivs $ Album
   <*> areq (userField users) "This album shared with" (Just $ albumShares album)
   <*> pure (albumContent album)
   <*> aopt (selectField media) "Sample picture" (Just $ albumSamplePic album)
+  <*> pure 220
   where
     media = do
       entities <- runDB $ selectList [MediumAlbum ==. albumId] [Asc MediumTitle]

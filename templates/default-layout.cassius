@@ -1,9 +1,11 @@
 #message
-  padding: 5px
-  border: 1px solid #ddd
-  border-radius: 6px
-  box-shadow: 0 0 3px #c4c4c4
-  background-color: lightyellow
+  padding: 20px
+  background: lightyellow url('../css/images/overlay.png')
+  color: #d64760
+  font-size: 1.5em
 
 nav li
   display: inline-block
+
+.center
+  text-align: center

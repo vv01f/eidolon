@@ -1,4 +1,4 @@
-<nav>
+<nav id="header">
   <div id="top-nav">
   <ul id="user-nav">
     <li>
@@ -18,7 +18,11 @@
         <li>
           <a href=@{SignupR}>Signup
 
-
 $maybe msg <- mmsg
-    <div #message>#{msg}
-^{widget}
+  <div #message>#{msg}
+
+<div id="main" role="main">
+  ^{pageBody wc}
+<div id="footer">
+  <div class="left">
+    #{appCopyright $ appSettings master}

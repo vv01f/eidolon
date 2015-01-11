@@ -1,10 +1,7 @@
-<h3>Image upload to album #{albumTitle album}
-
-Here you can upload your image.
-
-
-
-<form method=post enctype=#{enctype}>
-  ^{dUploadWidget}
-  <div>
-    <input type=submit value="Upload">
+<div id="header" class="item" data-width="400">
+  <form class="inner" method=post enctype=#{enctype}>
+    <h3>Image upload to album #{albumTitle album}
+    <p>Here you can upload your image.
+    ^{dUploadWidget}
+    <div>
+      <input type=submit value="Upload">

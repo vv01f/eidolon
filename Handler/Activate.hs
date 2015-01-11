@@ -17,7 +17,7 @@ getActivateR token = do
         Just (Entity _ uToken) -> do
           user <- runDB $ getJust (fromJust $ tokenUser uToken)
           hexSalt <- return $ toHex $ userSalt user
-          defaultLayout $ do
+          formLayout $ do
             setTitle "Activate your account"
             $(widgetFile "activate")
         _ -> do
@@ -29,7 +29,7 @@ getActivateR token = do
       case mToken of
         Just (Entity _ _) -> do
           hexSalt <- return $ toHex uSalt
-          defaultLayout $ do
+          formLayout $ do
             $(widgetFile "activate")
         _ -> do
           setMessage "Invalid token!"

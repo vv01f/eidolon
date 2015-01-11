@@ -1,24 +1,28 @@
 $newline always
-<h3>#{albumTitle album}
-by <a href=@{UserR ownerName}>#{ownerName}</a>
-<br>
-  $if presence == True
-    <a href=@{DirectUploadR albumId}>Upload image to this album
-    <br>
-    <a href=@{AlbumSettingsR albumId}>Change settings of this album
-<br>
-  $if null media
-    This album is empty
-  $else
-    Images in this album:
-    <ul>
-      $forall (Entity mediumId medium) <- media
-        <li>
-          <a href=@{MediumR mediumId}>
-            <figure class="thumbnail">
-              <img src=#{mediumThumb medium}>
-              <figcaption>#{mediumTitle medium}
+<div id="header" class="item" data-width="400">
+  <div class="inner">
+    <h1>#{albumTitle album}
+    <p>by <a href=@{UserR ownerName}>#{ownerSlug}</a>
+    $if presence == True
+      <p>
+        <a href=@{DirectUploadR albumId}>Upload image to this album
+      <p>
+        <a href=@{AlbumSettingsR albumId}>Change settings of this album
 
-get a feed from this:
-  <a href=@{AlbumFeedAtomR albumId}>Atom
-  <a href=@{AlbumFeedRssR albumId}>RSS
+$if null media
+  <div id="header" class="item" data-width="400">
+    <div class="inner">
+      <p class="center">This album is empty
+$else
+  $forall (Entity mediumId medium) <- media
+    <article class="item" data-width=#{mediumThumbWidth medium}>
+      <a href=@{MediumR mediumId}>
+        <figure class="thumbnail">
+          <img src=#{mediumThumb medium}>
+          <figcaption>#{mediumTitle medium}
+
+<div id="footer">
+  <div class="right">
+    get a feed from this:
+      <a href=@{AlbumFeedAtomR albumId}>Atom
+      <a href=@{AlbumFeedRssR albumId}>RSS

@@ -11,6 +11,7 @@ getAlbumR albumId = do
       ownerId <- return $ albumOwner album
       owner <- runDB $ getJust ownerId
       ownerName <- return $ userName owner
+      ownerSlug <- return $ userSlug owner
       msu <- lookupSession "userId"
       presence <- case msu of
         Just tempUserId -> do

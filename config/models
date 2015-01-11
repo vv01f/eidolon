@@ -22,6 +22,7 @@ Album
     shares [UserId]
     content [MediumId]
     samplePic FP.FilePath Maybe
+    sampleWidth Int
     deriving Eq Show
 Medium
     title Text
@@ -32,6 +33,7 @@ Medium
     owner UserId
     description Textarea
     tags Texts
+    thumbWidth Int
     album AlbumId
     deriving Eq Show
 Comment

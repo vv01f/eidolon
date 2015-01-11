@@ -30,16 +30,19 @@ postProfileDeleteR userId = do
           albumList <- return $ userAlbums user
           _ <- mapM (\albumId -> do
             album <- runDB $ getJust albumId
-            mediaList <- return $ albumContent album
-            _ <- mapM (\med -> do
-              commEnts <- runDB $ selectList [CommentOrigin ==. med] []
-              _ <- mapM (\ent -> runDB $ delete $ entityKey ent) commEnts
-              medium <- runDB $ getJust med
-              liftIO $ removeFile (normalise $ L.tail $ mediumPath medium)
-              liftIO $ removeFile (normalise $ L.tail $ mediumThumb medium)
-              runDB $ delete med
-              ) mediaList
-            runDB $ delete albumId
+            case (albumOwner album) == userId of
+              True -> do
+                mediaList <- return $ albumContent album
+                _ <- mapM (\med -> do
+                  commEnts <- runDB $ selectList [CommentOrigin ==. med] []
+                  _ <- mapM (\ent -> runDB $ delete $ entityKey ent) commEnts
+                  medium <- runDB $ getJust med
+                  liftIO $ removeFile (normalise $ L.tail $ mediumPath medium)
+                  liftIO $ removeFile (normalise $ L.tail $ mediumThumb medium)
+                  runDB $ delete med
+                  ) mediaList
+                runDB $ delete albumId
+              False -> return ()
             ) albumList
           runDB $ delete userId
           liftIO $ removeDirectoryRecursive $ "static" </> "data" </> (T.unpack $ extractKey userId)

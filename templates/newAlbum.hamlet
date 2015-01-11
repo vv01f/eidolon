@@ -1,6 +1,7 @@
-<h3>Create new Album
+<div id="header" class="item" data-width="300">
 
-<form method=post enctype=#{enctype}>
-  ^{albumWidget}
-  <div>
-    <input type=submit value="Create">
+  <form class="inner r" method=post enctype=#{enctype}>
+    <h3>Create new Album
+    ^{albumWidget}
+    <div>
+      <input type=submit value="Create">

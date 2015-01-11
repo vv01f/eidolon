@@ -51,6 +51,7 @@ mediumSettingsForm medium = renderDivs $ Medium
   <*> pure (mediumOwner medium)
   <*> areq textareaField "Description" (Just $ mediumDescription medium)
   <*> areq tagField "tags" (Just $ mediumTags medium)
+  <*> pure (mediumThumbWidth medium)
   <*> pure (mediumAlbum medium)
 
 getMediumDeleteR :: MediumId -> Handler Html

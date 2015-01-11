@@ -24,10 +24,17 @@ getUploadR = do
   case msu of
     Just tempUserId -> do
       userId <- return $ getUserIdFromText tempUserId
-      (uploadWidget, enctype) <- generateFormPost (uploadForm userId)
-      defaultLayout $ do
-        setTitle "Eidolon :: Upload Medium"
-        $(widgetFile "upload")
+      user <- runDB $ getJust userId
+      albums <- return $ userAlbums user
+      case I.null albums of
+        False -> do
+          (uploadWidget, enctype) <- generateFormPost (uploadForm userId)
+          formLayout $ do
+            setTitle "Eidolon :: Upload Medium"
+            $(widgetFile "upload")
+        True -> do
+          setMessage "Please create an album first"
+          redirect $ NewAlbumR
     Nothing -> do
       setMessage "You need to be logged in"
       redirect $ LoginR
@@ -48,7 +55,7 @@ postUploadR = do
               albRef <- runDB $ getJust (tempMediumAlbum temp)
               ownerId <- return $ albumOwner albRef
               path <- writeOnDrive fil ownerId (tempMediumAlbum temp)
-              thumbPath <- generateThumb path ownerId (tempMediumAlbum temp)
+              (thumbPath, width) <- generateThumb path ownerId (tempMediumAlbum temp)
               inAlbumId <- return $ tempMediumAlbum temp
               medium <- return $ Medium
                 (tempMediumTitle temp)
@@ -59,6 +66,7 @@ postUploadR = do
                 (tempMediumOwner temp)
                 (tempMediumDesc temp)
                 (tempMediumTags temp)
+                width
                 inAlbumId
               mId <- runDB $ I.insert medium
               inAlbum <- runDB $ getJust inAlbumId
@@ -90,7 +98,7 @@ getDirectUploadR albumId = do
           case presence of -- is the owner present or a user with whom the album is shared
             True -> do
               (dUploadWidget, enctype) <- generateFormPost $ dUploadForm userId albumId
-              defaultLayout $ do
+              formLayout $ do
                 setTitle $ toHtml ("Eidolon :: Upload medium to " `T.append` (albumTitle album))
                 $(widgetFile "dUpload")
             False -> do
@@ -126,7 +134,7 @@ postDirectUploadR albumId = do
                       albRef <- runDB $ getJust (tempMediumAlbum temp)
                       refOwnerId <- return $ albumOwner albRef
                       path <- writeOnDrive fil refOwnerId albumId
-                      thumbPath <- generateThumb path ownerId albumId
+                      (thumbPath, width) <- generateThumb path ownerId albumId
                       medium <- return $ Medium
                         (tempMediumTitle temp)
                         ('/' : path)
@@ -136,6 +144,7 @@ postDirectUploadR albumId = do
                         (tempMediumOwner temp)
                         (tempMediumDesc temp)
                         (tempMediumTags temp)
+                        width
                         albumId
                       mId <- runDB $ insert medium
                       inAlbum <- runDB $ getJust albumId
@@ -159,24 +168,25 @@ postDirectUploadR albumId = do
       setMessage "This Album does not exist"
       redirect $ AlbumR albumId
 
-generateThumb :: FP.FilePath -> UserId -> AlbumId -> Handler FP.FilePath
+generateThumb :: FP.FilePath -> UserId -> AlbumId -> Handler (FP.FilePath, Int)
 generateThumb path userId albumId = do
   newName <- return $ (FP.takeBaseName path) ++ "_thumb" ++ (FP.takeExtension path)
   newPath <- return $ "static" FP.</> "data"
     FP.</> (T.unpack $ extractKey userId)
     FP.</> (T.unpack $ extractKey albumId)
     FP.</> newName
-  liftIO $ withMagickWandGenesis $ do
+  width <- liftIO $ withMagickWandGenesis $ do
     (_ , w) <- magickWand
     readImage w (decodeString path)
     w1 <- getImageWidth w
     h1 <- getImageHeight w
-    h2 <- return 220
+    h2 <- return 230
     w2 <- return $ floor (((fromIntegral w1) / (fromIntegral h1)) * (fromIntegral h2) :: Double)
     resizeImage w w2 h2 lanczosFilter 1
     setImageCompressionQuality w 95
     writeImage w (Just (decodeString newPath))
-  return newPath
+    return w2
+  return (newPath, width)
 
 writeOnDrive :: FileInfo -> UserId -> AlbumId -> Handler FP.FilePath
 writeOnDrive fil userId albumId = do

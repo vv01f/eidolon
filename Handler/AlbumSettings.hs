@@ -23,7 +23,7 @@ getAlbumSettingsR albumId = do
               entities <- runDB $ selectList [UserId !=. (albumOwner album)] [Desc UserName]
               users <- return $ map (\u -> (userName $ entityVal u, entityKey u)) entities
               (albumSettingsWidget, enctype) <- generateFormPost $ albumSettingsForm album albumId users
-              defaultLayout $ do
+              formLayout $ do
                 setTitle "Eidolon :: Album Settings"
                 $(widgetFile "albumSettings")
             False -> do
@@ -64,7 +64,12 @@ postAlbumSettingsR albumId = do
                       link <- ($ AlbumR albumId) <$> getUrlRender
                       rcptIds <- return $ L.nub $ newShares L.\\ oldShares
                       mapM (\uId -> do
+                        -- update userAlbums
                         user <- runDB $ getJust uId
+                        oldAlbs <- return $ userAlbums user
+                        newAlbs <- return $ albumId : oldAlbs
+                        _ <- runDB $ update uId [UserAlbums =. newAlbs]
+                        -- send notification
                         addr <- return $ userEmail user
                         sendMail addr "A new album was shared with you" $
                           [shamlet|
@@ -79,10 +84,12 @@ postAlbumSettingsR albumId = do
                     False -> do
                       return [()]
                       -- nothing to do here
+                  width <- getThumbWidth $ albumSamplePic temp
                   _ <- runDB $ update albumId 
                     [ AlbumTitle =. albumTitle temp
                     , AlbumShares =. newShares
                     , AlbumSamplePic =. albumSamplePic temp
+                    , AlbumSampleWidth =. width
                     ]
                   setMessage "Album settings changed succesfully"
                   redirect $ AlbumR albumId
@@ -106,6 +113,7 @@ albumSettingsForm album albumId users = renderDivs $ Album
   <*> areq (userField users) "Share this album with" (Just $ albumShares album)
   <*> pure (albumContent album)
   <*> aopt (selectField media) "Sample picture" (Just $ albumSamplePic album)
+  <*> pure 230
   where
     media = do
       entities <- runDB $ selectList [MediumAlbum ==. albumId] [Asc MediumTitle]
@@ -127,7 +135,7 @@ getAlbumDeleteR albumId = do
           presence <- return (userId == ownerId)
           case presence of
             True -> do
-              defaultLayout $ do
+              formLayout $ do
                 setTitle $ toHtml ("Eidolon :: Delete album" `T.append` (albumTitle album))
                 $(widgetFile "albumDelete")
             False -> do

@@ -12,7 +12,7 @@ getNewAlbumR = do
     Just tempUserId -> do
       userId <- lift $ pure $ getUserIdFromText tempUserId
       (albumWidget, enctype) <- generateFormPost (albumForm userId)
-      defaultLayout $ do
+      formLayout $ do
         setTitle "Eidolon :: Create new Album"
         $(widgetFile "newAlbum")
     Nothing -> do
@@ -54,3 +54,4 @@ albumForm userId = renderDivs $ Album
   <*> pure []
   <*> pure []
   <*> pure Nothing
+  <*> pure 230

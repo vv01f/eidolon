@@ -1,10 +1,7 @@
-<h3>Image upload
-
-Here you can upload your image.
-
-
-
-<form method=post enctype=#{enctype}>
-  ^{uploadWidget}
-  <div>
-    <input type=submit value="Upload">
+<div id="header" class="item" data-width="400">
+  <form class="inner" method=post enctype=#{enctype}>
+    <h1>Image upload
+    <p>Here you can upload your image.
+    ^{uploadWidget}
+    <div>
+      <input type=submit value="Upload">

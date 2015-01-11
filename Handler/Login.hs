@@ -19,7 +19,7 @@ data Credentials = Credentials
 getLoginR :: Handler Html
 getLoginR = do
 --  (loginWidget, enctype) <- generateFormPost loginForm
-  defaultLayout $ do
+  formLayout $ do
     setTitle "Eidolon :: Login"
     $(widgetFile "login")
 

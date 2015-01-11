@@ -5,7 +5,7 @@ import Yesod.Static
 import Model
 import Control.Applicative
 import Data.Maybe
-import Data.List
+import Data.List as L
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.Text as T
@@ -18,6 +18,8 @@ import Yesod
 import Numeric (readHex, showHex)
 import Network.Mail.Mime
 import Text.Blaze.Html.Renderer.Utf8
+import Graphics.ImageMagick.MagickWand
+import Filesystem.Path.CurrentOS
 
 getUserIdFromText :: T.Text -> UserId
 getUserIdFromText tempUserId =
@@ -66,7 +68,7 @@ tagField :: Monad m => Field m [T.Text]
 tagField = Field
   { fieldParse = \rawVals _ -> do
       case rawVals of
-        [x] -> case null [x] of
+        [x] -> case L.null [x] of
           False -> return $ Right $ Just $ removeItem "" $ T.splitOn " " x
           True -> return $ Right $ Nothing
         _   -> return $ Left  $ error "unexpected tag list"
@@ -158,3 +160,11 @@ mediumStaticImageRoute medium =
 mediumStaticThumbRoute :: Medium -> Route Static
 mediumStaticThumbRoute medium =
   StaticRoute (drop 2 $ T.splitOn "/" $ T.pack $ mediumThumb medium) []
+
+--getThumbWidth :: MonadIO m => Maybe String -> m (Maybe Int)
+getThumbWidth path
+  | path == Nothing = pure 230
+  | otherwise       = liftIO $ withMagickWandGenesis $ do
+                        (_, w) <- magickWand
+                        readImage w (decodeString $ fromJust path)
+                        getImageWidth w

@@ -1,7 +1,7 @@
 $newline always
-<div class="content">
-  <noscript>You need to have Javscript enabled</noscript>
-  <form class="signup" method="POST" action="/signup">
+<div id="header" class="item" data-width="300">
+  <noscript>You need to have Javscript enabled
+  <form class="inner" method="POST" action="/signup">
     <h3>Signup
     <p>
       <label for="username">Username:
@@ -16,5 +16,5 @@ $newline always
       <input type="checkbox" id="tos-2" name="tos-2" value="tos-2" required>
       <label for="tos-2">terms of service 2
     <input id="signup" type="submit" value="Signup">
-  <script src="/static/js/jquery-1.7.1.min.js" type="text/javascript">
+  <script src="/static/js/jquery.min.js" type="text/javascript">
   <script src="/static/js/signup.js" type="text/javascript">

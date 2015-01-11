@@ -1,10 +1,12 @@
 $newline always
-<h3>Delete Album #{albumTitle album}
+<div id="header" class="item" data-width="300">
+  <div class="inner">
+    <h3>Delete Album #{albumTitle album}
 
-<p>
-  Do you wish to delete this album and all its containing images?
+    <p>
+      Do you wish to delete this album and all its containing images?
 
-<form method="POST" action=@{AlbumDeleteR albumId}>
-  <label for="confirm">Really delete this album
-  <input type="checkbox" id="confirm" name="confirm" value="confirm" required>
-  <input id="delete" type="submit" value="Delete album">
+    <form method="POST" action=@{AlbumDeleteR albumId}>
+      <label for="confirm">Really delete this album
+      <input type="checkbox" id="confirm" name="confirm" value="confirm" required>
+      <input id="delete" type="submit" value="Delete album">
