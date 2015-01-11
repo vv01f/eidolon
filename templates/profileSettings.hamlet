@@ -1,9 +1,9 @@
 $newline always
-<h3>Profile settings
+<div id="header" class="item" data-width="300">
+  <form class="inner" method="post" enctype=#{enctype}>
+    <h1>Profile settings
+    ^{profileSettingsWidget}
+    <div>
+      <input type=submit value="Change settings">
 
-<form method="post" enctype=#{enctype}>
-  ^{profileSettingsWidget}
-  <div>
-    <input type=submit value="Change settings">
-
-<a href=@{ProfileDeleteR userId}>Delete user
+  <a href=@{ProfileDeleteR userId}>Delete user

@@ -2,6 +2,8 @@ $newline always
 <div id="header" class="item" data-width="400">
   <div class="inner">
     <h1>Profile of #{ownerSlug}
+    $if presence == True
+      <a href=@{ProfileSettingsR ownerId}>Change your profile settings
 
 <div id="header" class="item" data-width="400">
   <div class="inner">
@@ -55,5 +57,3 @@ $else
     get a feed from this:
       <a href=@{UserFeedAtomR ownerId}>Atom
       <a href=@{UserFeedRssR ownerId}>RSS
-    $if presence == True
-      <a href=@{ProfileSettingsR ownerId}>Change your profile settings

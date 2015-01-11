@@ -9,7 +9,7 @@ getProfileSettingsR userId = do
   case checkRes of
     Right user -> do
       (profileSettingsWidget, enctype) <- generateFormPost $ profileSettingsForm user
-      defaultLayout $ do
+      formLayout $ do
         setTitle "Eidolon :: Profile settings"
         $(widgetFile "profileSettings")
     Left (errorMsg, route) -> do

@@ -10,8 +10,3 @@ $forall (Entity mediumId medium) <- recentMedia
       <figure>
         <img src=#{mediumThumb medium}>
         <figcaption>#{mediumTitle medium}
-<div id="header" class="item" data-width="400">
-  <div class="inner">
-    <h1>Test
-    <p>
-      foo bar baz

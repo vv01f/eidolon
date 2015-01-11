@@ -2,6 +2,7 @@ module Handler.AlbumSettings where
 
 import Import
 import qualified Data.Text as T
+import Data.Maybe
 import System.Directory
 import System.FilePath
 import qualified Data.List as L
@@ -84,7 +85,7 @@ postAlbumSettingsR albumId = do
                     False -> do
                       return [()]
                       -- nothing to do here
-                  width <- getThumbWidth $ albumSamplePic temp
+                  width <- getThumbWidth $ Just $ L.tail $ fromMaybe ['a'] $ albumSamplePic temp
                   _ <- runDB $ update albumId 
                     [ AlbumTitle =. albumTitle temp
                     , AlbumShares =. newShares

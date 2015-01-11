@@ -1,10 +1,12 @@
 $newline always
-<h3>Delete User #{userSlug user}
+<div id="header" class="item" data-width="300">
+  <div class="inner">
+    <h1>Delete User #{userSlug user}
 
-<p>
-  Do you wish to delete this user and all his albums in images?
+    <p>
+      Do you wish to delete this user and all his albums and images?
 
-<form method="POST" action=@{ProfileDeleteR userId}>
-  <label for="confirm">Really delete this user
-  <input type="checkbox" id="confirm" name="confirm" value="confirm" required>
-  <input id="delete" type="submit" value="Delete user">
+    <form method="POST" action=@{ProfileDeleteR userId}>
+      <label for="confirm">Really delete this user
+      <input type="checkbox" id="confirm" name="confirm" value="confirm" required>
+      <input id="delete" type="submit" value="Delete user">
