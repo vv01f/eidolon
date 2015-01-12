@@ -499,7 +499,7 @@ console.log(itemsWidth,itemHeight)
 						overlayColor: _.settings.popupOverlayColor,
 						overlayOpacity: _.settings.popupOverlayOpacity,
 						popupCloserText: '',
-						popupLoaderText: '',
+						popupLoaderText: 'loading',
 						selector: '.thumb a',
 						usePopupCaption: true,
 						usePopupCloser: false,

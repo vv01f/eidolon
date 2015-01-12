@@ -28,7 +28,7 @@ getAdminMediumSettingsR mediumId = do
       case tempMedium of
         Just medium -> do
           (adminMediumSetWidget, enctype) <- generateFormPost $ adminMediumSetForm medium
-          defaultLayout $ do
+          formLayout $ do
             setTitle "Administration: Medium Settings"
             $(widgetFile "adminMediumSet")
         Nothing -> do

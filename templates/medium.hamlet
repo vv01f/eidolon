@@ -1,58 +1,59 @@
-<h3>#{mediumTitle medium}
-
-by <a href=@{UserR ownerName}>#{ownerName}</a> from album <a href=@{AlbumR albumId}>#{albumTitle album}</a>
-
-
-
-<div class="image">
-  <img src=#{mediumPath medium}>
+<div id="header" class="item" data-width="800">
+  <div class="inner">
+    <h1>#{mediumTitle medium}
+ 
+    by <a href=@{UserR ownerName}>#{ownerName}</a> from album <a href=@{AlbumR albumId}>#{albumTitle album}</a>
 
 
-<div class="desc">
-  Uploaded on: #{formatTime defaultTimeLocale "%A %F %H:%M" (mediumTime medium)}<br>
-  Description:<br>
-  #{mediumDescription medium}
-<br>
-<div class="tags">
-  Tags:
-  <ul>
-    $if null (mediumTags medium)
-      none
+
+    <img src=#{mediumPath medium}>
+
+
+    <div class="desc">
+      Uploaded on: #{formatTime defaultTimeLocale "%A %F %H:%M" (mediumTime medium)}<br>
+      Description:<br>
+      #{mediumDescription medium}
+
+    <div class="tags">
+      Tags:
+      <ul>
+        $if null (mediumTags medium)
+          none
+        $else
+          $forall tag <- mediumTags medium
+            <li>
+              <a href=@{TagR tag}>#{tag}
+    $if presence == True
+      <a href=@{MediumSettingsR mediumId}>Change medium settings
+ 
+    $if null comments
+      <p>There are no Comments yet
     $else
-      $forall tag <- mediumTags medium
-        <li>
-          <a href=@{TagR tag}>#{tag}
-$if presence == True
-  <a href=@{MediumSettingsR mediumId}>Change medium settings
-
-$if null comments
-  <p>There are no Comments yet
-$else
-  $forall (Entity commentId comment) <- comments
-    <div #comment>
-      <a href=@{ProfileR $ fromJust $ commentAuthor comment}>#{fromJust $ commentAuthorSlug comment}</a> wrote on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime comment}:
-      <hr>
-      #{commentContent comment}
-      $if userId /= Nothing
-        <hr>
-        <a href=@{CommentReplyR commentId}>Reply to this comment
-        $if userId == (commentAuthor comment)
-          <a href=@{CommentDeleteR commentId}>Delete this comment
-    $forall (Entity _ reply) <- replies
-      $if commentParent reply == Just commentId
-        <div #comment class="reply">
-          <a href=@{ProfileR $ fromJust $ commentAuthor reply}>#{fromJust $ commentAuthorSlug reply}</a> wrote on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime reply}:
+      $forall (Entity commentId comment) <- comments
+        <div #comment>
+          <a href=@{ProfileR $ fromJust $ commentAuthor comment}>#{fromJust $ commentAuthorSlug comment}</a> wrote on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime comment}:
           <hr>
-          #{commentContent reply}
-          $if userId == (commentAuthor comment)
-            <a href=@{CommentDeleteR commentId}>Delete this comment
+          #{commentContent comment}
+          $if userId /= Nothing
+            <hr>
+            <a href=@{CommentReplyR commentId}>Reply to this comment
+            $if userId == (commentAuthor comment)
+              <a href=@{CommentDeleteR commentId}>Delete this comment
+        $forall (Entity _ reply) <- replies
+          $if commentParent reply == Just commentId
+            <div #comment class="reply">
+              <a href=@{ProfileR $ fromJust $ commentAuthor reply}>#{fromJust $ commentAuthorSlug reply}</a> wrote on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime reply}:
+              <hr>
+              #{commentContent reply}
+              $if userId == (commentAuthor comment)
+                <a href=@{CommentDeleteR commentId}>Delete this comment
 
-$if userId /= Nothing
-  <form method=post enctype=#{enctype}>
-    ^{commentWidget}
-    <div>
-      <input type=submit value="Post comment">
-
-get a feed from this:
-  <a href=@{CommentFeedAtomR mediumId}>Atom
-  <a href=@{CommentFeedRssR mediumId}>RSS
+    $if userId /= Nothing
+      <form method=post enctype=#{enctype}>
+        ^{commentWidget}
+        <div>
+          <input type=submit value="Post comment">
+ 
+    get a feed from this:
+      <a href=@{CommentFeedAtomR mediumId}>Atom
+      <a href=@{CommentFeedRssR mediumId}>RSS

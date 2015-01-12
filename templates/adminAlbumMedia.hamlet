@@ -6,8 +6,8 @@ $newline always
       <p>#{albumTitle album} has no media yet
 
 $forall (Entity mId m) <- media
-  <article class="item" data-width="200">
-    <a href=@{AdminMediumSettingsR mId}>#{mediumTitle m}
+  <article class="item" data-width=#{mediumThumbWidth m}>
+    <a href=@{AdminMediumSettingsR mId}>
       <figure class="thumbnail">
         <img src=#{mediumThumb m}>
         <figcaption>#{mediumTitle m}

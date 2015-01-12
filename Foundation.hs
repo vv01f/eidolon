@@ -83,8 +83,9 @@ renderLayout widget = do
             , js_init_js
             ])
         $(combineStylesheets 'StaticR
-            [ css_normalize_css
-            , css_bootstrap_css
+            [
+            --  css_normalize_css
+              css_bootstrap_css
             ])
         $(widgetFile "default-layout")
     withUrlRenderer $(hamletFile "templates/default-layout-wrapper.hamlet")
