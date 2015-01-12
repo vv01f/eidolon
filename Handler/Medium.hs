@@ -102,7 +102,7 @@ getCommentReplyR commentId = do
           userSl <- return $ Just $ userSlug u
           mediumId <- return $ commentOrigin comment
           (replyWidget, enctype) <- generateFormPost $ commentForm userId userSl mediumId (Just commentId)
-          defaultLayout $ do
+          formLayout $ do
             setTitle "Eidolon :: Reply to comment"
             $(widgetFile "commentReply")
         Nothing -> do
@@ -179,7 +179,7 @@ getCommentDeleteR commentId = do
           presence <- return $ (Just userId) == (commentAuthor comment)
           case presence of
             True -> do
-              defaultLayout $ do
+              formLayout $ do
                 setTitle "Eidolon :: Delete comment"
                 $(widgetFile "commentDelete")
             False -> do

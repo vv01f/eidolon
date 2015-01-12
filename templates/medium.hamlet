@@ -4,11 +4,10 @@
  
     by <a href=@{UserR ownerName}>#{ownerName}</a> from album <a href=@{AlbumR albumId}>#{albumTitle album}</a>
 
-
-
     <img src=#{mediumPath medium}>
 
-
+<div id="header" class="item" data-width="400">
+  <div class="inner">
     <div class="desc">
       Uploaded on: #{formatTime defaultTimeLocale "%A %F %H:%M" (mediumTime medium)}<br>
       Description:<br>
@@ -39,14 +38,15 @@
             <a href=@{CommentReplyR commentId}>Reply to this comment
             $if userId == (commentAuthor comment)
               <a href=@{CommentDeleteR commentId}>Delete this comment
-        $forall (Entity _ reply) <- replies
+        $forall (Entity replyId reply) <- replies
           $if commentParent reply == Just commentId
             <div #comment class="reply">
               <a href=@{ProfileR $ fromJust $ commentAuthor reply}>#{fromJust $ commentAuthorSlug reply}</a> wrote on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime reply}:
               <hr>
               #{commentContent reply}
+              <hr>
               $if userId == (commentAuthor comment)
-                <a href=@{CommentDeleteR commentId}>Delete this comment
+                <a href=@{CommentDeleteR replyId}>Delete this comment
 
     $if userId /= Nothing
       <form method=post enctype=#{enctype}>

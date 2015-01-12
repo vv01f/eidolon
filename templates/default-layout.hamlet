@@ -1,3 +1,6 @@
+<head>
+  ^{pageHead wc}
+
 <nav id="header">
   <div id="top-nav">
   <ul id="user-nav">

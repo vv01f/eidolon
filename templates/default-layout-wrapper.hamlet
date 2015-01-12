@@ -4,7 +4,7 @@ $doctype 5
     <head>
         <meta charset="UTF-8">
 
-        <title>#{pageTitle pc}
+        <title>#{pageTitle wc}
         <meta name="description" content="">
         <meta name="author" content="">
 
@@ -15,8 +15,8 @@ $doctype 5
           <link rel="stylesheet" href=@{StaticR css_style_desktop_css} />
           <link rel="stylesheet" href=@{StaticR css_style_noscript_css} />
 
-        ^{pageHead wc}
         ^{pageHead pc}
+        ^{pageHead wc}
 
     <body>
       <div id="wrapper">

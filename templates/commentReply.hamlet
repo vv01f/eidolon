@@ -1,9 +1,11 @@
-<h4>Reply to comment
-<strong>#{fromJust $ commentAuthorSlug comment}</strong> posted on #{formatTime defaultTimeLocale "%A %F %H:%M" (commentTime comment)}:
-<hr>
-  <p>#{markdownToHtml $ commentContent comment}
-<hr>
-  <form method=post enctype=#{enctype}>
-    ^{replyWidget}
-    <div>
-      <input type=submit value="Post reply">
+<div id="header" class="item" data-width="600">
+  <div class="inner">
+    <h4>Reply to comment
+    <strong>#{fromJust $ commentAuthorSlug comment}</strong> posted on #{formatTime defaultTimeLocale "%A %F %H:%M" (commentTime comment)}:
+    <hr>
+      <p>#{markdownToHtml $ commentContent comment}
+    <hr>
+      <form method=post enctype=#{enctype}>
+        ^{replyWidget}
+        <div>
+          <input type=submit value="Post reply">
