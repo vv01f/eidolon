@@ -33,6 +33,7 @@ Medium
     owner UserId
     description Textarea
     tags Texts
+    width Int
     thumbWidth Int
     album AlbumId
     deriving Eq Show

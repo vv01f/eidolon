@@ -1,7 +1,7 @@
 img
   position: relative !important
   max-width: 100% !important
-  height: 28em !important
+  max-height: 28em !important
   width: auto !important
 
 .reply

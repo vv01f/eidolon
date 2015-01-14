@@ -33,6 +33,9 @@ getMediumR mediumId = do
       (commentWidget, enctype) <- generateFormPost $ commentForm userId userSl mediumId Nothing
       comments <- runDB $ selectList [CommentOrigin ==. mediumId, CommentParent ==. Nothing] [Desc CommentTime]
       replies <- runDB $ selectList [CommentOrigin ==. mediumId, CommentParent !=. Nothing] [Desc CommentTime]
+      dataWidth <- case mediumWidth medium >= 750 of
+        True -> return 750
+        False -> return $ (mediumWidth medium) + 53
       formLayout $ do
         setTitle $ toHtml ("Eidolon :: Medium " `T.append` (mediumTitle medium))
         $(widgetFile "medium")

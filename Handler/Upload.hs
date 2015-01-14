@@ -55,7 +55,7 @@ postUploadR = do
               albRef <- runDB $ getJust (tempMediumAlbum temp)
               ownerId <- return $ albumOwner albRef
               path <- writeOnDrive fil ownerId (tempMediumAlbum temp)
-              (thumbPath, width) <- generateThumb path ownerId (tempMediumAlbum temp)
+              (thumbPath, iWidth, tWidth) <- generateThumb path ownerId (tempMediumAlbum temp)
               inAlbumId <- return $ tempMediumAlbum temp
               medium <- return $ Medium
                 (tempMediumTitle temp)
@@ -66,7 +66,8 @@ postUploadR = do
                 (tempMediumOwner temp)
                 (tempMediumDesc temp)
                 (tempMediumTags temp)
-                width
+                iWidth
+                tWidth
                 inAlbumId
               mId <- runDB $ I.insert medium
               inAlbum <- runDB $ getJust inAlbumId
@@ -134,7 +135,7 @@ postDirectUploadR albumId = do
                       albRef <- runDB $ getJust (tempMediumAlbum temp)
                       refOwnerId <- return $ albumOwner albRef
                       path <- writeOnDrive fil refOwnerId albumId
-                      (thumbPath, width) <- generateThumb path ownerId albumId
+                      (thumbPath, iWidth, tWidth) <- generateThumb path ownerId albumId
                       medium <- return $ Medium
                         (tempMediumTitle temp)
                         ('/' : path)
@@ -144,7 +145,8 @@ postDirectUploadR albumId = do
                         (tempMediumOwner temp)
                         (tempMediumDesc temp)
                         (tempMediumTags temp)
-                        width
+                        iWidth
+                        tWidth
                         albumId
                       mId <- runDB $ insert medium
                       inAlbum <- runDB $ getJust albumId
@@ -168,14 +170,14 @@ postDirectUploadR albumId = do
       setMessage "This Album does not exist"
       redirect $ AlbumR albumId
 
-generateThumb :: FP.FilePath -> UserId -> AlbumId -> Handler (FP.FilePath, Int)
+generateThumb :: FP.FilePath -> UserId -> AlbumId -> Handler (FP.FilePath, Int, Int)
 generateThumb path userId albumId = do
   newName <- return $ (FP.takeBaseName path) ++ "_thumb" ++ (FP.takeExtension path)
   newPath <- return $ "static" FP.</> "data"
     FP.</> (T.unpack $ extractKey userId)
     FP.</> (T.unpack $ extractKey albumId)
     FP.</> newName
-  width <- liftIO $ withMagickWandGenesis $ do
+  (iWidth, tWidth) <- liftIO $ withMagickWandGenesis $ do
     (_ , w) <- magickWand
     readImage w (decodeString path)
     w1 <- getImageWidth w
@@ -185,8 +187,8 @@ generateThumb path userId albumId = do
     resizeImage w w2 h2 lanczosFilter 1
     setImageCompressionQuality w 95
     writeImage w (Just (decodeString newPath))
-    return w2
-  return (newPath, width)
+    return (w1, w2)
+  return (newPath, iWidth, tWidth)
 
 writeOnDrive :: FileInfo -> UserId -> AlbumId -> Handler FP.FilePath
 writeOnDrive fil userId albumId = do

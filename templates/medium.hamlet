@@ -1,14 +1,14 @@
-<div id="header" class="item" data-width="800">
+<div id="header" class="item" data-width=#{dataWidth}>
   <div class="inner">
     <h1>#{mediumTitle medium}
- 
-    by <a href=@{UserR ownerName}>#{ownerName}</a> from album <a href=@{AlbumR albumId}>#{albumTitle album}</a>
+    <p>
+      by <a href=@{UserR ownerName}>#{ownerName}</a> from album <a href=@{AlbumR albumId}>#{albumTitle album}</a>
 
     <img src=#{mediumPath medium}>
 
 <div id="header" class="item" data-width="400">
   <div class="inner">
-    <div class="desc">
+    <p class="desc">
       Uploaded on: #{formatTime defaultTimeLocale "%A %F %H:%M" (mediumTime medium)}<br>
       Description:<br>
       #{mediumDescription medium}
