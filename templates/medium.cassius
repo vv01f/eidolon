@@ -1,6 +1,8 @@
 img
   position: relative !important
-  width: 100%
+  max-width: 100% !important
+  height: 28em !important
+  width: auto !important
 
 .reply
   margin-left: 50px

@@ -16,3 +16,6 @@ nav li
 
 nav
   padding: 1em 2em !important
+
+a:hover
+  color: black !important

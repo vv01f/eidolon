@@ -1,14 +1,13 @@
 $newline always
+<div id="header" class="item" data-width="400">
+  <div class="inner">
+    <h1>Tag #{tag}
+    $if null media
+      There are no media tagged with #{tag}
 
-<h3>Tag #{tag}
-
-$if null media
-  There are no media tagged with #{tag}
-$else
-  <ul>
-  $forall Just (Entity mId m) <- media
-    <li>
-      <a href=@{MediumR mId}>
-        <figure class="thumbnail">
-          <img src=#{mediumThumb m}>
-          <figcapion>#{mediumTitle m}
+$forall Just (Entity mId m) <- media
+  <article class="item" data-width=#{mediumThumbWidth m}>
+    <a href=@{MediumR mId}>
+      <figure class="thumbnail">
+        <img src=#{mediumThumb m}>
+        <figcapion>#{mediumTitle m}

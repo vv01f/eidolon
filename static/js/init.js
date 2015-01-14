@@ -48,7 +48,7 @@ var parallelism = (function($) { var _ = {
 						marginTop: 0,
 					
 					// Nudge the reel by this value (in px) after it's been vertically centered.
-						verticalNudge: 60,
+						verticalNudge: 0,
 						
 					// Maximum number of rows.
 						maxRows: 5,
