@@ -100,7 +100,7 @@ getAdminMediumDeleteR mediumId = do
           runDB $ delete mediumId
           -- delete files
           liftIO $ removeFile (normalise $ tail $ mediumPath medium)
-          liftIO $ removeFile (normalise $ tail $ mediumPath medium)
+          liftIO $ removeFile (normalise $ tail $ mediumThumb medium)
           -- outro
           setMessage "Medium deleted successfully"
           redirect $ AdminR
