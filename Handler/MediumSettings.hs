@@ -12,7 +12,7 @@ getMediumSettingsR mediumId = do
   case checkRes of
     Right medium -> do
       (mediumSettingsWidget, enctype) <- generateFormPost $ mediumSettingsForm medium
-      defaultLayout $ do
+      formLayout $ do
         setTitle "Eidolon :: Medium Settings"
         $(widgetFile "mediumSettings")
     Left (errorMsg, route) -> do
@@ -60,7 +60,7 @@ getMediumDeleteR mediumId = do
   checkRes <- mediumCheck mediumId
   case checkRes of
     Right medium -> do
-      defaultLayout $ do
+      formLayout $ do
         setTitle "Eidolon :: Delete Medium"
         $(widgetFile "mediumDelete")
     Left (errorMsg, route) -> do

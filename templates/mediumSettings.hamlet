@@ -1,9 +1,11 @@
 $newline always
-<h3>Medium settings
+<div id="header" class="item" data-width="300">
+  <div class="inner">
+    <h3>Medium settings
 
-<form method="post" enctype=#{enctype}>
-  ^{mediumSettingsWidget}
-  <div>
-    <input type=submit value="Change settings">
+    <form method="post" enctype=#{enctype}>
+      ^{mediumSettingsWidget}
+      <div>
+        <input type=submit value="Change settings">
 
-<a href=@{MediumDeleteR mediumId}>Delete this image
+  <a href=@{MediumDeleteR mediumId}>Delete this image
