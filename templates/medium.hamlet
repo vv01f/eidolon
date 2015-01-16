@@ -25,38 +25,45 @@
     $if presence == True
       <a href=@{MediumSettingsR mediumId}>Change medium settings
  
-    $if null comments
+$if null comments
+  <div id="header" class="item" data-width="300">
+    <div class="inner">
       <p>There are no Comments yet
-    $else
-      $forall (Entity commentId comment) <- comments
-        <div #comment>
-          <a href=@{ProfileR $ fromJust $ commentAuthor comment}>#{fromJust $ commentAuthorSlug comment}</a> wrote on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime comment}:
+$else
+  $forall (Entity commentId comment) <- comments
+    <article class="item comment" data-width="300">
+      <a href=@{ProfileR $ fromJust $ commentAuthor comment}>#{fromJust $ commentAuthorSlug comment}</a> wrote on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime comment}:
+      <hr>
+      #{commentContent comment}
+      $if userId /= Nothing
+        <hr>
+        <a href=@{CommentReplyR commentId}>Reply to this comment
+        $if userId == (commentAuthor comment)
+          <a href=@{CommentDeleteR commentId}>Delete this comment
+    $forall (Entity replyId reply) <- replies
+      $if commentParent reply == Just commentId
+        <article class="item reply">
+          <a href=@{ProfileR $ fromJust $ commentAuthor reply}>#{fromJust $ commentAuthorSlug reply}</a> wrote on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime reply}:
           <hr>
-          #{commentContent comment}
-          $if userId /= Nothing
-            <hr>
-            <a href=@{CommentReplyR commentId}>Reply to this comment
-            $if userId == (commentAuthor comment)
-              <a href=@{CommentDeleteR commentId}>Delete this comment
-        $forall (Entity replyId reply) <- replies
-          $if commentParent reply == Just commentId
-            <div #comment class="reply">
-              <a href=@{ProfileR $ fromJust $ commentAuthor reply}>#{fromJust $ commentAuthorSlug reply}</a> wrote on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime reply}:
-              <hr>
-              #{commentContent reply}
-              <hr>
-              $if userId == (commentAuthor comment)
-                <a href=@{CommentDeleteR replyId}>Delete this comment
+          #{commentContent reply}
+          <hr>
+          $if userId == (commentAuthor comment)
+            <a href=@{CommentDeleteR replyId}>Delete this comment
 
-    $if userId /= Nothing
+$if userId /= Nothing
+  <div id="header" class="item" data-width="300">
+    <div class="inner">
       <form method=post enctype=#{enctype}>
         ^{commentWidget}
         <div>
           <input type=submit value="Post comment">
- 
-    get a feed from this:
-      <a href=@{CommentFeedAtomR mediumId}>Atom
-      <a href=@{CommentFeedRssR mediumId}>RSS
+
+<div id="header" class="item">
+  <div class="inner">
+    <h3>
+      get a feed from this:
+    <a href=@{CommentFeedAtomR mediumId}>Atom
+    <a href=@{CommentFeedRssR mediumId}>RSS
 
 <style type="text/css">
   body{background-image: url('/static/css/images/overlay.png'),	-webkit-linear-gradient(top, rgba(0,0,0,0) 75%, rgba(0,0,0,0.65)), url('#{mediumPath medium}');}
