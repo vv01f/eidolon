@@ -168,3 +168,15 @@ getThumbWidth path
                         (_, w) <- magickWand
                         readImage w (decodeString $ fromJust path)
                         getImageWidth w
+
+multiFileField :: (Monad m, RenderMessage (HandlerSite m) FormMessage) => Field m [FileInfo]
+multiFileField = Field
+    { fieldParse = \_ files -> return $
+        case files of
+            [] -> Right Nothing
+            file:_ -> Right $ Just files
+    , fieldView = \id' name attrs _ isReq -> toWidget [hamlet|
+            <input id=#{id'} name=#{name} *{attrs} type=file :isReq:required multiple="" enctype="multipart/form-data">
+        |]
+    , fieldEnctype = Multipart
+    }

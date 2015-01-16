@@ -4,86 +4,11 @@ import Import as I
 import Data.Time
 import Data.Maybe
 import qualified Data.Text as T
+import Data.List as L
 import qualified System.FilePath as FP
 import Filesystem.Path.CurrentOS
 import Graphics.ImageMagick.MagickWand
-
-data TempMedium = TempMedium
-  { tempMediumTitle :: Text
-  , tempMediumFile :: FileInfo
-  , tempMediumTime :: UTCTime
-  , tempMediumOwner :: UserId
-  , tempMediumDesc :: Textarea
-  , tempMediumTags :: [Text]
-  , tempMediumAlbum :: AlbumId
-  }
-
-getUploadR :: Handler Html
-getUploadR = do
-  msu <- lookupSession "userId"
-  case msu of
-    Just tempUserId -> do
-      userId <- return $ getUserIdFromText tempUserId
-      user <- runDB $ getJust userId
-      albums <- return $ userAlbums user
-      case I.null albums of
-        False -> do
-          (uploadWidget, enctype) <- generateFormPost (uploadForm userId)
-          formLayout $ do
-            setTitle "Eidolon :: Upload Medium"
-            $(widgetFile "upload")
-        True -> do
-          setMessage "Please create an album first"
-          redirect $ NewAlbumR
-    Nothing -> do
-      setMessage "You need to be logged in"
-      redirect $ LoginR
-
-postUploadR :: Handler Html
-postUploadR = do
-  msu <- lookupSession "userId"
-  case msu of
-    Just tempUserId -> do
-      userId <- lift $ pure $ getUserIdFromText tempUserId
-      ((result, _), _) <- runFormPost (uploadForm userId)
-      case result of
-        FormSuccess temp -> do
-          fil <- return $ tempMediumFile temp
-          mime <- return $ (fileContentType fil)
-          case mime `elem` acceptedTypes of
-            True -> do
-              albRef <- runDB $ getJust (tempMediumAlbum temp)
-              ownerId <- return $ albumOwner albRef
-              path <- writeOnDrive fil ownerId (tempMediumAlbum temp)
-              (thumbPath, iWidth, tWidth) <- generateThumb path ownerId (tempMediumAlbum temp)
-              inAlbumId <- return $ tempMediumAlbum temp
-              medium <- return $ Medium
-                (tempMediumTitle temp)
-                ('/' : path)
-                ('/' : thumbPath)
-                mime
-                (tempMediumTime temp)
-                (tempMediumOwner temp)
-                (tempMediumDesc temp)
-                (tempMediumTags temp)
-                iWidth
-                tWidth
-                inAlbumId
-              mId <- runDB $ I.insert medium
-              inAlbum <- runDB $ getJust inAlbumId
-              newMediaList <- return $ mId : (albumContent inAlbum)
-              runDB $ update inAlbumId [AlbumContent =. newMediaList]
-              setMessage "Image succesfully uploaded"
-              redirect $ HomeR
-            _ -> do
-              setMessage "This filetype is not supported"
-              redirect $ UploadR
-        _ -> do
-          setMessage "There was an error uploading the file"
-          redirect $ UploadR
-    Nothing -> do
-      setMessage "You need to be logged in"
-      redirect $ LoginR
+import Text.Blaze.Internal
 
 getDirectUploadR :: AlbumId -> Handler Html
 getDirectUploadR albumId = do
@@ -128,35 +53,48 @@ postDirectUploadR albumId = do
               ((result, _), _) <- runFormPost (dUploadForm userId albumId)
               case result of
                 FormSuccess temp -> do
-                  fil <- return $ tempMediumFile temp
-                  mime <- return $ fileContentType fil
-                  case mime `elem` acceptedTypes of
+                  fils <- return $ fileBulkFiles temp
+                  indFils <- return $ zip [1..] fils
+                  errNames <- mapM
+                    (\(index, file) -> do
+                      mime <- return $ fileContentType file
+                      case mime `elem` acceptedTypes of
+                        True -> do
+                          albRef <- runDB $ getJust albumId
+                          ownerId <- return $ albumOwner albRef
+                          path <- writeOnDrive file ownerId albumId
+                          (thumbPath, iWidth, tWidth) <- generateThumb path ownerId albumId
+                          tempName <- return $ ((fileBulkPrefix temp) `T.append` " " `T.append` (T.pack (show index)) `T.append` " of " `T.append` (T.pack (show (length indFils))))
+                          medium <- return $ Medium
+                            tempName
+                            ('/' : path)
+                            ('/' : thumbPath)
+                            mime
+                            (fileBulkTime temp)
+                            (fileBulkOwner temp)
+                            (fileBulkDesc temp)
+                            (fileBulkTags temp)
+                            iWidth
+                            tWidth
+                            albumId
+                          mId <- runDB $ I.insert medium
+                          inALbum <- runDB $ getJust albumId
+                          newMediaList <- return $ mId : (albumContent inALbum)
+                          runDB $ update albumId [AlbumContent =. newMediaList]
+                          return Nothing
+                        False -> do
+                          return $ Just $ fileName file
+                      ) indFils
+                  onlyErrNames <- return $ removeItem Nothing errNames
+                  case L.null onlyErrNames of
                     True -> do
-                      albRef <- runDB $ getJust (tempMediumAlbum temp)
-                      refOwnerId <- return $ albumOwner albRef
-                      path <- writeOnDrive fil refOwnerId albumId
-                      (thumbPath, iWidth, tWidth) <- generateThumb path ownerId albumId
-                      medium <- return $ Medium
-                        (tempMediumTitle temp)
-                        ('/' : path)
-                        ('/' : thumbPath)
-                        mime
-                        (tempMediumTime temp)
-                        (tempMediumOwner temp)
-                        (tempMediumDesc temp)
-                        (tempMediumTags temp)
-                        iWidth
-                        tWidth
-                        albumId
-                      mId <- runDB $ insert medium
-                      inAlbum <- runDB $ getJust albumId
-                      newMediaList <- return $ mId : (albumContent inAlbum)
-                      runDB $ update albumId [AlbumContent =. newMediaList]
-                      setMessage "Image successfully uploaded"
-                      redirect $ AlbumR albumId
-                    _ -> do
-                      setMessage "This filetype is not supported"
-                      redirect $ DirectUploadR albumId
+                      setMessage "All images succesfully uploaded"
+                      redirect $ HomeR
+                    False -> do
+                      justErrNames <- return $ map fromJust onlyErrNames
+                      msg <- return $ Content $ Text $ "File type not supported of: " `T.append` (T.intercalate ", " justErrNames)
+                      setMessage msg
+                      redirect $ HomeR
                 _ -> do
                   setMessage "There was an error uploading the file"
                   redirect $ DirectUploadR albumId
@@ -203,17 +141,57 @@ writeOnDrive fil userId albumId = do
   liftIO $ fileMove fil path
   return path
 
-uploadForm :: UserId -> Form TempMedium
-uploadForm userId = renderDivs $ (\a b c d e f g -> TempMedium b c d e f g a)
+dUploadForm :: UserId -> AlbumId -> Form FileBulk
+dUploadForm userId albumId = renderDivs $ FileBulk
+  <$> areq textField "Title" Nothing
+  <*> areq multiFileField "Select file(s)" Nothing
+  <*> lift (liftIO getCurrentTime)
+  <*> pure userId
+  <*> areq textareaField "Description" Nothing
+  <*> areq tagField "Enter tags" Nothing
+  <*> pure albumId
+
+data FileBulk = FileBulk
+  { fileBulkPrefix :: Text
+  , fileBulkFiles :: [FileInfo]
+  , fileBulkTime :: UTCTime
+  , fileBulkOwner :: UserId
+  , fileBulkDesc :: Textarea
+  , fileBulkTags :: [Text]
+  , fileBulkAlbum :: AlbumId
+  }
+
+getUploadR :: Handler Html
+getUploadR = do
+  msu <- lookupSession "userId"
+  case msu of
+    Just tempUserId -> do
+      userId <- return $ getUserIdFromText tempUserId
+      user <- runDB $ getJust userId
+      albums <- return $ userAlbums user
+      case I.null albums of
+        False -> do
+          (uploadWidget, enctype) <- generateFormPost (bulkUploadForm userId)
+          formLayout $ do
+            setTitle "Eidolon :: Upload Medium"
+            $(widgetFile "bulkUpload")
+        True -> do
+          setMessage "Please create an album first"
+          redirect $ NewAlbumR
+    Nothing -> do
+      setMessage "You need to be logged in"
+      redirect $ LoginR
+
+bulkUploadForm :: UserId -> Form FileBulk
+bulkUploadForm userId = renderDivs $ (\a b c d e f g -> FileBulk b c d e f g a)
   <$> areq (selectField albums) "Album" Nothing
   <*> areq textField "Title" Nothing
-  <*> areq fileField "Select file" Nothing
+  <*> areq multiFileField "Select file(s)" Nothing
   <*> lift (liftIO getCurrentTime)
   <*> pure userId
   <*> areq textareaField "Description" Nothing
   <*> areq tagField "Enter tags" Nothing
   where
---    albums :: GHandler App App (OptionList AlbumId)
     albums = do
       allEnts <- runDB $ selectList [] [Desc AlbumTitle]
       entities <- return $
@@ -224,15 +202,65 @@ uploadForm userId = renderDivs $ (\a b c d e f g -> TempMedium b c d e f g a)
               True -> Just ent
               False -> Nothing
             ) allEnts
---      entities <- runDB $ selectList [AlbumOwner ==. userId] [Desc AlbumTitle]
       optionsPairs $ I.map (\alb -> (albumTitle $ entityVal alb, entityKey alb)) entities
 
-dUploadForm :: UserId -> AlbumId -> Form TempMedium
-dUploadForm userId albumId = renderDivs $ TempMedium
-  <$> areq textField "Title" Nothing
-  <*> areq fileField "Select file" Nothing
-  <*> lift (liftIO getCurrentTime)
-  <*> pure userId
-  <*> areq textareaField "Description" Nothing
-  <*> areq tagField "Enter tags" Nothing
-  <*> pure albumId
+postUploadR :: Handler Html
+postUploadR = do
+  msu <- lookupSession "userId"
+  case msu of
+    Just tempUserId -> do
+      userId <- lift $ pure $ getUserIdFromText tempUserId
+      ((result, _), _) <- runFormPost (bulkUploadForm userId)
+      case result of
+        FormSuccess temp -> do
+          fils <- return $ fileBulkFiles temp
+          indFils <- return $ zip [1..] fils
+          errNames <- mapM
+            (\(index, file) -> do
+              mime <- return $ fileContentType file
+              case mime `elem` acceptedTypes of
+                True -> do
+                  inAlbumId <- return $ fileBulkAlbum temp
+                  albRef <- runDB $ getJust inAlbumId
+                  ownerId <- return $ albumOwner albRef
+                  path <- writeOnDrive file ownerId inAlbumId
+                  (thumbPath, iWidth, tWidth) <- generateThumb path ownerId inAlbumId
+                  tempName <- case length indFils == 1 of
+                    False -> return $ ((fileBulkPrefix temp) `T.append` " " `T.append` (T.pack (show index)) `T.append` " of " `T.append` (T.pack (show (length indFils))))
+                    True -> return $ fileBulkPrefix temp
+                  medium <- return $ Medium
+                    tempName
+                    ('/' : path)
+                    ('/' : thumbPath)
+                    mime
+                    (fileBulkTime temp)
+                    (fileBulkOwner temp)
+                    (fileBulkDesc temp)
+                    (fileBulkTags temp)
+                    iWidth
+                    tWidth
+                    inAlbumId
+                  mId <- runDB $ I.insert medium
+                  inALbum <- runDB $ getJust inAlbumId
+                  newMediaList <- return $ mId : (albumContent inALbum)
+                  runDB $ update inAlbumId [AlbumContent =. newMediaList]
+                  return Nothing
+                False -> do
+                  return $ Just $ fileName file
+              ) indFils
+          onlyErrNames <- return $ removeItem Nothing errNames
+          case L.null onlyErrNames of
+            True -> do
+              setMessage "All images succesfully uploaded"
+              redirect $ HomeR
+            False -> do
+              justErrNames <- return $ map fromJust onlyErrNames
+              msg <- return $ Content $ Text $ "File type not supported of: " `T.append` (T.intercalate ", " justErrNames)
+              setMessage msg
+              redirect $ HomeR
+        _ -> do
+          setMessage "There was an error uploading the file"
+          redirect $ UploadR
+    Nothing -> do
+      setMessage "You need to be logged in"
+      redirect $ LoginR
