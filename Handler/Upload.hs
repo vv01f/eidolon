@@ -60,11 +60,11 @@ postDirectUploadR albumId = do
                       mime <- return $ fileContentType file
                       case mime `elem` acceptedTypes of
                         True -> do
-                          albRef <- runDB $ getJust albumId
-                          ownerId <- return $ albumOwner albRef
                           path <- writeOnDrive file ownerId albumId
                           (thumbPath, iWidth, tWidth) <- generateThumb path ownerId albumId
-                          tempName <- return $ ((fileBulkPrefix temp) `T.append` " " `T.append` (T.pack (show index)) `T.append` " of " `T.append` (T.pack (show (length indFils))))
+                          tempName <- case length indFils == 1 of
+                            False -> return $ ((fileBulkPrefix temp) `T.append` " " `T.append` (T.pack (show index)) `T.append` " of " `T.append` (T.pack (show (length indFils))))
+                            True -> return $ fileBulkPrefix temp
                           medium <- return $ Medium
                             tempName
                             ('/' : path)
