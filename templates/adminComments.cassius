@@ -1,17 +1,39 @@
+/*templates/medium.cassius*/
+
+img
+  position: relative !important
+  max-width: 100% !important
+  width: auto !important
+  display: block !important
+  margin-left: auto !important
+  margin-right: auto !important
+
+.comment
+  border: 5px solid rgb(255, 255, 255)
+  padding: 2em 3em
+  background: #d64760 url('/static/css/images/overlay.png')
+
 .reply
-  margin-left: 50px
+  background: #47d65f url('/static/css/images/overlay.png')
 
-#mediabox
-  margin: 10px
-  padding: 5px
-  border: 1px solid #ddd
-  border-radius: 6px
-  box-shadow: 0 0 3px #c4c4c4
+.image
+  width: 100% !important
 
-#comment
-  margin-top: 5px
-  padding: 5px
-  border: 1px solid #ddd
-  border-radius: 6px
-  box-shadow: 0 0 3px #c4c4c4
-  background-color: #f5f5f5
+#wrapper
+  overflow: auto !important
+
+#reel
+  width: 90% !important
+  max-height: auto !important
+
+#reel .item
+  float: none !important
+  display: inline-block !important
+  width: 100% !important
+
+div #main
+  margin-top: 60px !important
+  position: static !important
+
+#footer
+  position: static !important
