@@ -73,4 +73,4 @@ postSignupR = do
 
 validateLen :: Text -> Bool
 validateLen a =
-  (T.length a) > 3
+  (T.length a) > 2
