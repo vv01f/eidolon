@@ -64,3 +64,9 @@ Unfortunately the gallery is not highly customizable, but you can change most of
 You can start the gallery now by running the executable. You need to provide a settings file, normally found in `config/settings.yml`
 
 Since eidolon will block your console, I recommend wrapping a init-script around it. how you can do that is written in my [blog](http://nek0.eu/posts/2014-10-23-Daemonize-a-yesod-app.html).
+
+##Acknowledgements:
+
+* This software uses the web Framework "Yesod" by Michael Snoyman. See more at: <http://www.yesodweb.com/>
+
+* This software uses parts of the template "Parallelism" by n33co. see more at: <http://html5up.net/>
