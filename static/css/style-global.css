@@ -33,11 +33,6 @@
 		-ms-transition: color 0.25s ease-in-out;
 		transition: color 0.25s ease-in-out;
 	}
-	
-		a:hover
-		{
-			color: #d64760;
-		}
 
 	h1,h2,h3,h4,h5,h6
 	{
@@ -96,6 +91,8 @@
 
 		.item
 		{
+			background: #1a1f2c;
+			background: rgba(255,255,255,0.25);
 		}
 		
 			.item.thumb
@@ -160,6 +157,8 @@
 	{
 		position: relative;
 		z-index: 1;
+		/*custom*/
+		overflow: auto;
 	}
 	
 /*********************************************************************************/
@@ -168,6 +167,8 @@
 
 	#main
 	{
+		margin-top: 60px;
+		position: static;
 	}
 	
 /*********************************************************************************/
@@ -189,3 +190,60 @@
                 #header .inner {
 			width: 100%;
 		}
+
+/*custom*/
+
+	a:hover
+	{
+		color: black;
+	}
+
+	.image img
+	{
+		position: relative !important;
+		max-width: 100%;
+		width: auto !important;
+		display: block;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	nav
+	{
+		padding: 1em 2em;
+	}
+
+	nav li
+	{
+		display: inline-block;
+	}
+
+	.comment
+	{
+		border: 5px solid rgb(255, 255, 255);
+		padding: 2em 3em;
+		background: #d64760 url('/static/css/images/overlay.png');
+	}
+
+	.center
+	{
+		text-align: center;
+	}
+
+	.image
+	{
+		height: 100% !important;
+	}
+
+	.reply
+	{
+		background: #47d65f url('/static/css/images/overlay.png');
+	}
+
+	#message
+	{
+		padding: 20px;
+		background: lightyellow url('/static/css/images/overlay.png');
+		color: #d64760;
+		font-size: 1.5em;
+	}

@@ -67,6 +67,7 @@ postLoginR = do
           returnJsonError msg
         Right userId -> do
           setSession "userId" $ extractKey (fromJust userId)
+          setMessage "Succesfully logged in"
           welcomeLink <- ($ProfileR (fromJust userId)) <$> getUrlRender
           returnJson ["welcome" .= welcomeLink]
 
