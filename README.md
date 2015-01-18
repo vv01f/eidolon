@@ -55,6 +55,10 @@ Also check `config/settings.yml` and set the values there accrding to your confi
 
 It may also be necessery to create a reverse proxy to your gallery. I would recommend using [nginx](http://nginx.org/).
 
+##Customizing
+
+Unfortunately the gallery is not highly customizable, but you can change most of its appearance by changing the files `static/css/static-*.css`. Especially the default background image can be changed by replacing `static/css/img/bg.jpg`.
+
 ##Starting
 
 You can start the gallery now by running the executable. You need to provide a settings file, normally found in `config/settings.yml`
