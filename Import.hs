@@ -18,7 +18,6 @@ import           Settings.StaticFiles as Import
 -- custom imports
 
 import           Helper               as Import
-import           Data.Bool            as Import
 
 -- end custom imports
 
