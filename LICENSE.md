@@ -6,7 +6,7 @@
 
 #For all else software:
 
-### GNU AFFERO GENERAL PUBLIC LICENSE {style="text-align: center;"}
+## GNU AFFERO GENERAL PUBLIC LICENSE
 
 Version 3, 19 November 2007
 
