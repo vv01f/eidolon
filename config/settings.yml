@@ -12,7 +12,7 @@
 #  GNU Affero General Public License for more details.
 #
 #  You should have received a copy of the GNU Affero General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>.module Handler.Activate where
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # Values formatted like "_env:ENV_VAR_NAME:default_value" can be overridden by the specified environment variable.
 # See https://github.com/yesodweb/yesod/wiki/Configuration#overriding-configuration-values-with-environment-variables
