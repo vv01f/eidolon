@@ -202,7 +202,7 @@
 	{
 		position: relative !important;
 		max-width: 100%;
-		max-height: auto;
+		max-height: auto !important;
 		width: auto !important;
 		display: block;
 		margin-left: auto;
