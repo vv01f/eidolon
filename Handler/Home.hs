@@ -18,11 +18,24 @@
 module Handler.Home where
 
 import Import
+import qualified Data.Text as T
 
 getHomeR :: Handler Html
 getHomeR = do
   recentMedia <- runDB $ selectList [] [Desc MediumTime, LimitTo 30]
+  nextMediaQuery <- runDB $ selectList [] [Desc MediumTime, LimitTo 1, OffsetBy 30]
+  nextMedia <- return $ not $ null nextMediaQuery
   widgetLayout <- return $ widgetFile "default-widget"
   defaultLayout $ do
     setTitle "Eidolon :: Home"
     $(widgetFile "home")
+
+getPageR :: Int -> Handler Html
+getPageR page = do
+  pageMedia <- runDB $ selectList [] [Desc MediumTime, LimitTo 30, OffsetBy (page*30)]
+  nextMediaQuery <- runDB $ selectList [] [Desc MediumTime, LimitTo 1, OffsetBy ((page + 1) * 30)]
+  nextMedia <- return $ not $ null nextMediaQuery
+  widgetLayout <- return $ widgetFile "default-widget"
+  defaultLayout $ do
+    setTitle $ toHtml ("Eidolon :: Page " `T.append` (T.pack $ show page))
+    $(widgetFile "page")

@@ -1,0 +1,25 @@
+$doctype 5
+$if page == 1
+  <div id="header" class="item" data-width="400">
+    <div class="inner">
+      <p>
+        <a href=@{HomeR}>
+          newer
+$else
+  <div id="header" class="item" data-width="400">
+    <div class="inner">
+      <p>
+        <a href=@{PageR (page - 1)}>
+          newer
+$forall (Entity mediumId medium) <- pageMedia
+  <article class="item" data-width=#{mediumThumbWidth medium}>
+    <a href=@{MediumR mediumId}>
+      <figure>
+        <img src=#{mediumThumb medium}>
+        <figcaption>#{mediumTitle medium}
+$if nextMedia
+  <div id="header" class="item" data-width="400">
+    <div class="inner">
+      <p>
+        <a href=@{PageR (page + 1)}>
+         older

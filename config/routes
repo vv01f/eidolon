@@ -20,6 +20,7 @@
 /robots.txt RobotsR GET
 
 /				HomeR			GET
+/page/#Int			PageR			GET
 /signup				SignupR			GET POST
 /login				LoginR			GET POST
 /logout				LogoutR			GET

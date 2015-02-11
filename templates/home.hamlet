@@ -10,3 +10,9 @@ $forall (Entity mediumId medium) <- recentMedia
       <figure>
         <img src=#{mediumThumb medium}>
         <figcaption>#{mediumTitle medium}
+$if nextMedia
+  <div id="header" class="item" data-width="400">
+    <div class="inner">
+      <p>
+        <a href=@{PageR 1}>
+         older
