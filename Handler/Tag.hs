@@ -18,6 +18,7 @@ module Handler.Tag where
 
 import Import
 import qualified Data.Text as T
+import System.FilePath
 
 getTagR :: Text -> Handler Html
 getTagR tag = do

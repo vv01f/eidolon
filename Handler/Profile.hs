@@ -19,6 +19,7 @@ module Handler.Profile where
 import Import
 import Data.Maybe
 import qualified Data.Text as T
+import System.FilePath
 
 getProfileR :: UserId -> Handler Html
 getProfileR ownerId = do

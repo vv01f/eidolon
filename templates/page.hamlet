@@ -15,7 +15,7 @@ $forall (Entity mediumId medium) <- pageMedia
   <article class="item" data-width=#{mediumThumbWidth medium}>
     <a href=@{MediumR mediumId}>
       <figure>
-        <img src=#{mediumThumb medium}>
+        <img src=@{StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumThumb medium) []}>
         <figcaption>#{mediumTitle medium}
 $if nextMedia
   <div id="header" class="item" data-width="400">

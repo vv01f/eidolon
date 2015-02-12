@@ -6,7 +6,7 @@
         by <a href=@{UserR ownerName}>#{ownerName}</a> from album <a href=@{AlbumR albumId}>#{albumTitle album}</a>
   <div id="header" class="item image" data-width=#{dataWidth}>
     <div class="inner">
-      <img src=#{mediumPath medium}>
+      <img src=@{StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumPath medium) []}>
 
   <div id="header" class="item" data-width="400">
     <div class="inner">

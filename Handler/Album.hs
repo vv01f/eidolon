@@ -18,6 +18,7 @@ module Handler.Album where
 
 import Import
 import qualified Data.Text as T
+import System.FilePath
 
 getAlbumR :: AlbumId -> Handler Html
 getAlbumR albumId = do
