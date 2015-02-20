@@ -7,7 +7,7 @@ $newline always
 
 $forall (Entity mId m) <- media
   <article class="item" data-width=#{mediumThumbWidth m}>
-    <a href=@{AdminMediumSettingsR mId}>#{mediumTitle m}
+    <a href=@{AdminMediumSettingsR mId}>
       <figure class="thumbnail">
         <img src=@{StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumThumb m) []}>
         <figcaption>#{mediumTitle m}
