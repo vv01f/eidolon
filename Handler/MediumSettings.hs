@@ -20,6 +20,7 @@ import Import
 import Handler.Commons
 import System.Directory
 import System.FilePath
+import qualified Data.Text as T
 import Data.List (tail)
 
 getMediumSettingsR :: MediumId -> Handler Html

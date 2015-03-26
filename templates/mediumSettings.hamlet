@@ -9,3 +9,6 @@ $newline always
         <input type=submit value="Change settings">
 
   <a href=@{MediumDeleteR mediumId}>Delete this image
+
+<style type="text/css">
+  body{background-image: url('/static/css/images/overlay.png'), -webkit-linear-gradient(top, rgba(0,0,0,0) 75%, rgba(0,0,0,0.65)), url('@{StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumPath medium) []}');background-attachment:fixed;background-image: url('/static/css/images/overlay.png'), -moz-linear-gradient(center top , transparent 75%, rgba(0, 0, 0, 0.65)), url('@{StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumPath medium) []}');}
