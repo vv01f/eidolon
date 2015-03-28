@@ -2,9 +2,9 @@
 
 ##Introduction
 
-A image gallery service written in Haskell as a yesod webapp
+A image gallery service written in Haskell as a yesod webapp.
 
-**Warning: This is still in early development and not to be used productively**
+Visit the test instance at [eidolon.nek0.eu][eidolon]
 
 ##Installation
 
@@ -70,3 +70,5 @@ Since eidolon will block your console, I recommend wrapping a init-script around
 * This software uses the web Framework "Yesod" by Michael Snoyman. See more at: <http://www.yesodweb.com/>
 
 * This software uses parts of the template "Parallelism" by n33co. see more at: <http://html5up.net/>
+
+[eidolon]: http://eidolon.nek0.eu
