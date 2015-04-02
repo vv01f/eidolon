@@ -115,6 +115,7 @@ library
                  , blaze-builder
                  , blaze-markup
                  , either
+                 , wai
 
 executable         eidolon
     if flag(library-only)

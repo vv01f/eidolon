@@ -30,6 +30,8 @@ import Text.Hamlet (hamletFile)
 import Yesod.Core.Types
 -- costom imports
 import Data.Text
+import Data.Text.Encoding
+import Network.Wai
 import Helper
 
 -- | The site argument for your application. This can be a good place to
@@ -110,10 +112,17 @@ formLayout :: Widget -> Handler Html
 formLayout widget = do
     renderLayout $(widgetFile "form-widget")
 
+approotRequest :: App -> Request -> Text
+approotRequest master req =
+    case requestHeaderHost req of
+      Just a  -> decodeUtf8 a
+      Nothing -> appRoot $ appSettings master
+
 -- Please see the documentation for the Yesod typeclass. There are a number
 -- of settings which can be configured by overriding methods here.
 instance Yesod App where
-    approot = ApprootMaster $ appRoot . appSettings
+    --approot = ApprootMaster $ appRoot . appSettings
+    approot = ApprootRequest approotRequest
 
     -- change maximum content length
     maximumContentLength _ _ = Just $ 1024 ^ (5 :: Int)
