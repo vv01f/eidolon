@@ -122,7 +122,7 @@ approotRequest master req =
 -- of settings which can be configured by overriding methods here.
 instance Yesod App where
     --approot = ApprootMaster $ appRoot . appSettings
-    approot = ApprootRequest approotRequest
+    approot = ApprootRelative
 
     -- change maximum content length
     maximumContentLength _ _ = Just $ 1024 ^ (5 :: Int)
