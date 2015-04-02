@@ -29,7 +29,7 @@ import Text.Jasmine (minifym)
 import Text.Hamlet (hamletFile)
 import Yesod.Core.Types
 -- costom imports
-import Data.Text
+import Data.Text as T
 import Data.Text.Encoding
 import Network.Wai
 import Helper
@@ -74,14 +74,14 @@ renderLayout widget = do
         user <- runDB $ getJust uId
         return $ userName user
       Nothing -> do
-        return ("" :: Text)
+        return ("" :: T.Text)
     slug <- case msu of
       Just a -> do
         uId <- return $ getUserIdFromText a
         user <- runDB $ getJust uId
         return $ userSlug user
       Nothing -> do
-        return ("" :: Text)
+        return ("" :: T.Text)
     block <- return $ appSignupBlocked $ appSettings master
 
     -- We break up the default layout into two components:
@@ -112,17 +112,22 @@ formLayout :: Widget -> Handler Html
 formLayout widget = do
     renderLayout $(widgetFile "form-widget")
 
-approotRequest :: App -> Request -> Text
+approotRequest :: App -> Request -> T.Text
 approotRequest master req =
     case requestHeaderHost req of
-      Just a  -> decodeUtf8 a
+      Just a  -> prefix `T.append` decodeUtf8 a
       Nothing -> appRoot $ appSettings master
+    where
+      prefix =
+        case isSecure req of
+          True  -> "https://"
+          False -> "http://"
 
 -- Please see the documentation for the Yesod typeclass. There are a number
 -- of settings which can be configured by overriding methods here.
 instance Yesod App where
     --approot = ApprootMaster $ appRoot . appSettings
-    approot = ApprootRelative
+    approot = ApprootRequest approotRequest
 
     -- change maximum content length
     maximumContentLength _ _ = Just $ 1024 ^ (5 :: Int)
