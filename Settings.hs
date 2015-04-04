@@ -70,6 +70,9 @@ data AppSettings = AppSettings
     -- ^ Google Analytics code
     , appSignupBlocked		:: Bool
     -- ^ block signup site
+    , appTos1                   :: Text
+    , appTos2                   :: Text
+    -- ^ Terms of Service
     }
 
 instance FromJSON AppSettings where
@@ -97,6 +100,8 @@ instance FromJSON AppSettings where
         appAnalytics              <- o .:? "analytics"
 
         appSignupBlocked          <- o .: "signupBlocked"
+        appTos1                   <- o .: "tos1"
+        appTos2                   <- o .: "tos2"
 
         return AppSettings {..}
 
