@@ -121,7 +121,7 @@ approotRequest master req =
       prefix =
         case isSecure req of
           True  -> "https://"
-          False -> "http://"
+          False -> (fst $ breakOn ":" $ appRoot $ appSettings master) `T.append` "://"
 
 -- Please see the documentation for the Yesod typeclass. There are a number
 -- of settings which can be configured by overriding methods here.
