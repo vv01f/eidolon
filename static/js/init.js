@@ -72,7 +72,7 @@ var parallelism = (function($) { var _ = {
 						scrollKeyAmount: 50,
 						
 					// Determines where scrollwheel events should be captured ('window' or 'reel').
-						scrollWheelTarget: 'window',
+						scrollWheelTarget: 'reel',
 						
 					// Scroll amount when using scroll zones.
 						scrollZoneAmount: 10,	
