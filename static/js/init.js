@@ -315,7 +315,7 @@ console.log(itemsWidth,itemHeight)
 										.css('min-height', '100%')
 										.css('top', 0)
 										.css('left', 0)
-										.attr('title', $item.text());
+										//.attr('title', $item.text());
 
 								// inner (for fade effect).
 									$item.wrapInner('<div class="inner" />');

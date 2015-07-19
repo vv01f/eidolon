@@ -20,7 +20,7 @@ $forall (Entity albumId album) <- userAlbs
         $if (albumSamplePic album) == Nothing
           <img src=@{StaticR img_album_jpg}>
         $else
-          <img src=@{StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ fromJust $ albumSamplePic album) []}>
+          <img src=@{StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ fromJust $ albumSamplePic album) []} title=#{albumTitle album}>
         <figcaption>#{albumTitle album}
 
 $if null sharedAlbs
@@ -36,7 +36,7 @@ $else
           $if (albumSamplePic album) == Nothing
             <img src=@{StaticR img_album_jpg}>
           $else
-            <img src=@{StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ fromJust $ albumSamplePic album) []}>
+            <img src=@{StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ fromJust $ albumSamplePic album) []} title=#{albumTitle album}>
           <figcaption>#{albumTitle album}
 
 $if null recentMedia
@@ -49,7 +49,7 @@ $else
     <article class="recent item" data-width=#{mediumThumbWidth medium}>
       <a href=@{MediumR mediumId}>
         <figure class="thumbnail">
-          <img src=@{StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumThumb medium) []}>
+          <img src=@{StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumThumb medium) []} title={mediumTitle medium}>
           <figcaption>#{mediumTitle medium}
 
 <div id="footer">
