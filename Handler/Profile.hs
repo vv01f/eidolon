@@ -52,7 +52,7 @@ getProfileR ownerId = do
 
 getUserR :: Text -> Handler Html
 getUserR ownerName = do
-  tempOwner <- runDB $ selectFirst [UserName ==. ownerName] []
+  tempOwner <- runDB $ getBy $ UniqueUser ownerName
   case tempOwner of
     Just (Entity ownerId _) ->
       getProfileR ownerId

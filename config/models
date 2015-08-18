@@ -22,6 +22,7 @@ User
     salted ByteString
     albums [AlbumId]
     admin Bool
+    UniqueUser name
     deriving Typeable Eq Show
 Activator
     token Text
