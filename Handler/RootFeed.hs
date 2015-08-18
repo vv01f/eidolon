@@ -214,6 +214,24 @@ getUserFeedAtomR = getUserFeedR
 getUserFeedRssR :: UserId -> Handler RepRss
 getUserFeedRssR = getUserFeedR
 
+getNameFeedAtomR :: Text -> Handler RepAtom
+getNameFeedAtomR name = do
+  muser <- runDB $ getBy $ UniqueUser name
+  case muser of
+    Just (Entity uId _) ->
+      getUserFeedR uId
+    Nothing ->
+      notFound
+
+getNameFeedRssR :: Text -> Handler RepRss
+getNameFeedRssR name = do
+  muser <- runDB $ getBy $ UniqueUser name
+  case muser of
+    Just (Entity uId _) ->
+      getUserFeedR uId
+    Nothing ->
+      notFound
+
 getUserFeedR :: RepFeed a => UserId -> Handler a
 getUserFeedR userId = do
   user <- runDB $ get404 userId

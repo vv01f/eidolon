@@ -66,6 +66,7 @@ type Form x = Html -> MForm (HandlerT App IO) (FormResult x, Widget)
 renderLayout :: Widget -> Handler Html
 renderLayout widget = do
     master <- getYesod
+    route <- getCurrentRoute
     mmsg <- getMessage
     msu <- lookupSession "userId"
     username <- case msu of

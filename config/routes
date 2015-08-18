@@ -68,3 +68,5 @@
 /feed/medium/#MediumId/rss.xml	CommentFeedRssR		GET
 /feed/user/#UserId/atom.xml	UserFeedAtomR		GET
 /feed/user/#UserId/rss.xml	UserFeedRssR		GET
+!/feed/user/#Text/atom.xml	NameFeedAtomR		GET
+!/feed/user/#Text/rss.xml	NameFeedRssR		GET
