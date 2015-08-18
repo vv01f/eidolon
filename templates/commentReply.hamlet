@@ -3,7 +3,7 @@
     <h4>Reply to comment
     <strong>#{fromJust $ commentAuthorSlug comment}</strong> posted on #{formatTime defaultTimeLocale "%A %F %H:%M" (commentTime comment)}:
     <hr>
-      <p>#{markdownToHtml $ commentContent comment}
+      <p>#{commentContent comment}
     <hr>
       <form method=post enctype=#{enctype}>
         ^{replyWidget}
