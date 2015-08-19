@@ -20,9 +20,3 @@ $else
         <figure class="thumbnail">
           <img src=@{StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumThumb medium) []} title=#{mediumTitle medium}>
           <figcaption>#{mediumTitle medium}
-
-<div id="footer">
-  <div class="right">
-    get a feed from this:
-      <a href=@{AlbumFeedAtomR albumId}>Atom
-      <a href=@{AlbumFeedRssR albumId}>RSS
