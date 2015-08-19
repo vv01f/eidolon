@@ -32,31 +32,49 @@ $maybe msg <- mmsg
   <div class="right">
     $case route
       $of Just HomeR
+        <head>
+          <link rel="alternate" type="application/atom+xml" title="Root Feed" href=@{RootFeedAtomR}>
+          <link rel="alternate" type="application/rss+xml" title="Root Feed" href=@{RootFeedRssR}>
         get a Feed from This:
         <a href="@{RootFeedAtomR}">Atom
         |
         <a href="@{RootFeedRssR}">RSS
       $of Just (PageR _)
+        <head>
+          <link rel="alternate" type="application/atom+xml" title="Root Feed" href=@{RootFeedAtomR}>
+          <link rel="alternate" type="application/rss+xml" title="Root Feed" href=@{RootFeedRssR}>
         get a Feed from This:
         <a href="@{RootFeedAtomR}">Atom
         |
         <a href="@{RootFeedRssR}">RSS
       $of Just (ProfileR uId)
+        <head>
+          <link rel="alternate" type="application/atom+xml" title="User Feed" href=@{UserFeedAtomR uId}>
+          <link rel="alternate" type="application/rss+xml" title="User Feed" href=@{UserFeedRssR uId}>
         get a Feed from This:
         <a href="@{UserFeedAtomR uId}">Atom
         |
         <a href="@{UserFeedRssR uId}">RSS
       $of Just (UserR name)
+        <head>
+          <link rel="alternate" type="application/atom+xml" title="User Feed" href=@{NameFeedAtomR name}>
+          <link rel="alternate" type="application/rss+xml" title="User Feed" href=@{NameFeedRssR name}>
         get a Feed from This:
         <a href="@{NameFeedAtomR name}">Atom
         |
         <a href="@{NameFeedRssR name}">RSS
       $of Just (AlbumR aId)
+        <head>
+          <link rel="alternate" type="application/atom+xml" title="Album Feed" href=@{AlbumFeedAtomR aId}>
+          <link rel="alternate" type="application/rss+xml" title="Album Feed" href=@{AlbumFeedRssR aId}>
         get a Feed from This:
         <a href="@{AlbumFeedAtomR aId}">Atom
         |
         <a href="@{AlbumFeedRssR aId}">RSS
       $of Just (MediumR mId)
+        <head>
+          <link rel="alternate" type="application/atom+xml" title="Comment Feed" href=@{CommentFeedAtomR mId}>
+          <link rel="alternate" type="application/rss+xml" title="Comment Feed" href=@{CommentFeedRssR mId}>
         get a Feed from This:
         <a href="@{CommentFeedAtomR mId}">Atom
         |
