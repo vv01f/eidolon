@@ -148,7 +148,7 @@ reverseLookup s ((x, y):zs)
   | otherwise = Nothing
 
 acceptedTypes :: [T.Text]
-acceptedTypes = ["image/jpeg", "image/jpg", "image/png", "image/x-ms-bmp", "image/x-bmp", "image/bmp", "image/tiff", "image/tiff-fx"]
+acceptedTypes = ["image/jpeg", "image/jpg", "image/png", "image/x-ms-bmp", "image/x-bmp", "image/bmp", "image/tiff", "image/tiff-fx", "image/svg+xml", "image/gif"]
 
 iso8601 :: FormatTime t => t -> String
 iso8601 time =

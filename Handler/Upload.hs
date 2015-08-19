@@ -133,12 +133,14 @@ generateThumb path userId albumId = do
     FP.</> newName
   (iWidth, tWidth) <- liftIO $ withMagickWandGenesis $ do
     (_ , w) <- magickWand
-    setImageFormat w "jpeg"
+    p <- pixelWand
     readImage w (decodeString path)
     w1 <- getImageWidth w
     h1 <- getImageHeight w
     h2 <- return 230
     w2 <- return $ floor (((fromIntegral w1) / (fromIntegral h1)) * (fromIntegral h2) :: Double)
+    setImageAlphaChannel w deactivateAlphaChannel
+    setImageFormat w "jpeg"
     resizeImage w w2 h2 lanczosFilter 1
     setImageCompressionQuality w 95
     writeImage w (Just (decodeString newPath))
