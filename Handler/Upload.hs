@@ -126,13 +126,14 @@ postDirectUploadR albumId = do
 
 generateThumb :: FP.FilePath -> UserId -> AlbumId -> Handler (FP.FilePath, Int, Int)
 generateThumb path userId albumId = do
-  newName <- return $ (FP.takeBaseName path) ++ "_thumb" ++ (FP.takeExtension path)
+  newName <- return $ (FP.takeBaseName path) ++ "_thumb.jpg"
   newPath <- return $ "static" FP.</> "data"
     FP.</> (T.unpack $ extractKey userId)
     FP.</> (T.unpack $ extractKey albumId)
     FP.</> newName
   (iWidth, tWidth) <- liftIO $ withMagickWandGenesis $ do
     (_ , w) <- magickWand
+    setImageFormat w "jpeg"
     readImage w (decodeString path)
     w1 <- getImageWidth w
     h1 <- getImageHeight w
