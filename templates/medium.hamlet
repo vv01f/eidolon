@@ -60,12 +60,6 @@ $if userId /= Nothing
         ^{commentWidget}
         <div>
           <input type=submit value="Post comment">
-<div id="header" class="item">
-  <div class="inner">
-    <h3>
-      Get a feed from this:
-    <a href=@{CommentFeedAtomR mediumId}>Atom
-    <a href=@{CommentFeedRssR mediumId}>RSS
 
 <style type="text/css">
   body{background-image: url('/static/css/images/overlay.png'),	-webkit-linear-gradient(top, rgba(0,0,0,0) 75%, rgba(0,0,0,0.65)), url('@{StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumPath medium) []}');background-attachment:fixed;background-image: url('/static/css/images/overlay.png'), -moz-linear-gradient(center top , transparent 75%, rgba(0, 0, 0, 0.65)), url('@{StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumPath medium) []}');}

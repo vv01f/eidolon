@@ -142,7 +142,7 @@
 		bottom: 0;
 		left: 0;
 		width: 100%;
-		overflow: hidden;
+		overflow: auto;
 	}
 	
 		#footer h2
@@ -153,15 +153,21 @@
 		
 		#footer .left
 		{
+			display: inline-block;
 			padding: 2em;
 			text-align: left;
+			float: left;
 		}
 		
 		#footer .right
 		{
+			/*
 			position: absolute;
 			bottom: 0;
 			right: 0;
+			*/
+			float: right;
+			display:inline-block;
 			padding: 2em;
 			text-align: right;
 		}

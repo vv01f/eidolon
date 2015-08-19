@@ -33,27 +33,32 @@ $maybe msg <- mmsg
     $case route
       $of Just HomeR
         get a Feed from This:
-        <a href=@{RootFeedAtomR}>Atom
+        <a href="@{RootFeedAtomR}">Atom
         |
-        <a href=@{RootFeedRssR}>RSS
+        <a href="@{RootFeedRssR}">RSS
       $of Just (PageR _)
         get a Feed from This:
-        <a href=@{RootFeedAtomR}>Atom
+        <a href="@{RootFeedAtomR}">Atom
         |
-        <a href=@{RootFeedRssR}>RSS
+        <a href="@{RootFeedRssR}">RSS
       $of Just (ProfileR uId)
         get a Feed from This:
-        <a href=@{UserFeedAtomR uId}>Atom
+        <a href="@{UserFeedAtomR uId}">Atom
         |
-        <a href=@{UserFeedRssR uId}>RSS
+        <a href="@{UserFeedRssR uId}">RSS
       $of Just (UserR name)
         get a Feed from This:
-        <a href=@{NameFeedAtomR name}>Atom
+        <a href="@{NameFeedAtomR name}">Atom
         |
-        <a href=@{NameFeedRssR name}>RSS
+        <a href="@{NameFeedRssR name}">RSS
       $of Just (AlbumR aId)
         get a Feed from This:
-        <a href=@{AlbumFeedAtomR aId}>Atom
+        <a href="@{AlbumFeedAtomR aId}">Atom
         |
-        <a href=@{AlbumFeedRssR aId}>RSS
+        <a href="@{AlbumFeedRssR aId}">RSS
+      $of Just (MediumR mId)
+        get a Feed from This:
+        <a href="@{CommentFeedAtomR mId}">Atom
+        |
+        <a href="@{CommentFeedRssR mId}">RSS
       $of _
