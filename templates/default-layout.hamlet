@@ -28,7 +28,7 @@ $maybe msg <- mmsg
   ^{pageBody wc}
 <div id="footer">
   <div class="left">
-    #{appCopyright $ appSettings master}
+    ^{pageBody copyrightWidget}
   <div class="right">
     $case route
       $of Just HomeR
