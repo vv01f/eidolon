@@ -22,6 +22,11 @@
 		font-weight: 400;
 	}
 
+	figcaption
+	{
+		display:none;
+	}
+
 	a
 	{
 		color: #fff;

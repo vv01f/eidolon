@@ -34,10 +34,15 @@ ip-from-header: "_env:IP_FROM_HEADER:false"
 # skip-combining: false
 
 database:
-  database: "_env:SQLITE_DATABASE:eidolon.sqlite3"
-  poolsize: "_env:SQLITE_POOLSIZE:10"
+  user:     "_env:PGUSER:eidolon"
+  password: "_env:PGPASS:eidolon"
+  host:     "_env:PGHOST:localhost"
+  port:     "_env:PGPORT:5432"
+  database: "_env:PGDATABASE:eidolon"
+  poolsize: "_env:PGPOOLSIZE:10"
 
-copyright: Insert copyright statement here
+copyright: Powered by Eidolon
+copyrightLink: https://github.com/nek0/eidolon
 #analytics: UA-YOURCODE
 
 # block signup process

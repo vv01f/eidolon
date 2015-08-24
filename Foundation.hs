@@ -91,6 +91,9 @@ renderLayout widget = do
     -- value passed to hamletToRepHtml cannot be a widget, this allows
     -- you to use normal widget features in default-layout.
 
+    copyrightWidget <- widgetToPageContent $ do
+        $(widgetFile "copyrightFooter")
+
     wc <- widgetToPageContent widget
 
     pc <- widgetToPageContent $ do
@@ -107,6 +110,7 @@ renderLayout widget = do
               css_bootstrap_css
             ])
         $(widgetFile "default-layout")
+
     withUrlRenderer $(hamletFile "templates/default-layout-wrapper.hamlet")
 
 formLayout :: Widget -> Handler Html
