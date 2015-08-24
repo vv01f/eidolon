@@ -23,7 +23,6 @@ module Application
     ) where
 
 import Import
-import Yesod.Static
 import Yesod.Default.Config2
 import Yesod.Default.Handlers
 import Database.Persist.Sql (runMigration)

@@ -66,9 +66,11 @@ data AppSettings = AppSettings
     -- Example app-specific configuration values.
     , appCopyright              :: Text
     -- ^ Copyright text to appear in the footer of the page
+    , appCopyrightLink          :: Text
+    -- ^ Link to Copyright
     , appAnalytics              :: Maybe Text
     -- ^ Google Analytics code
-    , appSignupBlocked		:: Bool
+    , appSignupBlocked          :: Bool
     -- ^ block signup site
     , appTos1                   :: Text
     , appTos2                   :: Text

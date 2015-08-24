@@ -17,8 +17,6 @@
 module Handler.RootFeed where
 
 import Import
-import Yesod
-import Yesod.Static
 import qualified Data.Text as T
 import Data.Maybe
 import Data.Time
