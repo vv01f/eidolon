@@ -13,7 +13,7 @@
       <li>
         <a href=@{NewAlbumR}>Create album
       <li>
-        <a href=@{UploadR}>Upload image
+        <a href=@{UploadR}>Upload images
     $nothing
       <li>
         <a href=@{LoginR}>Login
