@@ -84,7 +84,10 @@ instance RepFeed RepAtom where
                                >
                              <id>#{fromJust $ lookup mediumId $ fromRight [] links}
                              <published>#{iso8601 $ utcToZonedTime tz $ mediumTime medium}
-                             <summary>#{mediumDescription medium}
+                             $maybe d <- mediumDescription medium
+                               <summary>#{d}
+                             $nothing
+                               <summary>No description given
                              <link rel="icon"
                                href=#{url $ StaticR $ mediumStaticThumbRoute medium}
                                >
@@ -139,7 +142,10 @@ instance RepFeed RepRss where
                              <title>#{mediumTitle medium}
                              <link>#{fromJust $ lookup mediumId $ fromRight [] links}
                              <language>en
-                             <description>#{mediumDescription medium}
+                             $maybe d <- mediumDescription medium
+                               <description>#{d}
+                             $nothing
+                               <description>No description given
                              <guid isPermaLink="true">#{fromJust $ lookup mediumId $ fromRight [] links}
                              <pubDate>#{rfc822 $ mediumTime medium}
                              <image>

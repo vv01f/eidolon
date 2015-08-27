@@ -12,8 +12,11 @@
     <div class="inner">
       <p class="desc">
         Uploaded on: #{formatTime defaultTimeLocale "%A %F %H:%M" (mediumTime medium)}<br>
-        Description:<br>
-        #{mediumDescription medium}
+        $maybe d <- mediumDescription medium
+          Description:<br>
+          #{d}
+        $nothing
+          No description given
 
       <div class="tags">
         <p>

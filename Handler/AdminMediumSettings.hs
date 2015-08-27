@@ -91,7 +91,7 @@ adminMediumSetForm medium = renderDivs $ Medium
   <*> pure (mediumMime medium)
   <*> pure (mediumTime medium)
   <*> pure (mediumOwner medium)
-  <*> areq textareaField "Description" (Just $ mediumDescription medium)
+  <*> aopt textareaField "Description" (Just $ mediumDescription medium)
   <*> areq tagField "Tags" (Just $ mediumTags medium)
   <*> pure (mediumWidth medium)
   <*> pure (mediumThumbWidth medium)

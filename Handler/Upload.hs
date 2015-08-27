@@ -133,7 +133,6 @@ generateThumb path userId albumId = do
     FP.</> newName
   (iWidth, tWidth) <- liftIO $ withMagickWandGenesis $ do
     (_ , w) <- magickWand
-    p <- pixelWand
     readImage w (decodeString path)
     w1 <- getImageWidth w
     h1 <- getImageHeight w
@@ -166,7 +165,7 @@ dUploadForm userId albumId = renderDivs $ FileBulk
   <*> areq multiFileField "Select file(s)" Nothing
   <*> lift (liftIO getCurrentTime)
   <*> pure userId
-  <*> areq textareaField "Description" Nothing
+  <*> aopt textareaField "Description" Nothing
   <*> areq tagField "Enter tags" Nothing
   <*> pure albumId
 
@@ -175,7 +174,7 @@ data FileBulk = FileBulk
   , fileBulkFiles :: [FileInfo]
   , fileBulkTime :: UTCTime
   , fileBulkOwner :: UserId
-  , fileBulkDesc :: Textarea
+  , fileBulkDesc :: Maybe Textarea
   , fileBulkTags :: [Text]
   , fileBulkAlbum :: AlbumId
   }
@@ -208,7 +207,7 @@ bulkUploadForm userId = renderDivs $ (\a b c d e f g -> FileBulk b c d e f g a)
   <*> areq multiFileField "Select file(s)" Nothing
   <*> lift (liftIO getCurrentTime)
   <*> pure userId
-  <*> areq textareaField "Description" Nothing
+  <*> aopt textareaField "Description" Nothing
   <*> areq tagField "Enter tags" Nothing
   where
     albums = do

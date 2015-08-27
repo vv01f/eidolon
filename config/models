@@ -48,7 +48,7 @@ Medium
     mime Text
     time UTCTime
     owner UserId
-    description Textarea
+    description Textarea Maybe
     tags Texts
     width Int
     thumbWidth Int
