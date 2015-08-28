@@ -17,7 +17,6 @@
 module Handler.Commons where
 
 import Import
-import Yesod
 import Data.String
 
 loginIsAdmin :: IsString t => Handler (Either (t, Route App)  ())

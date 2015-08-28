@@ -29,7 +29,6 @@ getSignupR = do
   case block of
     False -> do
       formLayout $ do
-        master <- getYesod
         setTitle "Eidolon :: Signup"
         $(widgetFile "signup")
     True -> do
