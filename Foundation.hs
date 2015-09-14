@@ -31,6 +31,7 @@ import Yesod.Core.Types
 -- costom imports
 import Data.Text as T
 import Data.Text.Encoding
+import Control.Applicative ((<$>))
 import Network.Wai
 import Helper
 
@@ -71,19 +72,19 @@ renderLayout widget = do
     msu <- lookupSession "userId"
     username <- case msu of
       Just a -> do
-        uId <- return $ getUserIdFromText a
+        let uId = getUserIdFromText a
         user <- runDB $ getJust uId
         return $ userName user
-      Nothing -> do
+      Nothing ->
         return ("" :: T.Text)
     slug <- case msu of
       Just a -> do
-        uId <- return $ getUserIdFromText a
+        let uId = getUserIdFromText a
         user <- runDB $ getJust uId
         return $ userSlug user
-      Nothing -> do
+      Nothing ->
         return ("" :: T.Text)
-    block <- return $ appSignupBlocked $ appSettings master
+    let block = appSignupBlocked $ appSettings master
 
     -- We break up the default layout into two components:
     -- default-layout is the contents of the body tag, and
@@ -91,7 +92,7 @@ renderLayout widget = do
     -- value passed to hamletToRepHtml cannot be a widget, this allows
     -- you to use normal widget features in default-layout.
 
-    copyrightWidget <- widgetToPageContent $ do
+    copyrightWidget <- widgetToPageContent $
         $(widgetFile "copyrightFooter")
 
     wc <- widgetToPageContent widget
@@ -114,7 +115,7 @@ renderLayout widget = do
     withUrlRenderer $(hamletFile "templates/default-layout-wrapper.hamlet")
 
 formLayout :: Widget -> Handler Html
-formLayout widget = do
+formLayout widget =
     renderLayout $(widgetFile "form-widget")
 
 approotRequest :: App -> Request -> T.Text
@@ -124,9 +125,12 @@ approotRequest master req =
       Nothing -> appRoot $ appSettings master
     where
       prefix =
-        case "https://" `T.isPrefixOf` (appRoot $ appSettings master) of
-          True  -> "https://"
-          False -> "http://"
+        if 
+          "https://" `isPrefixOf` appRoot (appSettings master)
+          then
+            "https://"
+          else
+            "http://"
 
 -- Please see the documentation for the Yesod typeclass. There are a number
 -- of settings which can be configured by overriding methods here.
@@ -139,11 +143,11 @@ instance Yesod App where
 
     -- Store session data on the client in encrypted cookies,
     -- default session idle timeout is 120 minutes
-    makeSessionBackend _ = fmap Just $ defaultClientSessionBackend
+    makeSessionBackend _ = Just <$> defaultClientSessionBackend
         120    -- timeout in minutes
         "config/client_session_key.aes"
 
-    defaultLayout widget = do
+    defaultLayout widget =
       renderLayout $(widgetFile "default-widget")
 
     -- This is done to provide an optimization for serving static files from

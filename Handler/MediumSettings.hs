@@ -34,7 +34,7 @@ getMediumSettingsR mediumId = do
         $(widgetFile "mediumSettings")
     Left (errorMsg, route) -> do
       setMessage errorMsg
-      redirect $ route
+      redirect route
 
 postMediumSettingsR :: MediumId -> Handler Html
 postMediumSettingsR mediumId = do
@@ -56,7 +56,7 @@ postMediumSettingsR mediumId = do
           redirect $ MediumSettingsR mediumId
     Left (errorMsg, route) -> do
       setMessage errorMsg
-      redirect $ route
+      redirect route
 
 mediumSettingsForm :: Medium -> Form Medium
 mediumSettingsForm medium = renderDivs $ Medium
@@ -76,13 +76,13 @@ getMediumDeleteR :: MediumId -> Handler Html
 getMediumDeleteR mediumId = do
   checkRes <- mediumCheck mediumId
   case checkRes of
-    Right medium -> do
+    Right medium ->
       formLayout $ do
         setTitle "Eidolon :: Delete Medium"
         $(widgetFile "mediumDelete")
     Left (errorMsg, route) -> do
       setMessage errorMsg
-      redirect $ route
+      redirect route
 
 postMediumDeleteR :: MediumId -> Handler Html
 postMediumDeleteR mediumId = do
@@ -94,22 +94,22 @@ postMediumDeleteR mediumId = do
         Just "confirm" -> do
           -- delete comments
           commEnts <- runDB $ selectList [CommentOrigin ==. mediumId] []
-          _ <- mapM (\ent -> runDB $ delete $ entityKey ent) commEnts
+          _ <- mapM (runDB . delete . entityKey) commEnts
           -- delete references first
-          albumId <- return $ mediumAlbum medium
+          let albumId = mediumAlbum medium
           album <- runDB $ getJust albumId
-          mediaList <- return $ albumContent album
-          newMediaList <- return $ removeItem mediumId mediaList
+          let mediaList = albumContent album
+          let newMediaList = removeItem mediumId mediaList
           -- update reference List
           runDB $ update albumId [AlbumContent =. newMediaList]
           liftIO $ removeFile (normalise $ tail $ mediumPath medium)
           liftIO $ removeFile (normalise $ tail $ mediumThumb medium)
           runDB $ delete mediumId
           setMessage "Medium succesfully deleted"
-          redirect $ HomeR
+          redirect HomeR
         _ -> do
           setMessage "You must confirm the deletion"
           redirect $ MediumSettingsR mediumId
     Left (errorMsg, route) -> do
       setMessage errorMsg
-      redirect $ route
+      redirect route

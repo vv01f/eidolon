@@ -25,7 +25,7 @@ import Data.Maybe
 getSignupR :: Handler Html
 getSignupR = do
   master <- getYesod
-  block <- return $ appSignupBlocked $ appSettings master
+  let block = appSignupBlocked $ appSettings master
   case block of
     False -> do
       formLayout $ do
@@ -38,7 +38,7 @@ getSignupR = do
 postSignupR :: Handler Html
 postSignupR = do
   master <- getYesod
-  block <- return $ appSignupBlocked $ appSettings master
+  let block = appSignupBlocked $ appSettings master
   case block of
     False -> do
       mUserName <- lookupPostParam "username"
@@ -46,7 +46,7 @@ postSignupR = do
         True -> return $ fromJust $ mUserName
         False -> do
           setMessage "Invalid username"
-          redirect $ SignupR
+          redirect SignupR
       mEmail <- lookupPostParam "email"
       mTos1 <- lookupPostParam "tos-1"
       mTos2 <- lookupPostParam "tos-2"
@@ -55,19 +55,13 @@ postSignupR = do
           return ()
         _ -> do
           setMessage "You need to agree to our terms."
-          redirect $ SignupR
+          redirect SignupR
       -- create user
       namesakes <- runDB $ selectList [UserName ==. newUserName] []
       case namesakes of
         [] -> do
           salt <- liftIO generateSalt
-          newUser <- return $ User newUserName
-            newUserName
-            (fromJust mEmail)
-            salt
-            ""
-            []
-            False
+          let newUser = User newUserName newUserName (fromJust mEmail) salt "" [] False
           activatorText <- liftIO generateString
           _ <- runDB $ insert $ Activator activatorText newUser
           _ <- runDB $ insert $ Token (encodeUtf8 activatorText) "activate" Nothing
@@ -79,13 +73,13 @@ postSignupR = do
               <a href="#{activateLink}">#{activateLink}
             |]
           setMessage "User pending activation"
-          redirect $ HomeR
+          redirect HomeR
         _ -> do
           setMessage "This user already exists"
-          redirect $ SignupR
+          redirect SignupR
     True -> do
       setMessage "User signup is disabled"
-      redirect $ HomeR
+      redirect HomeR
 
 validateLen :: Text -> Bool
 validateLen a =

@@ -33,8 +33,7 @@ data Credentials = Credentials
   deriving Show
 
 getLoginR :: Handler Html
-getLoginR = do
---  (loginWidget, enctype) <- generateFormPost loginForm
+getLoginR =
   formLayout $ do
     setTitle "Eidolon :: Login"
     $(widgetFile "login")
@@ -45,36 +44,35 @@ postLoginR = do
   mUserName <- lookupPostParam "username"
   mHexToken <- lookupPostParam "token"
   mHexResponse <- lookupPostParam "response"
-
   case (mUserName, mHexToken, mHexResponse) of
     (Just userName, Nothing, Nothing) -> do
       tempUser <- runDB $ selectFirst [UserName ==. userName] []
       case tempUser of
         Just (Entity userId user) -> do
-          salt <- return $ userSalt user
+          let salt = userSalt user
           token <- liftIO makeRandomToken
-          _ <- runDB $ insert $ Token (encodeUtf8 token) "login" (Just userId)
-          returnJson ["salt" .= (toHex salt), "token" .= (toHex $ encodeUtf8 token)]
+          runDB $ insert_ $ Token (encodeUtf8 token) "login" (Just userId)
+          returnJson ["salt" .= toHex salt, "token" .= toHex (encodeUtf8 token)]
         Nothing ->
           returnJsonError ("No such user" :: T.Text)
-
     (Nothing, Just hexToken, Just hexResponse) -> do
       response <- do
-        tempToken <- return $ fromHex' $ T.unpack hexToken
+        let tempToken = fromHex' $ T.unpack hexToken
         savedToken <- runDB $ selectFirst [TokenKind ==. "login", TokenToken ==. tempToken] []
         case savedToken of
           Just (Entity tokenId token) -> do
-            savedUserId <- return $ tokenUser token
+            let savedUserId = tokenUser token
             queriedUser <- runDB $ getJust (fromJust savedUserId)
-            salted <- return $ userSalted queriedUser
-            hexSalted <- return $ toHex salted
-            expected <- return $ hmacSHA1 (tokenToken token) (encodeUtf8 hexSalted)
-            case (fromHex' $ T.unpack hexResponse) == expected of
-              True -> do
+            let salted = userSalted queriedUser
+            let hexSalted = toHex salted
+            let expected = hmacSHA1 (tokenToken token) (encodeUtf8 hexSalted)
+            if
+              fromHex' (T.unpack hexResponse) == expected
+              then do
                 -- Success!!
                 runDB $ delete tokenId
                 return $ Right savedUserId
-              _    ->
+              else
                 return $ Left ("Wrong password" :: T.Text)
           Nothing ->
             return $ Left "Invalid token"
@@ -86,7 +84,6 @@ postLoginR = do
           setMessage "Succesfully logged in"
           welcomeLink <- ($ProfileR (fromJust userId)) <$> getUrlRender
           returnJson ["welcome" .= welcomeLink]
-
     _ ->
       returnJsonError ("Protocol error" :: T.Text)
 
@@ -100,7 +97,7 @@ getLogoutR :: Handler Html
 getLogoutR = do
   deleteSession "userId"
   setMessage "Succesfully logged out"
-  redirect $ HomeR
+  redirect HomeR
 
 returnJson :: Monad m => [Pair] -> m RepJson
 returnJson = return . repJson . object

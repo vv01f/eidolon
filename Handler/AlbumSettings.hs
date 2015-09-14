@@ -28,17 +28,17 @@ getAlbumSettingsR albumId = do
   tempAlbum <- runDB $ get albumId
   case tempAlbum of
     Just album -> do
-      ownerId <- return $ albumOwner album
+      let ownerId = albumOwner album
       msu <- lookupSession "userId"
       case msu of
         Just tempUserId -> do
-          userId <- return $ getUserIdFromText tempUserId
-          ownerPresence <- return (userId == ownerId)
-          presence <- return $ userId `elem` (albumShares album)
+          let userId = getUserIdFromText tempUserId
+          let ownerPresence = userId == ownerId
+          let presence = userId `elem` (albumShares album)
           case ownerPresence || presence of
             True -> do
               entities <- runDB $ selectList [UserId !=. (albumOwner album)] [Desc UserName]
-              users <- return $ map (\u -> (userName $ entityVal u, entityKey u)) entities
+              let users = map (\u -> (userName $ entityVal u, entityKey u)) entities
               (albumSettingsWidget, enctype) <- generateFormPost $ albumSettingsForm album albumId users
               formLayout $ do
                 setTitle "Eidolon :: Album Settings"
@@ -48,46 +48,48 @@ getAlbumSettingsR albumId = do
               redirect $ AlbumR albumId
         Nothing -> do
           setMessage "You must be logged in to change settings"
-          redirect $ LoginR
+          redirect LoginR
     Nothing -> do
       setMessage "This album does not exist"
-      redirect $ HomeR
+      redirect HomeR
 
 postAlbumSettingsR :: AlbumId -> Handler Html
 postAlbumSettingsR albumId = do
   tempAlbum <- runDB $ get albumId
   case tempAlbum of
     Just album -> do
-      ownerId <- return $ albumOwner album
+      let ownerId = albumOwner album
       owner <- runDB $ getJust ownerId
-      ownerName <- return $ userName owner
+      let ownerName = userName owner
       msu <- lookupSession "userId"
       case msu of
         Just tempUserId -> do
-          userId <- return $ getUserIdFromText tempUserId
-          ownerPresence <- return (userId == ownerId)
-          presence <- return $ userId `elem` (albumShares album)
-          case ownerPresence || presence of
-            True -> do
+          let userId = getUserIdFromText tempUserId
+          let ownerPresence = userId == ownerId
+          let presence = userId `elem` albumShares album
+          if
+            ownerPresence || presence
+            then do
               entities <- runDB $ selectList [UserId !=. (albumOwner album)] [Desc UserName]
-              users <- return $ map (\u -> (userName $ entityVal u, entityKey u)) entities
+              let users = map (\u -> (userName $ entityVal u, entityKey u)) entities
               ((result, _), _) <- runFormPost $ albumSettingsForm album albumId users
               case result of
                 FormSuccess temp -> do
-                  newShares <- return (L.sort $ albumShares temp)
-                  oldShares <- return (L.sort $ albumShares album)
-                  _ <- case newShares /= oldShares of
-                    True -> do
+                  let newShares = L.sort $ albumShares temp
+                  let oldShares = L.sort $ albumShares album
+                  _ <- if
+                    newShares /= oldShares
+                    then do
                       link <- ($ AlbumR albumId) <$> getUrlRender
-                      rcptIds <- return $ L.nub $ newShares L.\\ oldShares
+                      let rcptIds = L.nub $ newShares L.\\ oldShares
                       mapM (\uId -> do
                         -- update userAlbums
                         user <- runDB $ getJust uId
-                        oldAlbs <- return $ userAlbums user
-                        newAlbs <- return $ albumId : oldAlbs
+                        let oldAlbs = userAlbums user
+                        let newAlbs = albumId : oldAlbs
                         _ <- runDB $ update uId [UserAlbums =. newAlbs]
                         -- send notification
-                        addr <- return $ userEmail user
+                        let addr = userEmail user
                         sendMail addr "A new album was shared with you" $
                           [shamlet|
                             <h1>Hello #{userSlug user}!
@@ -98,7 +100,7 @@ postAlbumSettingsR albumId = do
                               .
                             |]
                         ) rcptIds
-                    False -> do
+                    else  do
                       return [()]
                       -- nothing to do here
                   width <- getThumbWidth $ Just $ L.tail $ fromMaybe ['a'] $ albumSamplePic temp
@@ -113,15 +115,15 @@ postAlbumSettingsR albumId = do
                 _ -> do
                   setMessage "There was an error while changing the settings"
                   redirect $ AlbumSettingsR albumId
-            False -> do
+            else do
               setMessage "You must own this album to change its settings"
               redirect $ AlbumR albumId
         Nothing -> do
           setMessage "You must be logged in to change settings"
-          redirect $ LoginR
+          redirect LoginR
     Nothing -> do
       setMessage "This album does not exist"
-      redirect $ HomeR
+      redirect HomeR
 
 albumSettingsForm :: Album -> AlbumId -> [(Text, UserId)]-> Form Album
 albumSettingsForm album albumId users = renderDivs $ Album
@@ -144,47 +146,47 @@ getAlbumDeleteR albumId = do
   tempAlbum <- runDB $ get albumId
   case tempAlbum of
     Just album -> do
-      ownerId <- return $ albumOwner album
+      let ownerId = albumOwner album
       msu <- lookupSession "userId"
       case msu of
         Just tempUserId -> do
-          userId <- return $ getUserIdFromText tempUserId
-          presence <- return (userId == ownerId)
-          case presence of
-            True -> do
+          let userId = getUserIdFromText tempUserId
+          if
+            userId == ownerId
+            then do
               formLayout $ do
                 setTitle $ toHtml ("Eidolon :: Delete album" `T.append` (albumTitle album))
                 $(widgetFile "albumDelete")
-            False -> do
+            else do
               setMessage "You must own this album to delete it"
               redirect $ AlbumR albumId
         Nothing -> do
           setMessage "You must be logged in to delete albums"
-          redirect $ LoginR
+          redirect LoginR
     Nothing -> do
       setMessage "This album does not exist"
-      redirect $ HomeR
+      redirect HomeR
 
 postAlbumDeleteR :: AlbumId -> Handler Html
 postAlbumDeleteR albumId = do
   tempAlbum <- runDB $ get albumId
   case tempAlbum of
     Just album -> do
-      ownerId <- return $ albumOwner album
+      let ownerId = albumOwner album
       owner <- runDB $ getJust ownerId
       msu <- lookupSession "userId"
       case msu of
         Just tempUserId -> do
-          userId <- return $ getUserIdFromText tempUserId
-          presence <- return (userId == ownerId)
-          case presence of
-            True -> do
+          let userId = getUserIdFromText tempUserId
+          if 
+            userId == ownerId
+            then do
               confirm <- lookupPostParam "confirm"
               case confirm of
                 Just "confirm" -> do
                   -- remove album reference from user
-                  albumList <- return $ userAlbums owner
-                  newAlbumList <- return $ removeItem albumId albumList
+                  let albumList = userAlbums owner
+                  let newAlbumList = removeItem albumId albumList
                   runDB $ update ownerId [UserAlbums =. newAlbumList]
                   -- delete album content and its comments
                   _ <- mapM (\a -> do
@@ -194,25 +196,25 @@ postAlbumDeleteR albumId = do
                     liftIO $ removeFile (normalise $ L.tail $ mediumThumb medium)
                     -- delete comments
                     commEnts <- runDB $ selectList [CommentOrigin ==. a] []
-                    _ <- mapM (\ent -> runDB $ delete $ entityKey ent) commEnts
+                    _ <- mapM (runDB . delete . entityKey) commEnts
                     runDB $ delete a
                     ) (albumContent album)
                   -- delete album
                   runDB $ delete albumId
                   -- delete files
-                  liftIO $ removeDirectoryRecursive $ "static" </> "data" </> (T.unpack $ extractKey userId) </> (T.unpack $ extractKey albumId)
+                  liftIO $ removeDirectoryRecursive $ "static" </> "data" </> T.unpack (extractKey userId) </> T.unpack (extractKey albumId)
                   -- outro
                   setMessage "Album deleted succesfully"
-                  redirect $ HomeR
+                  redirect HomeR
                 _ -> do
                   setMessage "You must confirm the deletion"
                   redirect $ AlbumSettingsR albumId
-            _ -> do
+            else do
               setMessage "You must own this album to delete it"
               redirect $ AlbumR albumId
         Nothing -> do
           setMessage "You must be logged in to delete albums"
-          redirect $ LoginR
+          redirect LoginR
     Nothing -> do
       setMessage "This album does not exist"
-      redirect $ HomeR
+      redirect HomeR

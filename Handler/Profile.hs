@@ -26,29 +26,30 @@ getProfileR ownerId = do
   tempOwner <- runDB $ get ownerId
   case tempOwner of
     Just owner -> do
-      ownerSlug <- lift $ pure $ userSlug owner
+      let ownerSlug = userSlug owner
       userAlbs <- runDB $ selectList [AlbumOwner ==. ownerId] [Asc AlbumTitle]
       allAlbs <- runDB $ selectList [] [Asc AlbumTitle]
-      almostAlbs <- mapM (\alb -> do
-        case ownerId `elem` (albumShares $ entityVal alb) of
-          True -> return $ Just alb
-          False -> return Nothing
+      almostAlbs <- mapM (\alb ->
+        if
+          ownerId `elem` albumShares (entityVal alb)
+          then return $ Just alb
+          else return Nothing
         ) allAlbs
-      sharedAlbs <- return $ removeItem Nothing almostAlbs
-      recentMedia <- (runDB $ selectList [MediumOwner ==. ownerId] [Desc MediumTime])
+      let sharedAlbs = removeItem Nothing almostAlbs
+      recentMedia <- runDB $ selectList [MediumOwner ==. ownerId] [Desc MediumTime]
       msu <- lookupSession "userId"
       presence <- case msu of
         Just tempUserId -> do
-          userId <- lift $ pure $ getUserIdFromText tempUserId
+          let userId = getUserIdFromText tempUserId
           return (userId == ownerId)
         Nothing ->
           return False
       defaultLayout $ do
-        setTitle $ toHtml ("Eidolon :: " `T.append` (userSlug owner) `T.append` "'s profile")
+        setTitle $ toHtml ("Eidolon :: " `T.append` userSlug owner `T.append` "'s profile")
         $(widgetFile "profile")
     Nothing -> do
       setMessage "This profile does not exist"
-      redirect $ HomeR
+      redirect HomeR
 
 getUserR :: Text -> Handler Html
 getUserR ownerName = do
@@ -58,4 +59,4 @@ getUserR ownerName = do
       getProfileR ownerId
     Nothing -> do
       setMessage "This user does not exist"
-      redirect $ HomeR
+      redirect HomeR

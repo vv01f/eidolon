@@ -26,8 +26,7 @@ getHomeR :: Handler Html
 getHomeR = do
   recentMedia <- runDB $ selectList [] [Desc MediumTime, LimitTo 30]
   nextMediaQuery <- runDB $ selectList [] [Desc MediumTime, LimitTo 1, OffsetBy 30]
-  nextMedia <- return $ not $ L.null nextMediaQuery
-  widgetLayout <- return $ widgetFile "default-widget"
+  let nextMedia = not $ L.null nextMediaQuery
   defaultLayout $ do
     setTitle "Eidolon :: Home"
     $(widgetFile "home")
@@ -36,8 +35,7 @@ getPageR :: Int -> Handler Html
 getPageR page = do
   pageMedia <- runDB $ selectList [] [Desc MediumTime, LimitTo 30, OffsetBy (page*30)]
   nextMediaQuery <- runDB $ selectList [] [Desc MediumTime, LimitTo 1, OffsetBy ((page + 1) * 30)]
-  nextMedia <- return $ not $ L.null nextMediaQuery
-  widgetLayout <- return $ widgetFile "default-widget"
+  let nextMedia = not $ L.null nextMediaQuery
   defaultLayout $ do
-    setTitle $ toHtml ("Eidolon :: Page " `T.append` (T.pack $ show page))
+    setTitle $ toHtml ("Eidolon :: Page " `T.append` T.pack (show page))
     $(widgetFile "page")

@@ -33,14 +33,14 @@ getNewAlbumR = do
         $(widgetFile "newAlbum")
     Nothing -> do
       setMessage "You need to be logged in"
-      redirect $ LoginR
+      redirect LoginR
 
 postNewAlbumR :: Handler Html
 postNewAlbumR = do
   msu <- lookupSession "userId"
   case msu of
     Just tempUserId -> do
-      userId <- return $ getUserIdFromText tempUserId
+      let userId = getUserIdFromText tempUserId
       ((result, _), _) <- runFormPost (albumForm userId)
       case result of
         FormSuccess album -> do
@@ -48,20 +48,20 @@ postNewAlbumR = do
           albumId <- runDB $ insert album
           -- add album reference in user
           user <- runDB $ getJust userId
-          albumList <- return $ userAlbums user
-          newAlbumList <- return $ albumId : albumList
+          let albumList = userAlbums user
+          let newAlbumList = albumId : albumList
           runDB $ update userId [UserAlbums =. newAlbumList]
           -- create folder
-          liftIO $ createDirectory $ "static" </> "data" </> (unpack $ extractKey userId) </> (unpack $ extractKey albumId)
+          liftIO $ createDirectory $ "static" </> "data" </> unpack (extractKey userId) </> unpack (extractKey albumId)
           -- outro
-          setMessage $ "Album successfully created"
+          setMessage "Album successfully created"
           redirect $ ProfileR userId
         _ -> do
           setMessage "There was an error creating the album"
-          redirect $ NewAlbumR
+          redirect NewAlbumR
     Nothing -> do
       setMessage "You must be logged in to create albums"
-      redirect $ LoginR
+      redirect LoginR
 
 albumForm :: UserId -> Form Album
 albumForm userId = renderDivs $ Album

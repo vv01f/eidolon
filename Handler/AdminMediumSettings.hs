@@ -34,7 +34,7 @@ getAdminMediaR = do
         $(widgetFile "adminMedia")
     Left (errorMsg, route) -> do
       setMessage errorMsg
-      redirect $ route
+      redirect route
 
 getAdminMediumSettingsR :: MediumId -> Handler Html
 getAdminMediumSettingsR mediumId = do
@@ -50,10 +50,10 @@ getAdminMediumSettingsR mediumId = do
             $(widgetFile "adminMediumSet")
         Nothing -> do
           setMessage "This medium does not exist"
-          redirect $ AdminR
+          redirect AdminR
     Left (errorMsg, route) -> do
       setMessage errorMsg
-      redirect $ route
+      redirect route
 
 postAdminMediumSettingsR :: MediumId -> Handler Html
 postAdminMediumSettingsR mediumId = do
@@ -72,16 +72,16 @@ postAdminMediumSettingsR mediumId = do
                 , MediumTags =. mediumTags temp
                 ]
               setMessage "Medium settings changed successfully"
-              redirect $ AdminR
+              redirect AdminR
             _ -> do
               setMessage "There was an error while changing the settings"
               redirect $ AdminMediumSettingsR mediumId
         Nothing -> do
           setMessage "This medium does not exist"
-          redirect $ AdminR
+          redirect AdminR
     Left (errorMsg, route) -> do
       setMessage errorMsg
-      redirect $ route
+      redirect route
 
 adminMediumSetForm :: Medium -> Form Medium
 adminMediumSetForm medium = renderDivs $ Medium
@@ -106,14 +106,14 @@ getAdminMediumDeleteR mediumId = do
       case tempMedium of
         Just medium -> do
           -- remove reference from album
-          albumId <- return $ mediumAlbum medium
+          let albumId = mediumAlbum medium
           album <- runDB $ getJust albumId
-          mediaList <- return $ albumContent album
-          newMediaList <- return $ removeItem mediumId mediaList
+          let mediaList = albumContent album
+          let newMediaList = removeItem mediumId mediaList
           runDB $ update albumId [AlbumContent =. newMediaList]
           -- delete comments
           commEnts <- runDB $ selectList [CommentOrigin ==. mediumId] []
-          _ <- mapM (\ent -> runDB $ delete $ entityKey ent) commEnts
+          _ <- mapM (runDB . delete . entityKey) commEnts
           -- delete medium
           runDB $ delete mediumId
           -- delete files
@@ -121,10 +121,10 @@ getAdminMediumDeleteR mediumId = do
           liftIO $ removeFile (normalise $ tail $ mediumThumb medium)
           -- outro
           setMessage "Medium deleted successfully"
-          redirect $ AdminR
+          redirect AdminR
         Nothing -> do
           setMessage "This medium does not exist"
-          redirect $ AdminR
+          redirect AdminR
     Left (errorMsg, route) -> do
       setMessage errorMsg
-      redirect $ route
+      redirect route

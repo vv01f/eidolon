@@ -23,10 +23,10 @@ getAdminR :: Handler Html
 getAdminR = do
   adminCheck <- loginIsAdmin
   case adminCheck of
-    Right _ -> do
+    Right _ ->
       defaultLayout $ do
         setTitle "Administration: Menu"
         $(widgetFile "adminBase")
     Left (errorMsg, route) -> do
       setMessage errorMsg
-      redirect $ route
+      redirect route

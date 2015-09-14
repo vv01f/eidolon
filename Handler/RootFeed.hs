@@ -51,7 +51,7 @@ withXmlDecl c = c
 
 instance RepFeed RepAtom where
   renderFeed params items = do
-    image <- return $ pImage params
+    let image = pImage params
     url <- getUrlRender
     tz <- liftIO getCurrentTimeZone
     links <- case items of

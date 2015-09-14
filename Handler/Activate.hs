@@ -27,50 +27,52 @@ getActivateR token = do
   t <- runDB $ selectFirst [ActivatorToken ==. token] []
   case t of
     Nothing -> do
-      mToken <- runDB $ selectFirst [TokenToken ==. (encodeUtf8 token), TokenKind ==. "activate"] []
+      mToken <- runDB $ selectFirst [TokenToken ==. encodeUtf8 token, TokenKind ==. "activate"] []
       case mToken of
         Just (Entity _ uToken) -> do
           user <- runDB $ getJust (fromJust $ tokenUser uToken)
-          hexSalt <- return $ toHex $ userSalt user
+          let hexSalt = toHex $ userSalt user
           formLayout $ do
             setTitle "Activate your account"
             $(widgetFile "activate")
         _ -> do
           setMessage "Invalid token!"
-          redirect $ HomeR
+          redirect HomeR
     Just (Entity _ activator) -> do
-      uSalt <- return $ userSalt $ activatorUser activator
-      mToken <- runDB $ selectFirst [TokenToken ==. (encodeUtf8 token), TokenKind ==. "activate"] []
+      let uSalt = userSalt $ activatorUser activator
+      mToken <- runDB $ selectFirst [TokenToken ==. encodeUtf8 token, TokenKind ==. "activate"] []
       case mToken of
         Just (Entity _ _) -> do
-          hexSalt <- return $ toHex uSalt
-          formLayout $ do
+          let hexSalt = toHex uSalt
+          formLayout $
             $(widgetFile "activate")
         _ -> do
           setMessage "Invalid token!"
-          redirect $ HomeR
+          redirect HomeR
 
 postActivateR :: Text -> Handler RepJson
 postActivateR token = do
   msalted <- fromJust <$> lookupPostParam "salted"
-  salted <- return $ fromHex' $ unpack msalted
-  mToken <- runDB $ selectFirst [TokenToken ==. (encodeUtf8 token), TokenKind ==. "activate"] []
+  let salted = fromHex' $ unpack msalted
+  mToken <- runDB $ selectFirst [TokenToken ==. encodeUtf8 token, TokenKind ==. "activate"] []
   case mToken of
-    Just (Entity uTokenId uToken) -> do
-      case tokenUser uToken == Nothing of
-        True -> do
+    Just (Entity uTokenId uToken) ->
+      if
+        isNothing (tokenUser uToken)
+        then do
           newUser <- runDB $ selectFirst [ActivatorToken ==. token] []
           case newUser of
             Just (Entity aId activ) -> do
-              namesakes <- runDB $ selectList [UserName ==. (userName $ activatorUser activ)] []
-              case namesakes == [] of
-                True -> do
+              namesakes <- runDB $ selectList [UserName ==. userName (activatorUser activ)] []
+              if
+                I.null namesakes
+                then do
                   -- putting user in active state
                   uId <- runDB $ insert $ activatorUser activ
                   runDB $ update uId [UserSalted =. salted]
                   -- create user directory
                   liftIO $ createDirectoryIfMissing True $
-                    "static" </> "data" </> (unpack $ extractKey uId)
+                    "static" </> "data" </> unpack (extractKey uId)
                   -- cleanup
                   runDB $ delete aId
                   runDB $ delete uTokenId
@@ -78,21 +80,21 @@ postActivateR token = do
                   setSession "userId" (extractKey uId)
                   welcomeLink <- ($ ProfileR uId) <$> getUrlRender
                   returnJson ["welcome" .= welcomeLink]
-                False -> do
+                else do
                   -- cleanup
                   runDB $ delete aId
                   runDB $ delete uTokenId
                   returnJsonError "Somebody already activated your username. Your token has been deleted"
-            Nothing -> do
+            Nothing ->
               returnJsonError "Invalid token"
-        False -> do
+        else do
           runDB $ update (fromJust $ tokenUser uToken) [UserSalted =. salted]
           -- cleanup
           runDB $ delete uTokenId
           setSession "userId" (extractKey $ fromJust $ tokenUser uToken)
           welcomeLink <- ($ ProfileR (fromJust $ tokenUser uToken)) <$> getUrlRender
           returnJson ["welcome" .= welcomeLink]
-    _ -> do
+    _ ->
       returnJsonError "Invalid activation token!"
 
 returnJson :: (Monad m, ToJSON a, a ~ Value) =>

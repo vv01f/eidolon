@@ -23,12 +23,12 @@ import System.FilePath
 getTagR :: Text -> Handler Html
 getTagR tag = do
   tempMedia <- runDB $ selectList [] [Desc MediumTitle]
-  almostMedia <- mapM (\a -> do
-    case tag `elem` (mediumTags $ entityVal a) of
-      True -> return (Just a)
-      False -> return Nothing
+  almostMedia <- mapM (\a ->
+    if tag `elem` mediumTags (entityVal a)
+      then return (Just a)
+      else return Nothing
       ) tempMedia
-  media <- return $ removeItem Nothing almostMedia
+  let media = removeItem Nothing almostMedia
   defaultLayout $ do
     setTitle $ toHtml ("Eidolon :: Tag " `T.append` tag)
     $(widgetFile "tagMedia")

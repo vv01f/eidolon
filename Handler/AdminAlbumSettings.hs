@@ -35,7 +35,7 @@ getAdminAlbumsR = do
         $(widgetFile "adminAlbums")
     Left (errorMsg, route) -> do
       setMessage errorMsg
-      redirect $ route
+      redirect route
 
 getAdminAlbumMediaR :: AlbumId -> Handler Html
 getAdminAlbumMediaR albumId = do
@@ -51,10 +51,10 @@ getAdminAlbumMediaR albumId = do
             $(widgetFile "adminAlbumMedia")
         Nothing -> do
           setMessage "This album does not exist"
-          redirect $ AdminR
+          redirect AdminR
     Left (errorMsg, route) -> do
       setMessage errorMsg
-      redirect $ route
+      redirect route
 
 getAdminAlbumSettingsR :: AlbumId -> Handler Html
 getAdminAlbumSettingsR albumId = do
@@ -64,18 +64,18 @@ getAdminAlbumSettingsR albumId = do
       tempAlbum <- runDB $ get albumId
       case tempAlbum of
         Just album -> do
-          entities <- runDB $ selectList [UserId !=. (albumOwner album)] [Desc UserName]
-          users <- return $ map (\u -> (userName $ entityVal u, entityKey u)) entities
+          entities <- runDB $ selectList [UserId !=. albumOwner album] [Desc UserName]
+          let users = map (\u -> (userName $ entityVal u, entityKey u)) entities
           (adminAlbumSettingsWidget, enctype) <- generateFormPost $ adminAlbumSettingsForm album albumId users
           formLayout $ do
             setTitle "Administration: Album settings"
             $(widgetFile "adminAlbumSet")
         Nothing -> do
           setMessage "This album does not exist"
-          redirect $ AdminR
+          redirect AdminR
     Left (errorMsg, route) -> do
       setMessage errorMsg
-      redirect $ route
+      redirect route
 
 postAdminAlbumSettingsR :: AlbumId -> Handler Html
 postAdminAlbumSettingsR albumId = do
@@ -85,12 +85,12 @@ postAdminAlbumSettingsR albumId = do
       tempAlbum <- runDB $ get albumId
       case tempAlbum of
         Just album -> do
-          entities <- runDB $ selectList [UserId !=. (albumOwner album)] [Desc UserName]
-          users <- return $ map (\u -> (userName $ entityVal u, entityKey u)) entities
+          entities <- runDB $ selectList [UserId !=. albumOwner album] [Desc UserName]
+          let users = map (\u -> (userName $ entityVal u, entityKey u)) entities
           ((res, _), _) <- runFormPost $ adminAlbumSettingsForm album albumId users
           case res of
             FormSuccess temp -> do
-              width <- getThumbWidth $ Just $ L.tail $ fromMaybe ['a'] $ albumSamplePic temp
+              width <- getThumbWidth $ Just $ L.tail $ fromMaybe "a" $ albumSamplePic temp
               _ <- runDB $ update albumId
                 [ AlbumTitle =. albumTitle temp
                 , AlbumShares =. albumShares temp
@@ -98,16 +98,16 @@ postAdminAlbumSettingsR albumId = do
                 , AlbumSampleWidth =. width
                 ]
               setMessage "Album settings changed successfully"
-              redirect $ AdminR
+              redirect AdminR
             _ -> do
               setMessage "There was an error while changing the settings"
               redirect $ AdminAlbumSettingsR albumId
         Nothing -> do
           setMessage "This album does not exist"
-          redirect $ AdminR
+          redirect AdminR
     Left (errorMsg, route) -> do
       setMessage errorMsg
-      redirect $ route
+      redirect route
 
 adminAlbumSettingsForm :: Album -> AlbumId -> [(Text, UserId)] -> Form Album
 adminAlbumSettingsForm album albumId users = renderDivs $ Album
@@ -131,10 +131,10 @@ getAdminAlbumDeleteR albumId = do
       case tempAlbum of
         Just album -> do
           -- remove reference from owner
-          ownerId <- return $ albumOwner album
+          let ownerId = albumOwner album
           owner <- runDB $ getJust ownerId
-          albumList <- return $ userAlbums owner
-          newAlbumList <- return $ removeItem albumId albumList
+          let albumList = userAlbums owner
+          let newAlbumList = removeItem albumId albumList
           runDB $ update ownerId [UserAlbums =. newAlbumList]
           -- delete album content and its comments
           _ <- mapM (\a -> do
@@ -144,20 +144,20 @@ getAdminAlbumDeleteR albumId = do
             liftIO $ removeFile (normalise $ L.tail $ mediumThumb medium)
             -- delete comments
             commEnts <- runDB $ selectList [CommentOrigin ==. a] []
-            _ <- mapM (\ent -> runDB $ delete $ entityKey ent) commEnts
+            _ <- mapM (runDB . delete . entityKey) commEnts
             -- delete album database entry
             runDB $ delete a
             ) (albumContent album)
           -- delete album
           runDB $ delete albumId
           -- delete files
-          liftIO $ removeDirectoryRecursive $ "static" </> "data" </> (T.unpack $ extractKey ownerId) </> (T.unpack $ extractKey albumId)
+          liftIO $ removeDirectoryRecursive $ "static" </> "data" </> T.unpack (extractKey ownerId) </> T.unpack (extractKey albumId)
           -- outro
           setMessage "Album deleted successfully"
-          redirect $ AdminR
+          redirect AdminR
         Nothing -> do
           setMessage "This album dies not exist"
-          redirect $ AdminR
+          redirect AdminR
     Left (errorMsg, route) -> do
       setMessage errorMsg
-      redirect $ route
+      redirect route

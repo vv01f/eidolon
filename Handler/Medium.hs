@@ -29,14 +29,14 @@ getMediumR mediumId = do
   tempMedium <- runDB $ get mediumId
   case tempMedium of
     Just medium -> do
-      ownerId <- return $ mediumOwner medium
+      let ownerId = mediumOwner medium
       owner <- runDB $ getJust ownerId
-      ownerName <- return $ userName owner
-      albumId <- return $ mediumAlbum medium
+      let ownerName = userName owner
+      let albumId = mediumAlbum medium
       album <- runDB $ getJust albumId
       msu <- lookupSession "userId"
       userId <- case msu of
-        Just tempUserId -> do
+        Just tempUserId ->
           return $ Just $ getUserIdFromText tempUserId
         Nothing ->
           return Nothing
@@ -46,10 +46,16 @@ getMediumR mediumId = do
           return $ Just $ userSlug u
         Nothing ->
           return Nothing
-      presence <- return $ (userId == (Just ownerId) || userId == Just (albumOwner album))
+      let presence = userId == (Just ownerId) || userId == Just (albumOwner album)
       (commentWidget, enctype) <- generateFormPost $ commentForm userId userSl mediumId Nothing
-      comments <- runDB $ selectList [CommentOrigin ==. mediumId, CommentParent ==. Nothing] [Desc CommentTime]
-      replies <- runDB $ selectList [CommentOrigin ==. mediumId, CommentParent !=. Nothing] [Desc CommentTime]
+      comments <- runDB $ selectList
+        [ CommentOrigin ==. mediumId
+        , CommentParent ==. Nothing ]
+        [ Desc CommentTime ]
+      replies <- runDB $ selectList
+        [ CommentOrigin ==. mediumId
+        , CommentParent !=. Nothing ]
+        [ Desc CommentTime ]
       dataWidth <- case mediumWidth medium >= 850 of
         True -> return 850
         False -> return $ (mediumWidth medium)
@@ -58,7 +64,7 @@ getMediumR mediumId = do
         $(widgetFile "medium")
     Nothing -> do
       setMessage "This image does not exist"
-      redirect $ HomeR
+      redirect HomeR
 
 postMediumR :: MediumId -> Handler Html
 postMediumR mediumId = do
@@ -68,10 +74,10 @@ postMediumR mediumId = do
       msu <- lookupSession "userId"
       case msu of
         Just tempUserId -> do
-          userId <- return $ Just $ getUserIdFromText tempUserId
-          u <- runDB $ getJust $ fromJust userId
-          userSl <- return $ Just $ userSlug u
-          ((res, _), _) <- runFormPost $ commentForm userId userSl mediumId Nothing
+          let userId = getUserIdFromText tempUserId
+          u <- runDB $ getJust userId
+          let userSl = Just $ userSlug u
+          ((res, _), _) <- runFormPost $ commentForm (Just userId) userSl mediumId Nothing
           case res of
             FormSuccess temp -> do
               _ <- runDB $ insert temp
@@ -98,7 +104,7 @@ postMediumR mediumId = do
           redirect LoginR
     Nothing -> do
       setMessage "This image does not exist"
-      redirect $ HomeR
+      redirect HomeR
 
 commentForm :: Maybe UserId -> Maybe Text -> MediumId -> Maybe CommentId -> Form Comment
 commentForm authorId authorSlug originId parentId = renderDivs $ Comment
@@ -117,20 +123,20 @@ getCommentReplyR commentId = do
       msu <- lookupSession "userId"
       case msu of
         Just tempUserId -> do
-          userId <- return $ Just $ getUserIdFromText tempUserId
-          u <- runDB $ getJust $ fromJust userId
-          userSl <- return $ Just $ userSlug u
-          mediumId <- return $ commentOrigin comment
-          (replyWidget, enctype) <- generateFormPost $ commentForm userId userSl mediumId (Just commentId)
+          let userId = getUserIdFromText tempUserId
+          u <- runDB $ getJust userId
+          let userSl = Just $ userSlug u
+          let mediumId = commentOrigin comment
+          (replyWidget, enctype) <- generateFormPost $ commentForm (Just userId) userSl mediumId (Just commentId)
           formLayout $ do
             setTitle "Eidolon :: Reply to comment"
             $(widgetFile "commentReply")
         Nothing -> do
           setMessage "You need to be logged in to comment on media"
-          redirect $ LoginR
+          redirect LoginR
     Nothing -> do
       setMessage "This comment does not Exist"
-      redirect $ HomeR
+      redirect HomeR
 
 postCommentReplyR :: CommentId -> Handler Html
 postCommentReplyR commentId = do
@@ -140,11 +146,11 @@ postCommentReplyR commentId = do
       msu <- lookupSession "userId"
       case msu of
         Just tempUserId -> do
-          userId <- return $ Just $ getUserIdFromText tempUserId
-          u <- runDB $ getJust $ fromJust userId
-          userSl <- return $ Just $ userSlug u
-          mediumId <- return $ commentOrigin comment
-          ((res, _), _) <- runFormPost $ commentForm userId userSl mediumId (Just commentId)
+          let userId = getUserIdFromText tempUserId
+          u <- runDB $ getJust userId
+          let userSl = Just $ userSlug u
+          let mediumId = commentOrigin comment
+          ((res, _), _) <- runFormPost $ commentForm (Just userId) userSl mediumId (Just commentId)
           case res of
             FormSuccess temp -> do
               _ <- runDB $ insert temp
@@ -182,10 +188,10 @@ postCommentReplyR commentId = do
               redirect $ CommentReplyR commentId
         Nothing -> do
           setMessage "You need to be logged in to post replies"
-          redirect $ LoginR
+          redirect LoginR
     Nothing -> do
       setMessage "This comment does not exist!"
-      redirect $ HomeR
+      redirect HomeR
 
 getCommentDeleteR :: CommentId -> Handler Html
 getCommentDeleteR commentId = do
@@ -195,22 +201,22 @@ getCommentDeleteR commentId = do
       msu <- lookupSession "userId"
       case msu of
         Just tempUserId -> do
-          userId <- return $ getUserIdFromText tempUserId
-          presence <- return $ (Just userId) == (commentAuthor comment)
-          case presence of
-            True -> do
+          let userId = getUserIdFromText tempUserId
+          if
+            Just userId == commentAuthor comment
+            then do
               formLayout $ do
                 setTitle "Eidolon :: Delete comment"
                 $(widgetFile "commentDelete")
-            False -> do
+            else do
               setMessage "You must be the author of this comment to delete it"
               redirect $ MediumR $ commentOrigin comment
         Nothing -> do
           setMessage "You must be logged in to delete comments"
-          redirect $ LoginR
+          redirect LoginR
     Nothing -> do
       setMessage "This comment does not exist"
-      redirect $ HomeR
+      redirect HomeR
 
 postCommentDeleteR :: CommentId -> Handler Html
 postCommentDeleteR commentId = do
@@ -220,10 +226,10 @@ postCommentDeleteR commentId = do
       msu <- lookupSession "userId"
       case msu of
         Just tempUserId -> do
-          userId <- return $ getUserIdFromText tempUserId
-          presence <- return $ (Just userId) == (commentAuthor comment)
-          case presence of
-            True -> do
+          let userId = getUserIdFromText tempUserId
+          if
+            Just userId == commentAuthor comment
+            then do
               confirm <- lookupPostParam "confirm"
               case confirm of
                 Just "confirm" -> do
@@ -238,12 +244,12 @@ postCommentDeleteR commentId = do
                 _ -> do
                   setMessage "You must confirm the deletion"
                   redirect $ MediumR $ commentOrigin comment
-            False -> do
+            else do
               setMessage "You must be the author of this comment to delete it"
               redirect $ MediumR $ commentOrigin comment
         Nothing -> do
           setMessage "You must be logged in to delete comments"
-          redirect $ LoginR
+          redirect LoginR
     Nothing -> do
       setMessage "This comment does not exist"
-      redirect $ HomeR
+      redirect HomeR

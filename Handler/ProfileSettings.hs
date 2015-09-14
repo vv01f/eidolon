@@ -30,7 +30,7 @@ getProfileSettingsR userId = do
         $(widgetFile "profileSettings")
     Left (errorMsg, route) -> do
       setMessage errorMsg
-      redirect $ route
+      redirect route
 
 postProfileSettingsR :: UserId -> Handler Html
 postProfileSettingsR userId = do
@@ -41,9 +41,9 @@ postProfileSettingsR userId = do
       case result of
         FormSuccess temp -> do
          runDB $ update userId [
-             UserName =. (userName temp)
-           , UserSlug =. (userSlug temp)
-           , UserEmail =. (userEmail temp)
+             UserName =. userName temp
+           , UserSlug =. userSlug temp
+           , UserEmail =. userEmail temp
            ]
          setMessage "Profile settings changed successfully"
          redirect $ UserR $ userName user
@@ -52,7 +52,7 @@ postProfileSettingsR userId = do
           redirect $ ProfileSettingsR userId
     Left (errorMsg, route) -> do
       setMessage errorMsg
-      redirect $ route
+      redirect route
 
 
 profileSettingsForm :: User -> Form User

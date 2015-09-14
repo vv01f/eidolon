@@ -28,7 +28,7 @@ import Yesod.Default.Handlers
 import Database.Persist.Sql (runMigration)
 import Network.HTTP.Client.Conduit (newManager)
 import Control.Monad
-import System.Log.FastLogger (newStdoutLoggerSet, defaultBufSize)
+import System.Log.FastLogger (newStdoutLoggerSet, defaultBufSize, toLogStr)
 import Data.Default (def)
 import Yesod.Core.Types (loggerSet)
 
@@ -44,7 +44,6 @@ import Network.Wai.Middleware.RequestLogger (Destination (Logger),
                                              IPAddrSource (..),
                                              OutputFormat (..), destination,
                                              mkRequestLogger, outputFormat)
-import System.Log.FastLogger                (toLogStr)
 
 -- Import all relevant handler modules here.
 -- Don't forget to add new modules to your cabal file!

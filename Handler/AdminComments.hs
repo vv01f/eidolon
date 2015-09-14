@@ -35,7 +35,7 @@ getAdminCommentR = do
         $(widgetFile "adminComments")
     Left (errorMsg, route) -> do
       setMessage errorMsg
-      redirect $ route
+      redirect route
 
 getAdminCommentDeleteR :: CommentId -> Handler Html
 getAdminCommentDeleteR commentId = do
@@ -46,15 +46,15 @@ getAdminCommentDeleteR commentId = do
       case tempComment of
         Just _ -> do
           -- delete comment children
-          children <- runDB $ selectList [CommentParent ==. (Just commentId)] []
-          _ <- mapM (\ent -> runDB $ delete $ entityKey ent) children
+          children <- runDB $ selectList [CommentParent ==. Just commentId] []
+          _ <- mapM (runDB . delete . entityKey) children
           -- delete comment itself
           runDB $ delete commentId
           setMessage "Comment deleted succesfully"
-          redirect $ AdminR
+          redirect AdminR
         Nothing -> do
           setMessage "This comment does not exist"
-          redirect $ AdminR
+          redirect AdminR
     Left (errorMsg, route) -> do
       setMessage errorMsg
-      redirect $ route
+      redirect route

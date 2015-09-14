@@ -33,8 +33,9 @@ postReactivateR = do
   case result of
     FormSuccess temp -> do
       users <- runDB $ selectList [UserEmail ==. temp] []
-      case null users of
-        True -> do
+      if
+        null users
+        then do
           userTokens <- foldM (\userTokens (Entity userId user) -> do
             token <- liftIO $ generateString
             _ <- runDB $ insert $ Token (encodeUtf8 token) "activate" (Just userId)
@@ -58,7 +59,7 @@ postReactivateR = do
             ) True userTokens
           setMessage "Your new password activation will arrive in your e-mail"
           redirect $ HomeR
-        False -> do
+        else do
           setMessage "No user mith this Email"
           redirect $ LoginR
     _ -> do
