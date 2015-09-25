@@ -20,7 +20,7 @@ import Import
 import Data.Time
 import Data.Maybe
 import qualified Data.Text as T
-import System.Locale
+-- import System.Locale
 import System.FilePath
 import Yesod.Markdown
 

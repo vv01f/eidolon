@@ -29,7 +29,7 @@ import Data.Time
 import Data.Char
 import Database.Persist
 import System.Random
-import System.Locale
+-- import System.Locale
 import Yesod
 import Numeric (readHex, showHex)
 import Network.Mail.Mime
@@ -156,7 +156,7 @@ iso8601 time =
   zone
   where zone = case formatTime defaultTimeLocale "%z" time of
                  (sig:digits@(h1:h2:m1:m2))
-                   | sig `elem` "+-" &&
+                   | sig `elem` ("+-" :: String) &&
                      all isDigit digits ->
                        sig:h1:h2:':':m1:m2
                  _ ->

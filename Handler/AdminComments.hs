@@ -20,7 +20,7 @@ import Import
 import Handler.Commons
 import Data.Maybe
 import Data.Time
-import System.Locale
+-- import System.Locale
 
 getAdminCommentR :: Handler Html
 getAdminCommentR = do
