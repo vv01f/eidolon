@@ -55,8 +55,8 @@ Medium
     album AlbumId
     deriving Eq Show
 Comment
-    author UserId Maybe
-    authorSlug Text Maybe
+    author UserId
+    authorSlug Text
     origin MediumId
     parent CommentId Maybe
     time UTCTime

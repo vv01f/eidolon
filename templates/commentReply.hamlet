@@ -1,7 +1,7 @@
 <div id="header" class="item" data-width="600">
   <div class="inner">
     <h4>Reply to comment
-    <strong>#{fromJust $ commentAuthorSlug comment}</strong> posted on #{formatTime defaultTimeLocale "%A %F %H:%M" (commentTime comment)}:
+    <strong>#{commentAuthorSlug comment}</strong> posted on #{formatTime defaultTimeLocale "%A %F %H:%M" (commentTime comment)}:
     <hr>
       <p>#{commentContent comment}
     <hr>

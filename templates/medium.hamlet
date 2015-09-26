@@ -38,22 +38,22 @@
 
 $forall (Entity commentId comment) <- comments
   <article class="comment" data-width="300">
-    <a href=@{ProfileR $ fromJust $ commentAuthor comment}>#{fromJust $ commentAuthorSlug comment}</a> wrote on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime comment}:
+    <a href=@{ProfileR $ commentAuthor comment}>#{commentAuthorSlug comment}</a> wrote on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime comment}:
     <hr>
     #{commentContent comment}
     $if userId /= Nothing
       <hr>
       <a href=@{CommentReplyR commentId}>Reply to this comment
-      $if userId == (commentAuthor comment)
+      $if userId == (Just $ commentAuthor comment)
         <a href=@{CommentDeleteR commentId}>Delete this comment
   $forall (Entity replyId reply) <- replies
     $if commentParent reply == Just commentId
       <article class="comment reply">
-        <a href=@{ProfileR $ fromJust $ commentAuthor reply}>#{fromJust $ commentAuthorSlug reply}</a> replied on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime reply}:
+        <a href=@{ProfileR $ commentAuthor reply}>#{commentAuthorSlug reply}</a> replied on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime reply}:
         <hr>
         #{commentContent reply}
         <hr>
-        $if userId == (commentAuthor comment)
+        $if userId == (Just $ commentAuthor comment)
           <a href=@{CommentDeleteR replyId}>Delete this comment
 
 $if userId /= Nothing

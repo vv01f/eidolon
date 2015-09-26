@@ -18,7 +18,6 @@ module Handler.AdminComments where
 
 import Import
 import Handler.Commons
-import Data.Maybe
 import Data.Time
 -- import System.Locale
 

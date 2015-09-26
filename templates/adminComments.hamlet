@@ -16,7 +16,7 @@ $else
         $forall (Entity commentId comment) <- comments
           $if commentOrigin comment == mediumId
             <article class="comment">
-              #{fromJust $ commentAuthorSlug comment} wrote on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime comment}:
+              #{commentAuthorSlug comment} wrote on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime comment}:
               <hr>
               #{commentContent comment}
               <a href=@{AdminCommentDeleteR commentId}>Delete this comment
@@ -24,7 +24,7 @@ $else
             $if commentParent reply == Just commentId
               $if commentOrigin reply == mediumId
                 <article class="comment reply">
-                  #{fromJust $ commentAuthorSlug comment} wrote on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime comment}:
+                  #{commentAuthorSlug comment} wrote on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime comment}:
                   <hr>
                   #{commentContent reply}
                   <a href=@{AdminCommentDeleteR replyId}>Delete this comment

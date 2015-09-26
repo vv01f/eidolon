@@ -47,7 +47,7 @@ getMediumR mediumId = do
         Nothing ->
           return Nothing
       let presence = userId == (Just ownerId) || userId == Just (albumOwner album)
-      (commentWidget, enctype) <- generateFormPost $ commentForm userId userSl mediumId Nothing
+      (commentWidget, enctype) <- generateFormPost $ commentForm (fromJust userId) (fromJust userSl) mediumId Nothing
       comments <- runDB $ selectList
         [ CommentOrigin ==. mediumId
         , CommentParent ==. Nothing ]
@@ -76,18 +76,18 @@ postMediumR mediumId = do
         Just tempUserId -> do
           let userId = getUserIdFromText tempUserId
           u <- runDB $ getJust userId
-          let userSl = Just $ userSlug u
-          ((res, _), _) <- runFormPost $ commentForm (Just userId) userSl mediumId Nothing
+          let userSl = userSlug u
+          ((res, _), _) <- runFormPost $ commentForm userId userSl mediumId Nothing
           case res of
             FormSuccess temp -> do
               _ <- runDB $ insert temp
               --send mail to medium owner
               owner <- runDB $ getJust $ mediumOwner medium
               link <- ($ MediumR (commentOrigin temp)) <$> getUrlRender
-              sendMail (userEmail owner) ((fromJust $ commentAuthorSlug temp) `T.append` " commented on your medium")
+              sendMail (userEmail owner) ((commentAuthorSlug temp) `T.append` " commented on your medium")
                 [shamlet|
                   <h1>Hello #{userSlug owner}
-                  <p>#{fromJust $ commentAuthorSlug temp} commented on your medium:
+                  <p>#{commentAuthorSlug temp} commented on your medium:
                   <p>#{commentContent temp}
                   <p>To follow the comment thread follow
                     <a href=#{link}>
@@ -106,7 +106,7 @@ postMediumR mediumId = do
       setMessage "This image does not exist"
       redirect HomeR
 
-commentForm :: Maybe UserId -> Maybe Text -> MediumId -> Maybe CommentId -> Form Comment
+commentForm :: UserId -> Text -> MediumId -> Maybe CommentId -> Form Comment
 commentForm authorId authorSlug originId parentId = renderDivs $ Comment
   <$> pure authorId
   <*> pure authorSlug
@@ -125,9 +125,9 @@ getCommentReplyR commentId = do
         Just tempUserId -> do
           let userId = getUserIdFromText tempUserId
           u <- runDB $ getJust userId
-          let userSl = Just $ userSlug u
+          let userSl = userSlug u
           let mediumId = commentOrigin comment
-          (replyWidget, enctype) <- generateFormPost $ commentForm (Just userId) userSl mediumId (Just commentId)
+          (replyWidget, enctype) <- generateFormPost $ commentForm userId userSl mediumId (Just commentId)
           formLayout $ do
             setTitle "Eidolon :: Reply to comment"
             $(widgetFile "commentReply")
@@ -148,20 +148,20 @@ postCommentReplyR commentId = do
         Just tempUserId -> do
           let userId = getUserIdFromText tempUserId
           u <- runDB $ getJust userId
-          let userSl = Just $ userSlug u
+          let userSl = userSlug u
           let mediumId = commentOrigin comment
-          ((res, _), _) <- runFormPost $ commentForm (Just userId) userSl mediumId (Just commentId)
+          ((res, _), _) <- runFormPost $ commentForm userId userSl mediumId (Just commentId)
           case res of
             FormSuccess temp -> do
               _ <- runDB $ insert temp
               --send mail to parent author
               parent <- runDB $ getJust $ fromJust $ commentParent temp
-              parAuth <- runDB $ getJust $ fromJust $ commentAuthor parent
+              parAuth <- runDB $ getJust $ commentAuthor parent
               link <- ($ MediumR (commentOrigin temp)) <$> getUrlRender
-              sendMail (userEmail parAuth) ((fromJust $ commentAuthorSlug temp) `T.append` " replied to your comment")
+              sendMail (userEmail parAuth) ((commentAuthorSlug temp) `T.append` " replied to your comment")
                 [shamlet|
                   <h1>Hello #{userSlug parAuth}
-                  <p>#{fromJust $ commentAuthorSlug temp} replied to your comment:
+                  <p>#{commentAuthorSlug temp} replied to your comment:
                   #{commentContent temp}
                   <p>To see the comment thread follow
                     <a href=#{link}>
@@ -171,10 +171,10 @@ postCommentReplyR commentId = do
               --send mail to medium owner
               medium <- runDB $ getJust mediumId
               owner <- runDB $ getJust $ mediumOwner medium
-              sendMail (userEmail owner) ((fromJust $ commentAuthorSlug temp) `T.append` " commented on your medium")
+              sendMail (userEmail owner) ((commentAuthorSlug temp) `T.append` " commented on your medium")
                 [shamlet|
                   <h1>Hello #{userSlug owner}
-                  <p>#{fromJust $ commentAuthorSlug temp} commented your medium with:
+                  <p>#{commentAuthorSlug temp} commented your medium with:
                   #{commentContent temp}
                   <p>To see the comment thread follow
                     <a href=#{link}>
@@ -203,7 +203,7 @@ getCommentDeleteR commentId = do
         Just tempUserId -> do
           let userId = getUserIdFromText tempUserId
           if
-            Just userId == commentAuthor comment
+            Just userId == Just (commentAuthor comment)
             then do
               formLayout $ do
                 setTitle "Eidolon :: Delete comment"
@@ -228,7 +228,7 @@ postCommentDeleteR commentId = do
         Just tempUserId -> do
           let userId = getUserIdFromText tempUserId
           if
-            Just userId == commentAuthor comment
+            Just userId == Just (commentAuthor comment)
             then do
               confirm <- lookupPostParam "confirm"
               case confirm of
