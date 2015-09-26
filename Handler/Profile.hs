@@ -20,6 +20,8 @@ import Import
 import Data.Maybe
 import qualified Data.Text as T
 import System.FilePath
+import Yesod.RssFeed
+import Yesod.AtomFeed
 
 getProfileR :: UserId -> Handler Html
 getProfileR ownerId = do
@@ -46,6 +48,8 @@ getProfileR ownerId = do
           return False
       defaultLayout $ do
         setTitle $ toHtml ("Eidolon :: " `T.append` userSlug owner `T.append` "'s profile")
+        rssLink (UserFeedRssR ownerId) $ userSlug owner `T.append` "'s feed"
+        atomLink (UserFeedAtomR ownerId) $ userSlug owner `T.append` "'s feed"
         $(widgetFile "profile")
     Nothing -> do
       setMessage "This profile does not exist"

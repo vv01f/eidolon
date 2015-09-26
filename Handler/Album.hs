@@ -19,6 +19,8 @@ module Handler.Album where
 import Import
 import qualified Data.Text as T
 import System.FilePath
+import Yesod.RssFeed
+import Yesod.AtomFeed
 
 getAlbumR :: AlbumId -> Handler Html
 getAlbumR albumId = do
@@ -40,6 +42,8 @@ getAlbumR albumId = do
       media <- runDB $ selectList [MediumAlbum ==. albumId] [Desc MediumTime]
       defaultLayout $ do
         setTitle $ toHtml ("Eidolon :: Album " `T.append` albumTitle album)
+        rssLink (AlbumFeedRssR albumId) $ "Album feed of album " `T.append` albumTitle album
+        atomLink (AlbumFeedAtomR albumId) $ "Album feed of album " `T.append` albumTitle album
         $(widgetFile "album")
     Nothing -> do
       setMessage "This album does not exist"

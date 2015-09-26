@@ -23,6 +23,8 @@ import qualified Data.Text as T
 -- import System.Locale
 import System.FilePath
 import Yesod.Markdown
+import Yesod.RssFeed
+import Yesod.AtomFeed
 
 getMediumR :: MediumId -> Handler Html
 getMediumR mediumId = do
@@ -61,6 +63,8 @@ getMediumR mediumId = do
       let pr = StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumPath medium) []
       formLayout $ do
         setTitle $ toHtml ("Eidolon :: Medium " `T.append` (mediumTitle medium))
+        rssLink (CommentFeedRssR mediumId) $ "Comment feed of medium " `T.append` mediumTitle medium
+        atomLink (CommentFeedAtomR mediumId) $ "Comment feed of medium " `T.append` mediumTitle medium
         $(widgetFile "medium")
     Nothing -> do
       setMessage "This image does not exist"

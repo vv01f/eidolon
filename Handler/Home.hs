@@ -21,6 +21,8 @@ import Import
 import qualified Data.Text as T
 import Data.List as L
 import System.FilePath
+import Yesod.RssFeed
+import Yesod.AtomFeed
 
 getHomeR :: Handler Html
 getHomeR = do
@@ -28,6 +30,8 @@ getHomeR = do
   nextMediaQuery <- runDB $ selectList [] [Desc MediumTime, LimitTo 1, OffsetBy 30]
   let nextMedia = not $ L.null nextMediaQuery
   defaultLayout $ do
+    rssLink RootFeedRssR "Root Feed"
+    atomLink RootFeedAtomR "Root Feed"
     setTitle "Eidolon :: Home"
     $(widgetFile "home")
 
@@ -37,5 +41,7 @@ getPageR page = do
   nextMediaQuery <- runDB $ selectList [] [Desc MediumTime, LimitTo 1, OffsetBy ((page + 1) * 30)]
   let nextMedia = not $ L.null nextMediaQuery
   defaultLayout $ do
+    rssLink RootFeedRssR "Root Feed"
+    atomLink RootFeedAtomR "Root Feed"
     setTitle $ toHtml ("Eidolon :: Page " `T.append` T.pack (show page))
     $(widgetFile "page")
