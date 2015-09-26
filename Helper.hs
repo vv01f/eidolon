@@ -19,7 +19,6 @@ module Helper where
 import Prelude
 import Yesod.Static
 import Model
-import Control.Applicative
 import Data.Maybe
 import Data.List as L
 import qualified Data.ByteString as B
@@ -46,7 +45,7 @@ getUserIdFromText tempUserId =
       k
   where
     key = keyFromValues $ pInt64 : []
-    pInt64 = PersistInt64 $ fromIntegral $ read $ T.unpack tempUserId
+    pInt64 = PersistInt64 $ fromIntegral (read $ T.unpack tempUserId :: Integer)
 
 extractKey :: PersistEntity record => Key record -> T.Text
 extractKey = extractKey' . keyToValues
@@ -177,7 +176,7 @@ mediumStaticThumbRoute :: Medium -> Route Static
 mediumStaticThumbRoute medium =
   StaticRoute (drop 2 $ T.splitOn "/" $ T.pack $ mediumThumb medium) []
 
---getThumbWidth :: MonadIO m => Maybe String -> m (Maybe Int)
+getThumbWidth :: MonadIO m => Maybe String -> m Int
 getThumbWidth path
   | path == Nothing = pure 230
   | otherwise       = liftIO $ withMagickWandGenesis $ do

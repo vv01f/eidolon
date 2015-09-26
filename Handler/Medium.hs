@@ -56,9 +56,9 @@ getMediumR mediumId = do
         [ CommentOrigin ==. mediumId
         , CommentParent !=. Nothing ]
         [ Desc CommentTime ]
-      dataWidth <- case mediumWidth medium >= 850 of
-        True -> return 850
-        False -> return $ (mediumWidth medium)
+      let dataWidth = if mediumWidth medium >= 850 then 850 else mediumWidth medium
+      let tr = StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumThumb medium) []
+      let pr = StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumPath medium) []
       formLayout $ do
         setTitle $ toHtml ("Eidolon :: Medium " `T.append` (mediumTitle medium))
         $(widgetFile "medium")

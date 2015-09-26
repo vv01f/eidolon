@@ -31,7 +31,6 @@ import Yesod.Core.Types
 -- costom imports
 import Data.Text as T
 import Data.Text.Encoding
-import Control.Applicative ((<$>))
 import Network.Wai
 import Helper
 
@@ -100,10 +99,11 @@ renderLayout widget = do
     pc <- widgetToPageContent $ do
         -- add parallelism js files
         $(combineScripts 'StaticR
-            [ js_jquery_min_js
-            , js_jquery_poptrox_min_js
+            [ js_jquery_1_11_3_js
+            , js_jquery_poptrox_js
             , js_skel_min_js
             , js_init_js
+            , js_picturefill_js
             ])
         $(combineStylesheets 'StaticR
             [
