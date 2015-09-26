@@ -1,7 +1,15 @@
-name:              eidolon
-version:           0.0.2
-cabal-version:     >= 1.8
-build-type:        Simple
+name:                eidolon
+version:             0.0.3
+synopsis:            Image gallery in Yesod
+homepage:            https://eidolon.nek0.eu
+license:             AGPL-3
+license-file:        LICENSE.md
+author:              Amedeo Molnár
+maintainer:          nek0@chelnok.de
+category:            Web
+extra-source-files:  README.md
+cabal-version:       >= 1.10
+build-type:          Simple
 
 Flag dev
     Description:   Turn on development settings, like auto-reload templates.
@@ -49,7 +57,8 @@ library
     else
         ghc-options:   -Wall -O2
 
-    extensions: TemplateHaskell
+    default-language: Haskell2010
+    default-extensions: TemplateHaskell
                 QuasiQuotes
                 OverloadedStrings
                 NoImplicitPrelude
@@ -65,59 +74,45 @@ library
                 RecordWildCards
                 ViewPatterns
 
-    build-depends: base                          >= 4
-                 , yesod                         >= 1.4.0
+    build-depends: base                          >= 4.8
+                 , yesod                         >= 1.4
                  , yesod-core                    >= 1.2.12
-                 , yesod-auth                    >= 1.3
-                 , yesod-static                  >= 1.2
-                 , yesod-form                    >= 1.3
-                 , bytestring                    >= 0.9
-                 , text                          >= 0.11
-                 , persistent                    >= 2.1.1.3
-                 , persistent-postgresql         >= 1.3
-                 , persistent-template           >= 1.3
+                 , yesod-static                  >= 1.5
+                 , bytestring                    >= 0.10
+                 , text                          >= 1.2
+                 , persistent                    >= 2.2
+                 , persistent-postgresql         >= 2.2
                  , template-haskell
                  , shakespeare                   >= 2.0
                  , hjsmin                        >= 0.1
-                 , monad-control                 >= 0.3
                  , wai-extra                     >= 3.0
                  , yaml                          >= 0.8
                  , http-conduit                  >= 2.1
-                 , directory                     >= 1.1
-                 , warp                          >= 3.0
-                 , data-default
+                 , directory                     >= 1.2
+                 , warp                          >= 3.1
+                 , data-default                  >= 0.5
                  , aeson                         >= 0.6
-                 , conduit                       >= 1.0
                  , monad-logger                  >= 0.3
-                 , fast-logger                   >= 2.1.4
-                 , wai-logger                    >= 2.1
+                 , fast-logger                   >= 2.4
                  -- transition to persisten 2.0
-                 , classy-prelude
-                 , classy-prelude-conduit
-                 , classy-prelude-yesod
+                 , classy-prelude-yesod          >= 0.12
                  , file-embed
                  -- custom dependencies
-                 , random
-                 , mime-mail
-                 , blaze-html
+                 , random                        >= 1.1
+                 , mime-mail                     >= 0.4
+                 , blaze-html                    >= 0.8
                  , filepath
-                 , system-filepath
-                 , time
-                 , yesod-persistent
-                 , transformers
-                 , old-locale
-                 , cereal
-                 , cryptohash-cryptoapi
-                 , crypto-api
+                 , system-filepath               >= 0.4
+                 , time                          >= 1.5
+                 , transformers                  >= 0.4
+                 , cereal                        >= 0.4
+                 , cryptohash-cryptoapi          >= 0.1
+                 , crypto-api                    >= 0.13
                  , imagemagick
-                 , resourcet
-                 , yesod-markdown                >= 0.8
-                 , blaze-builder
-                 , blaze-markup
-                 , either
-                 , wai
-                 -- experiment
-                 , yesod-newsfeed
+                 , yesod-markdown                >= 0.10
+                 , blaze-markup                  >= 0.7
+                 , wai                           >= 3.0
+                 , yesod-newsfeed                >= 1.4
 
 executable         eidolon
     if flag(library-only)
