@@ -32,7 +32,7 @@ main = do
   tups <- sequence $ map (\entry ->
     case entry of
       [("id", theId), _, ("path", SqlByteString path), _, _, _, ("owner", SqlInteger owner), _, _, _, _, ("album", SqlInteger album), _, _] -> do
-        let newName = takeBaseName (B.unpack path) ++ "_thumb.jpg"
+        let newName = takeBaseName (B.unpack path) ++ "_preview.jpg"
         let newPath = "static" FP.</> "data" FP.</> show owner FP.</> show album FP.</> newName
         pWidth <- withMagickWandGenesis $ do
           (_, w) <- magickWand
