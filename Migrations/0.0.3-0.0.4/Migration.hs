@@ -22,7 +22,7 @@ main = do
   dbPasswd <- getPasswd
   let dbString = "host=" ++ dbHost ++ " port=" ++ dbPort ++ " user=" ++ dbUser ++ " dbname=" ++ dbName ++ " password=" ++ dbPasswd
   conn <- connectPostgreSQL dbString
-  -- Uncomment next two lines, if eidolon has been run after the update
+  -- comment next two lines, if eidolon has been run after the update
   _ <- run conn "alter table medium add column preview varchar not null default 'fill_me!'" []
   _ <- run conn "alter table medium add column preview_width int8 not null default 0" []
   stmt1 <- prepare conn "select * from medium"
