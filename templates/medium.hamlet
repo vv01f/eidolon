@@ -6,7 +6,8 @@
         by <a href=@{UserR ownerName}>#{ownerName}</a> from album <a href=@{AlbumR albumId}>#{albumTitle album}</a>
   <div id="header" class="item image" data-width=#{dataWidth}>
     <div class="inner">
-      <img sizes="(min-width: 40em) 80vw, 100vw" srcset="@{tr} 1x, @{pr} 2x" title=#{mediumTitle medium}>
+      <a href=@{ir}>
+        <img sizes="(min-width: 40em) 80vw, 100vw" srcset="@{tr} 1x, @{pr} 2x, @{ir} 3x" title=#{mediumTitle medium}>
 
   <div id="header" class="item" data-width="400">
     <div class="inner">

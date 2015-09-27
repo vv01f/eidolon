@@ -71,6 +71,8 @@ mediumSettingsForm medium = renderDivs $ Medium
   <*> pure (mediumWidth medium)
   <*> pure (mediumThumbWidth medium)
   <*> pure (mediumAlbum medium)
+  <*> pure (mediumPreview medium)
+  <*> pure (mediumPreviewWidth medium)
 
 getMediumDeleteR :: MediumId -> Handler Html
 getMediumDeleteR mediumId = do

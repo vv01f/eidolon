@@ -44,7 +44,7 @@ After installing all dependencies you can configure and build the software with
 
 ```bash
 cabal configure
-cabal build
+cabal build exe:eidolon
 ```
 
 ##Deploying
@@ -64,6 +64,16 @@ Unfortunately the gallery is not highly customizable, but you can change most of
 You can start the gallery now by running the executable. You need to provide a settings file, normally found in `config/settings.yml`
 
 Since eidolon will block your console, I recommend wrapping a init-script around it. how you can do that is written in my [blog](http://nek0.eu/posts/2014-10-23-Daemonize-a-yesod-app.html).
+
+##Migrations
+
+###0.0.3-0.0.4
+
+* do not start or restart your eidolon service before migration
+* build the Migration script with `cabal build Migration1`
+* Migration script is located in `dist/build/Migration1/` in your build directory
+* run Migration script from your run location (where your `static` folder with all the images are located)
+* start or restart your eidolon service
 
 ##Acknowledgements:
 

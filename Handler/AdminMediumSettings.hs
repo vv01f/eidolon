@@ -96,6 +96,8 @@ adminMediumSetForm medium = renderDivs $ Medium
   <*> pure (mediumWidth medium)
   <*> pure (mediumThumbWidth medium)
   <*> pure (mediumAlbum medium)
+  <*> pure (mediumPreview medium)
+  <*> pure (mediumPreviewWidth medium)
 
 getAdminMediumDeleteR :: MediumId -> Handler Html
 getAdminMediumDeleteR mediumId = do
