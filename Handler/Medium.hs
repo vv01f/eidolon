@@ -60,7 +60,8 @@ getMediumR mediumId = do
         [ Desc CommentTime ]
       let dataWidth = if mediumWidth medium >= 850 then 850 else mediumWidth medium
       let tr = StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumThumb medium) []
-      let pr = StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumPath medium) []
+      let pr = StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumPreview medium) []
+      let ir = StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumPath medium) []
       formLayout $ do
         setTitle $ toHtml ("Eidolon :: Medium " `T.append` (mediumTitle medium))
         rssLink (CommentFeedRssR mediumId) $ "Comment feed of medium " `T.append` mediumTitle medium

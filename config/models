@@ -53,6 +53,8 @@ Medium
     width Int
     thumbWidth Int
     album AlbumId
+    preview FP.FilePath
+    previewWidth Int
     deriving Eq Show
 Comment
     author UserId

@@ -80,12 +80,12 @@ postDirectUploadR albumId = do
                         mime `elem` acceptedTypes
                         then do
                           path <- writeOnDrive file ownerId albumId
-                          (thumbPath, iWidth, tWidth) <- generateThumb path ownerId albumId
+                          (thumbPath, prevPath, iWidth, tWidth, pWidth) <- generateThumb path ownerId albumId
                           tempName <- if
                             length indFils == 1
                             then return $ fileBulkPrefix temp
                             else return (fileBulkPrefix temp `T.append` " " `T.append` T.pack (show (index :: Int)) `T.append` " of " `T.append` T.pack (show (length indFils)))
-                          let medium = Medium tempName ('/' : path) ('/' : thumbPath) mime (fileBulkTime temp) (fileBulkOwner temp) (fileBulkDesc temp) (fileBulkTags temp) iWidth tWidth albumId
+                          let medium = Medium tempName ('/' : path) ('/' : thumbPath) mime (fileBulkTime temp) (fileBulkOwner temp) (fileBulkDesc temp) (fileBulkTags temp) iWidth tWidth albumId ('/' : prevPath) pWidth
                           mId <- runDB $ I.insert medium
                           inALbum <- runDB $ getJust albumId
                           let newMediaList = mId : albumContent inALbum
@@ -118,24 +118,35 @@ postDirectUploadR albumId = do
       setMessage "This Album does not exist"
       redirect $ AlbumR albumId
 
-generateThumb :: FP.FilePath -> UserId -> AlbumId -> Handler (FP.FilePath, Int, Int)
+generateThumb :: FP.FilePath -> UserId -> AlbumId -> Handler (FP.FilePath, FP.FilePath, Int, Int, Int)
 generateThumb path userId albumId = do
   let newName = FP.takeBaseName path ++ "_thumb.jpg"
   let newPath = "static" FP.</> "data" FP.</> T.unpack (extractKey userId) FP.</> T.unpack (extractKey albumId) FP.</> newName
-  (iWidth, tWidth) <- liftIO $ withMagickWandGenesis $ do
-    (_ , w) <- magickWand
+  let prevName = FP.takeBaseName path ++ "_preview.jpg"
+  let prevPath = "static" FP.</> "data" FP.</> T.unpack (extractKey userId) FP.</> T.unpack (extractKey albumId) FP.</> prevName
+  (iWidth, tWidth, pWidth) <- liftIO $ withMagickWandGenesis $ do
+    (_, w) <- magickWand
+    (_, p) <- magickWand
     readImage w (decodeString path)
+    readImage p (decodeString path)
     w1 <- getImageWidth w
     h1 <- getImageHeight w
     let h2 = 230
     let w2 = floor (fromIntegral w1 / fromIntegral h1 * fromIntegral h2 :: Double)
+    let h3 = h1 `div` 2
+    let w3 = w1 `div` 2
     setImageAlphaChannel w deactivateAlphaChannel
+    setImageAlphaChannel p deactivateAlphaChannel
     setImageFormat w "jpeg"
+    setImageFormat p "jpeg"
     resizeImage w w2 h2 lanczosFilter 1
+    resizeImage p w3 h3 lanczosFilter 1
     setImageCompressionQuality w 95
+    setImageCompressionQuality p 95
     writeImage w (Just (decodeString newPath))
-    return (w1, w2)
-  return (newPath, iWidth, tWidth)
+    writeImage p (Just (decodeString prevPath))
+    return (w1, w2, w3)
+  return (newPath, prevPath, iWidth, tWidth, pWidth)
 
 writeOnDrive :: FileInfo -> UserId -> AlbumId -> Handler FP.FilePath
 writeOnDrive fil userId albumId = do
@@ -230,12 +241,12 @@ postUploadR = do
                   albRef <- runDB $ getJust inAlbumId
                   let ownerId = albumOwner albRef
                   path <- writeOnDrive file ownerId inAlbumId
-                  (thumbPath, iWidth, tWidth) <- generateThumb path ownerId inAlbumId
+                  (thumbPath, prevPath, iWidth, tWidth, pWidth) <- generateThumb path ownerId inAlbumId
                   tempName <- if
                     length indFils == 1
                     then return $ fileBulkPrefix temp
                     else return (fileBulkPrefix temp `T.append` " " `T.append` T.pack (show (index :: Int)) `T.append` " of " `T.append` T.pack (show (length indFils)))
-                  let medium = Medium tempName ('/' : path) ('/' : thumbPath) mime (fileBulkTime temp) (fileBulkOwner temp) (fileBulkDesc temp) (fileBulkTags temp) iWidth tWidth inAlbumId
+                  let medium = Medium tempName ('/' : path) ('/' : thumbPath) mime (fileBulkTime temp) (fileBulkOwner temp) (fileBulkDesc temp) (fileBulkTags temp) iWidth tWidth inAlbumId ('/' : prevPath) pWidth
                   mId <- runDB $ I.insert medium
                   inALbum <- runDB $ getJust inAlbumId
                   let newMediaList = mId : albumContent inALbum
