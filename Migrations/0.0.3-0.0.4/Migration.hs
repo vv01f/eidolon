@@ -47,7 +47,7 @@ main = do
           setImageCompressionQuality w 95
           writeImage w (Just (decodeString newPath))
           return w2
-        return [SqlByteString (B.pack newPath), SqlInteger (fromIntegral pWidth), theId]
+        return [SqlByteString (B.pack $ '/':newPath), SqlInteger (fromIntegral pWidth), theId]
       _ ->
         error "malformed entry"
     ) rows
