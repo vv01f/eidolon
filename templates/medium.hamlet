@@ -7,7 +7,9 @@
   <div id="header" class="item image" data-width=#{dataWidth}>
     <div class="inner">
       <a href=@{ir}>
-        <img sizes="(min-width: 40em) 80vw, 100vw" srcset="@{pr} 1x, @{ir} 2x" src=@{pr} title=#{mediumTitle medium}>
+        <picture>
+          <source srcset="@{pr}, @{ir} 2x" media="(min-width: 100px)">
+          <img srcset="@{pr}, @{ir} 2x" src=@{pr} title=#{mediumTitle medium}>
 
   <div id="header" class="item" data-width="400">
     <div class="inner">
