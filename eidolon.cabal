@@ -113,10 +113,18 @@ library
                  , blaze-markup                  >= 0.7
                  , wai                           >= 3.0
                  , yesod-newsfeed                >= 1.4
+                 -- for Migrations
+                 , HDBC
+                 , HDBC-postgresql
+                 , imagemagick
+                 , text
+                 , filepath
+                 , system-filepath
+                 , bytestring
 
 executable         eidolon
     if flag(library-only)
-        Buildable: True
+        Buildable: False
 
     main-is:           main.hs
     hs-source-dirs:    app
@@ -125,20 +133,6 @@ executable         eidolon
                      , yesod
 
     ghc-options:       -threaded -O2
-
-executable         Migrate1
-
-    main-is: Migration.hs
-    hs-source-dirs: Migrations/0.0.3-0.0.4
-    ghc-options: -Wall
-    build-depends: base
-                 , HDBC
-                 , HDBC-postgresql
-                 , imagemagick
-                 , text
-                 , filepath
-                 , system-filepath
-                 , bytestring
 
 test-suite test
     type:              exitcode-stdio-1.0

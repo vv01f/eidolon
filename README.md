@@ -44,7 +44,7 @@ After installing all dependencies you can configure and build the software with
 
 ```bash
 cabal configure
-cabal build exe:eidolon
+cabal build
 ```
 
 ##Deploying
@@ -70,9 +70,10 @@ Since eidolon will block your console, I recommend wrapping a init-script around
 ###0.0.3-0.0.4
 
 * do not start or restart your eidolon service before migration
-* build the Migration script with `cabal build Migration1`
-* Migration script is located in `dist/build/Migration1/` in your build directory
-* run migration script from your run location (where your `static` folder with all the images are located)
+* run migration script from your run location (where your `static` folder with all the images is located)
+	* if you are building in a sandbox run `runghc -package-db/full/path/to/sandbox/XXX-ghc-version-packages.conf.d /path/to/eidolon/Migrations/0.0.3-0.0.4/Migration.hs`
+		* Note: No space between the option `-package-db` and its argument
+	* without sandbox: `runghc /path/to/eidolon/Migrations/0.0.3-0.0.4/Migration.hs`
 * start or restart your eidolon service
 
 ##Acknowledgements:
