@@ -18,7 +18,8 @@ module Handler.RootFeed where
 
 import Import
 import qualified Data.Text as T
-import qualified Data.Text.Lazy as L
+import qualified Data.Text.Lazy as LT
+import qualified Data.List as L
 import Data.Maybe
 import Data.Time
 import Text.Shakespeare.Text (stext)
@@ -68,7 +69,7 @@ commentToEntry c =
   return FeedEntry
     { feedEntryLink = MediumR (commentOrigin $ entityVal c)
     , feedEntryUpdated = (commentTime $ entityVal c)
-    , feedEntryTitle = L.toStrict $ [stext|#{commentAuthorSlug $ entityVal c} wrote:|]
+    , feedEntryTitle = LT.toStrict $ [stext|#{commentAuthorSlug $ entityVal c} wrote:|]
     , feedEntryContent = [shamlet|#{commentContent $ entityVal c}|]
     , feedEntryEnclosure = Nothing
     }
@@ -191,7 +192,7 @@ mediumToEntry ent =
     , feedEntryContent = toHtml (fromMaybe (Textarea "") $ mediumDescription $ entityVal ent)
     , feedEntryEnclosure = Just
         ( StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumPreview $ entityVal ent) []
-        , unsafePerformIO $ getSize $ mediumPreview $ entityVal ent
+        , unsafePerformIO $ getSize $ L.tail $ mediumPreview $ entityVal ent
         , "image/jpeg"
         )
     }
