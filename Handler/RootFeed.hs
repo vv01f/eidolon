@@ -25,6 +25,9 @@ import Text.Shakespeare.Text (stext)
 import Yesod.Feed
 import Yesod.RssFeed
 import Yesod.AtomFeed
+import System.FilePath
+import qualified System.Posix as P
+import System.IO.Unsafe
 
 getCommentFeedRssR :: MediumId -> Handler RepRss
 getCommentFeedRssR mId = do
@@ -56,6 +59,7 @@ commentFeedBuilder mId = do
       |]
     , feedLanguage = "en"
     , feedUpdated = time
+    , feedLogo = Just (StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumThumb medium) [], unTextarea $ fromMaybe (Textarea "") $ mediumDescription medium)
     , feedEntries = es
     }
 
@@ -66,6 +70,7 @@ commentToEntry c =
     , feedEntryUpdated = (commentTime $ entityVal c)
     , feedEntryTitle = L.toStrict $ [stext|#{commentAuthorSlug $ entityVal c} wrote:|]
     , feedEntryContent = [shamlet|#{commentContent $ entityVal c}|]
+    , feedEntryEnclosure = Nothing
     }
 
 getAlbumFeedRssR :: AlbumId -> Handler RepRss
@@ -98,6 +103,7 @@ albumFeedBuilder aId = do
       |]
     , feedLanguage = "en"
     , feedUpdated = time
+    , feedLogo = Just (StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ fromMaybe "/static/img/album.jpg" $ albumSamplePic album) [], "")
     , feedEntries = es
     }
 
@@ -140,6 +146,7 @@ userFeedBuilder uId = do
       |]
     , feedLanguage = "en"
     , feedUpdated = time
+    , feedLogo = Nothing
     , feedEntries = es
     }
 
@@ -171,6 +178,7 @@ rootFeedBuilder = do
       |]
     , feedLanguage = "en"
     , feedUpdated = time
+    , feedLogo = Nothing
     , feedEntries = es
     }
 
@@ -181,4 +189,15 @@ mediumToEntry ent =
     , feedEntryUpdated = mediumTime (entityVal ent)
     , feedEntryTitle = mediumTitle (entityVal ent)
     , feedEntryContent = toHtml (fromMaybe (Textarea "") $ mediumDescription $ entityVal ent)
+    , feedEntryEnclosure = Just
+        ( StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumPreview $ entityVal ent) []
+        , unsafePerformIO $ getSize $ mediumPreview $ entityVal ent
+        , "image/jpeg"
+        )
     }
+
+getSize :: FilePath -> IO Int
+getSize path = do
+  stat <- P.getFileStatus path
+  P.COff raw <- return $ P.fileSize stat
+  return $ (fromIntegral raw :: Int)
