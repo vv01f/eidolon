@@ -28,7 +28,6 @@ import Yesod.RssFeed
 import Yesod.AtomFeed
 import System.FilePath
 import qualified System.Posix as P
-import System.IO.Unsafe
 
 getCommentFeedRssR :: MediumId -> Handler RepRss
 getCommentFeedRssR mId = do
@@ -183,8 +182,9 @@ rootFeedBuilder = do
     , feedEntries = es
     }
 
-mediumToEntry :: Monad m => Entity Medium -> m (FeedEntry (Route App))
-mediumToEntry ent =
+mediumToEntry :: MonadIO m => Entity Medium -> m (FeedEntry (Route App))
+mediumToEntry ent = do
+  size <- liftIO $ getSize $ L.tail $ mediumPreview $ entityVal ent
   return FeedEntry
     { feedEntryLink = MediumR (entityKey ent)
     , feedEntryUpdated = mediumTime (entityVal ent)
@@ -192,7 +192,7 @@ mediumToEntry ent =
     , feedEntryContent = toHtml (fromMaybe (Textarea "") $ mediumDescription $ entityVal ent)
     , feedEntryEnclosure = Just
         ( StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumPreview $ entityVal ent) []
-        , unsafePerformIO $ getSize $ L.tail $ mediumPreview $ entityVal ent
+        , size
         , "image/jpeg"
         )
     }
