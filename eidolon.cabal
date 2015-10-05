@@ -112,7 +112,7 @@ library
                  , yesod-markdown                >= 0.10
                  , blaze-markup                  >= 0.7
                  , wai                           >= 3.0
-                 , yesod-newsfeed                >= 1.4
+                 , yesod-newsfeed                >= 1.5
                  , unix                          >= 2.7
                  -- for Migrations
                  , HDBC

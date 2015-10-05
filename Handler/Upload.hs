@@ -133,8 +133,8 @@ generateThumb path userId albumId = do
     h1 <- getImageHeight w
     let h2 = 230
     let w2 = floor (fromIntegral w1 / fromIntegral h1 * fromIntegral h2 :: Double)
-    let h3 = h1 `div` 2
-    let w3 = w1 `div` 2
+    let w3 = 1380
+    let h3 = floor (fromIntegral h1 / fromIntegral w1 * fromIntegral w3 :: Double)
     setImageAlphaChannel w deactivateAlphaChannel
     setImageAlphaChannel p deactivateAlphaChannel
     setImageFormat w "jpeg"

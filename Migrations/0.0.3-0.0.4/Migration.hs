@@ -39,8 +39,8 @@ main = do
           readImage w (decodeString $ tail $ B.unpack path)
           w1 <- getImageWidth w
           h1 <- getImageHeight w
-          let w2 = w1 `div` 2
-          let h2 = h1 `div` 2
+          let w2 = 1380
+          let h2 = floor (fromIntegral h1 / fromIntegral w1 * fromIntegral w2 :: Double)
           setImageAlphaChannel w deactivateAlphaChannel
           setImageFormat w (T.pack "jpeg")
           resizeImage w w2 h2 lanczosFilter 1
