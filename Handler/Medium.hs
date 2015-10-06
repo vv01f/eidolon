@@ -59,6 +59,7 @@ getMediumR mediumId = do
         , CommentParent !=. Nothing ]
         [ Desc CommentTime ]
       let dataWidth = if mediumWidth medium >= 850 then 850 else mediumWidth medium
+      let tr = StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumThumb medium) []
       let pr = StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumPreview medium) []
       let ir = StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumPath medium) []
       formLayout $ do
