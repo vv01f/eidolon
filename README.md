@@ -12,6 +12,10 @@ Visit the test instance at [eidolon.nek0.eu][eidolon]
 
 A working Haskell capable environment. For that you will need `ghc` and `cabal-install`.
 
+```bash
+sudo aptitude install ghc cabal-install
+```
+
 update your package list with `cabal update` and upgrade `cabal-install`, if necessary.
 
 Additionally to Haskell and its dependencies you will need the following software and libraries:
