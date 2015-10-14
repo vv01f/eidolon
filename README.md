@@ -10,15 +10,42 @@ Visit the test instance at [eidolon.nek0.eu][eidolon]
 
 ###Dependencies
 
-A working Haskell capable environment. For that you will need `ghc` and `cabal-install`.
+A working Haskell capable environment. For that you will need `haskell-stack` and `cabal-install`, which you can install with:
 
-update your package list with `cabal update` and upgrade `cabal-install`, if necessary.
+```bash
+sudo apt-get install haskell-stack cabal-install
+```
+
+Shouldn't stack be available through your package repositories you can get it [here][stack].
+
+Now you can set up your stack with `stack setup` and follow its instructions. This will install the latest GHC Haskell compiler on your system.
+
+update your package list with
+
+```bash
+cabal update
+```
+
+and upgrade `cabal-install`, if necessary with the command
+
+```bash
+cabal install cabal-install
+```
+
+Now you should add `~/.cabal/bin` to your `PATH` environment variable.
 
 Additionally to Haskell and its dependencies you will need the following software and libraries:
 
 * alex
 * happy
 * libmagick++-dev
+
+which can be installed through
+
+```bash
+cabal install alex happy
+sudo apt-get install libmagick++-dev
+```
 
 ###Building
 
@@ -34,7 +61,9 @@ It's generally a good idea to create a sandbox for compiling. To do so `cd` into
 cabal sandbox init
 ```
 
-Then install all dependencies with the following command. This may lead you into dependency hell, as I am working with very new libraries.
+If the sandbox generation fails, please make sure, you are using the latest version of `cabal istall`.
+
+Then install all dependencies with the following command. This may lead you into dependency hell, as I am working with very new libraries. I am trying my best to avoid this.
 
 ```bash
 cabal install --only-dependencies
@@ -83,3 +112,4 @@ Since eidolon will block your console, I recommend wrapping a init-script around
 * This software uses parts of the template "Parallelism" by n33co. see more at: <http://html5up.net/>
 
 [eidolon]: http://eidolon.nek0.eu
+[stack]: https://github.com/commercialhaskell/stack/releases
