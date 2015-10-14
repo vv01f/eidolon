@@ -20,6 +20,11 @@ Additionally to Haskell and its dependencies you will need the following softwar
 * happy
 * libmagick++-dev
 
+```bash
+sudo aptitude install libmagick++-dev
+cabal install alex happy
+```
+
 ###Building
 
 get the source with
