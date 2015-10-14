@@ -34,10 +34,21 @@ It's generally a good idea to create a sandbox for compiling. To do so `cd` into
 cabal sandbox init
 ```
 
+#### in case of failure
+
+update `cabal` before creating the sandbox
+
+```bash
+cabal update
+cabal install cabal-install
+export PATH=${PATH}:~/.cabal/bin/
+echo "export PATH=\~/.cabal/bin/:\${PATH}" >> ~/.profile
+```
+
 Then install all dependencies with the following command. This may lead you into dependency hell, as I am working with very new libraries.
 
 ```bash
-cabal install --only-dependencies
+cabal install --only-dependencies>
 ```
 
 After installing all dependencies you can configure and build the software with
