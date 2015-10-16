@@ -58,7 +58,7 @@
 /admin/comment			AdminCommentR		GET
 /admin/comment/#CommentId	AdminCommentDeleteR	GET
 
-/tag/#Text TagR GET
+/tag/#Text			TagR			GET
 
 /feed/root/atom.xml		RootFeedAtomR		GET
 /feed/root/rss.xml		RootFeedRssR		GET
