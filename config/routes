@@ -70,3 +70,4 @@
 /feed/user/#UserId/rss.xml	UserFeedRssR		GET
 !/feed/user/#Text/atom.xml	NameFeedAtomR		GET
 !/feed/user/#Text/rss.xml	NameFeedRssR		GET
+/search				SearchR			GET
