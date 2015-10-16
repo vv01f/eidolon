@@ -58,6 +58,14 @@ extractKey = extractKey' . keyToValues
     extractKey' [PersistInt64 k] = T.pack $ show k
     extractKey' _ = ""
 
+packKey :: PersistEntity record => T.Text -> Key record
+packKey = keyFromValues' . readText
+  where
+    readText t = PersistInt64 $ (fromIntegral $ read $ T.unpack t)
+    keyFromValues' v = case keyFromValues [v] of
+      Left err -> error $ T.unpack err
+      Right k -> k
+
 fromHex :: String -> BL.ByteString
 fromHex = BL.pack . hexToWords
   where hexToWords (c:c':text) =
@@ -205,19 +213,35 @@ multiFileField = Field
 putIndexES input = do
   resp <- case input of
     ESUser uId user -> do
-      _ <- runBH' $ createIndex defaultIndexSettings (IndexName "user")
+      ex <- runBH' $ indexExists (IndexName "user")
+      when (not ex) ((\ _ -> do
+        runBH' $ createIndex defaultIndexSettings (IndexName "user")
+        return ()
+        ) ex)
       _ <- runBH' $ openIndex (IndexName "user")
       runBH' $ indexDocument (IndexName "user") (MappingName "object") defaultIndexDocumentSettings user (DocId $ extractKey uId)
     ESAlbum aId album -> do
-      _ <- runBH' $ createIndex defaultIndexSettings (IndexName "album")
+      ex <- runBH' $ indexExists (IndexName "album")
+      when (not ex) ((\ _ -> do
+        runBH' $ createIndex defaultIndexSettings (IndexName "album")
+        return ()
+        ) ex)
       _ <- runBH' $ openIndex (IndexName "album")
       runBH' $ indexDocument (IndexName "album") (MappingName "object") defaultIndexDocumentSettings album (DocId $ extractKey aId)
     ESMedium mId medium -> do
-      _ <- runBH' $ createIndex defaultIndexSettings (IndexName "medium")
+      ex <- runBH' $ indexExists (IndexName "medium")
+      when (not ex) ((\ _ -> do
+        runBH' $ createIndex defaultIndexSettings (IndexName "medium")
+        return ()
+        ) ex)
       _ <- runBH' $ openIndex (IndexName "medium")
       runBH' $ indexDocument (IndexName "medium") (MappingName "object") defaultIndexDocumentSettings medium (DocId $ extractKey mId)
     ESComment cId comment -> do
-      _ <- runBH' $ createIndex defaultIndexSettings (IndexName "comment")
+      ex <- runBH' $ indexExists (IndexName "comment")
+      when (not ex) ((\ _ -> do
+        runBH' $ createIndex defaultIndexSettings (IndexName "comment")
+        return ()
+        ) ex)
       _ <- runBH' $ openIndex (IndexName "comment")
       runBH' $ indexDocument (IndexName "comment") (MappingName "object") defaultIndexDocumentSettings comment (DocId $ extractKey cId)
   case statusCode (responseStatus resp) of
@@ -229,13 +253,13 @@ putIndexES input = do
 deleteIndexES input = do
   resp <- case input of
     ESUser uId user ->
-      runBH' $ deleteDocument (IndexName "user") (MappingName "") (DocId $ extractKey uId)
+      runBH' $ deleteDocument (IndexName "user") (MappingName "object") (DocId $ extractKey uId)
     ESAlbum aId album ->
-      runBH' $ deleteDocument (IndexName "album") (MappingName "") (DocId $ extractKey aId)
+      runBH' $ deleteDocument (IndexName "album") (MappingName "object") (DocId $ extractKey aId)
     ESMedium mId medium ->
-      runBH' $ deleteDocument (IndexName "medium") (MappingName "") (DocId $ extractKey mId)
+      runBH' $ deleteDocument (IndexName "medium") (MappingName "object") (DocId $ extractKey mId)
     ESComment cId comment ->
-      runBH' $ deleteDocument (IndexName "comment") (MappingName "") (DocId $ extractKey cId)
+      runBH' $ deleteDocument (IndexName "comment") (MappingName "object") (DocId $ extractKey cId)
   case statusCode (responseStatus resp) of
     201 -> return ()
     -- 200 -> return ()

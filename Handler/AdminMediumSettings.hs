@@ -71,6 +71,7 @@ postAdminMediumSettingsR mediumId = do
                 , MediumDescription =. mediumDescription temp
                 , MediumTags =. mediumTags temp
                 ]
+              liftIO $ putIndexES $ ESMedium mediumId temp
               setMessage "Medium settings changed successfully"
               redirect AdminR
             _ -> do
@@ -115,8 +116,17 @@ getAdminMediumDeleteR mediumId = do
           runDB $ update albumId [AlbumContent =. newMediaList]
           -- delete comments
           commEnts <- runDB $ selectList [CommentOrigin ==. mediumId] []
-          _ <- mapM (runDB . delete . entityKey) commEnts
+          _ <- mapM (\ent -> do
+            children <- runDB $ selectList [CommentParent ==. (Just $ entityKey ent)] []
+            _ <- mapM (\child -> do
+              -- delete comment children
+              liftIO $ deleteIndexES $ ESComment (entityKey child) (entityVal child)
+              runDB $ delete $ entityKey child
+              ) children
+            liftIO $ deleteIndexES $ ESComment (entityKey ent) (entityVal ent)
+            runDB $ delete $ entityKey ent) commEnts
           -- delete medium
+          liftIO $ deleteIndexES $ ESMedium mediumId medium
           runDB $ delete mediumId
           -- delete files
           liftIO $ removeFile (normalise $ tail $ mediumPath medium)

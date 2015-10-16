@@ -242,7 +242,10 @@ postCommentDeleteR commentId = do
                 Just "confirm" -> do
                   -- delete comment children
                   childEnts <- runDB $ selectList [CommentParent ==. (Just commentId)] []
-                  _ <- mapM (\ent -> runDB $ delete $ entityKey ent) childEnts
+                  _ <- mapM (\ent -> do
+                    -- delete comment children from elasticsearch
+                    liftIO $ deleteIndexES (ESComment (entityKey ent) (entityVal ent))
+                    runDB $ delete $ entityKey ent) childEnts
                   -- delete comment itself
                   runDB $ delete commentId
                   -- delete from elasticsearch

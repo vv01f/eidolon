@@ -195,9 +195,20 @@ postAlbumDeleteR albumId = do
                     medium <- runDB $ getJust a
                     liftIO $ removeFile (normalise $ L.tail $ mediumPath medium)
                     liftIO $ removeFile (normalise $ L.tail $ mediumThumb medium)
+                    -- delete medium from elasticsearch
+                    liftIO $ deleteIndexES (ESMedium a medium)
                     -- delete comments
                     commEnts <- runDB $ selectList [CommentOrigin ==. a] []
-                    _ <- mapM (runDB . delete . entityKey) commEnts
+                    _ <- mapM (\c -> do
+                      children <- runDB $ selectList [CommentParent ==. (Just $ entityKey c)] []
+                      _ <- mapM (\child -> do
+                        -- delete comment children from elasticsearch and db
+                        liftIO $ deleteIndexES (ESComment (entityKey child) (entityVal child))
+                        runDB $ delete $ entityKey child
+                        ) children
+                      -- delete comment from elasticsearch
+                      liftIO $ deleteIndexES (ESComment (entityKey c) (entityVal c))
+                      runDB $ delete $ entityKey c) commEnts
                     runDB $ delete a
                     ) (albumContent album)
                   -- delete album
