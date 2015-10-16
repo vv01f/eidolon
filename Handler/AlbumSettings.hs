@@ -110,6 +110,7 @@ postAlbumSettingsR albumId = do
                     , AlbumSamplePic =. albumSamplePic temp
                     , AlbumSampleWidth =. width
                     ]
+                  liftIO $ putIndexES (ESAlbum albumId temp)
                   setMessage "Album settings changed succesfully"
                   redirect $ AlbumR albumId
                 _ -> do
@@ -203,6 +204,8 @@ postAlbumDeleteR albumId = do
                   runDB $ delete albumId
                   -- delete files
                   liftIO $ removeDirectoryRecursive $ "static" </> "data" </> T.unpack (extractKey userId) </> T.unpack (extractKey albumId)
+                  -- delete from elasticsearch
+                  liftIO $ deleteIndexES (ESAlbum albumId album)
                   -- outro
                   setMessage "Album deleted succesfully"
                   redirect HomeR

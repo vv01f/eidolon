@@ -90,6 +90,7 @@ postDirectUploadR albumId = do
                           inALbum <- runDB $ getJust albumId
                           let newMediaList = mId : albumContent inALbum
                           runDB $ update albumId [AlbumContent =. newMediaList]
+                          liftIO $ putIndexES (ESMedium mId medium)
                           return Nothing
                         else
                           return $ Just $ fileName file
@@ -189,13 +190,13 @@ getUploadR = do
       if
         I.null albums
         then do
+          setMessage "Please create an album first"
+          redirect NewAlbumR
+        else do
           (uploadWidget, enctype) <- generateFormPost (bulkUploadForm userId)
           formLayout $ do
             setTitle "Eidolon :: Upload Medium"
             $(widgetFile "bulkUpload")
-        else do
-          setMessage "Please create an album first"
-          redirect NewAlbumR
     Nothing -> do
       setMessage "You need to be logged in"
       redirect LoginR
@@ -251,6 +252,7 @@ postUploadR = do
                   inALbum <- runDB $ getJust inAlbumId
                   let newMediaList = mId : albumContent inALbum
                   runDB $ update inAlbumId [AlbumContent =. newMediaList]
+                  liftIO $ putIndexES (ESMedium mId medium)
                   return Nothing
                 else
                   return $ Just $ fileName file

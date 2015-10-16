@@ -53,6 +53,7 @@ postProfileDeleteR userId = do
                 commEnts <- runDB $ selectList [CommentOrigin ==. med] []
                 _ <- mapM (runDB . delete . entityKey) commEnts
                 medium <- runDB $ getJust med
+                liftIO $ deleteIndexES (ESMedium med medium)
                 liftIO $ removeFile (normalise $ L.tail $ mediumPath medium)
                 liftIO $ removeFile (normalise $ L.tail $ mediumThumb medium)
                 runDB $ delete med
@@ -61,6 +62,7 @@ postProfileDeleteR userId = do
             ) albumList
           runDB $ delete userId
           liftIO $ removeDirectoryRecursive $ "static" </> "data" </> T.unpack (extractKey userId)
+          liftIO $ deleteIndexES (ESUser userId user)
           deleteSession "userId"
           setMessage "User deleted successfully"
           redirect HomeR

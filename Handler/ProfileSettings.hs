@@ -45,6 +45,7 @@ postProfileSettingsR userId = do
            , UserSlug =. userSlug temp
            , UserEmail =. userEmail temp
            ]
+         liftIO $ putIndexES (ESUser userId temp)
          setMessage "Profile settings changed successfully"
          redirect $ UserR $ userName user
         _ -> do

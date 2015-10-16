@@ -22,6 +22,7 @@ import Model
 import Data.Maybe
 import Data.List as L
 import qualified Data.ByteString as B
+import qualified Data.ByteString.Char8 as C
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.Text as T
 import Data.Time
@@ -35,6 +36,10 @@ import Network.Mail.Mime
 import Text.Blaze.Html.Renderer.Utf8
 import Graphics.ImageMagick.MagickWand
 import Filesystem.Path.CurrentOS
+import Database.Bloodhound
+import Network.HTTP.Client
+import Network.HTTP.Types.Status as S
+import Control.Monad (when)
 
 getUserIdFromText :: T.Text -> UserId
 getUserIdFromText tempUserId =
@@ -195,3 +200,48 @@ multiFileField = Field
         |]
     , fieldEnctype = Multipart
     }
+
+-- <putIndexES :: ESInput -> Handler ()
+putIndexES input = do
+  resp <- case input of
+    ESUser uId user -> do
+      _ <- runBH' $ createIndex defaultIndexSettings (IndexName "user")
+      _ <- runBH' $ openIndex (IndexName "user")
+      runBH' $ indexDocument (IndexName "user") (MappingName "object") defaultIndexDocumentSettings user (DocId $ extractKey uId)
+    ESAlbum aId album -> do
+      _ <- runBH' $ createIndex defaultIndexSettings (IndexName "album")
+      _ <- runBH' $ openIndex (IndexName "album")
+      runBH' $ indexDocument (IndexName "album") (MappingName "object") defaultIndexDocumentSettings album (DocId $ extractKey aId)
+    ESMedium mId medium -> do
+      _ <- runBH' $ createIndex defaultIndexSettings (IndexName "medium")
+      _ <- runBH' $ openIndex (IndexName "medium")
+      runBH' $ indexDocument (IndexName "medium") (MappingName "object") defaultIndexDocumentSettings medium (DocId $ extractKey mId)
+    ESComment cId comment -> do
+      _ <- runBH' $ createIndex defaultIndexSettings (IndexName "comment")
+      _ <- runBH' $ openIndex (IndexName "comment")
+      runBH' $ indexDocument (IndexName "comment") (MappingName "object") defaultIndexDocumentSettings comment (DocId $ extractKey cId)
+  case statusCode (responseStatus resp) of
+    201 -> return ()
+    -- 200 -> return ()
+    _ -> error $ C.unpack $ BL.toStrict $ responseBody resp
+
+-- deleteIndexES :: ESInput -> Handler ()
+deleteIndexES input = do
+  resp <- case input of
+    ESUser uId user ->
+      runBH' $ deleteDocument (IndexName "user") (MappingName "") (DocId $ extractKey uId)
+    ESAlbum aId album ->
+      runBH' $ deleteDocument (IndexName "album") (MappingName "") (DocId $ extractKey aId)
+    ESMedium mId medium ->
+      runBH' $ deleteDocument (IndexName "medium") (MappingName "") (DocId $ extractKey mId)
+    ESComment cId comment ->
+      runBH' $ deleteDocument (IndexName "comment") (MappingName "") (DocId $ extractKey cId)
+  case statusCode (responseStatus resp) of
+    201 -> return ()
+    -- 200 -> return ()
+    _ -> error $ C.unpack $ BL.toStrict $ responseBody resp 
+
+runBH' action = do
+  let server = Server "http://localhost:9200"
+  manager <- newManager defaultManagerSettings
+  runBH (BHEnv server manager) action

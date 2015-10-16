@@ -53,6 +53,8 @@ postNewAlbumR = do
           runDB $ update userId [UserAlbums =. newAlbumList]
           -- create folder
           liftIO $ createDirectory $ "static" </> "data" </> unpack (extractKey userId) </> unpack (extractKey albumId)
+          -- update elasticsearch
+          liftIO $ putIndexES (ESAlbum albumId album)
           -- outro
           setMessage "Album successfully created"
           redirect $ ProfileR userId

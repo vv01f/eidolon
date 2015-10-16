@@ -49,6 +49,7 @@ postMediumSettingsR mediumId = do
             , MediumDescription =. mediumDescription temp
             , MediumTags =. mediumTags temp
             ]
+          liftIO $ putIndexES (ESMedium mediumId temp)
           setMessage "Medium settings changed succesfully"
           redirect $ MediumR mediumId
         _ -> do
@@ -107,6 +108,8 @@ postMediumDeleteR mediumId = do
           liftIO $ removeFile (normalise $ tail $ mediumPath medium)
           liftIO $ removeFile (normalise $ tail $ mediumThumb medium)
           runDB $ delete mediumId
+          -- delete form elasticsearch
+          liftIO $ deleteIndexES (ESMedium mediumId medium)
           setMessage "Medium succesfully deleted"
           redirect HomeR
         _ -> do

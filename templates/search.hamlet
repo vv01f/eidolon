@@ -1,0 +1,13 @@
+<div #header .item data-width="400">
+  <div .inner>
+    <form method=GET action=@{SearchR}>
+      ^{widget}
+      <input type="submit" value="Search">
+
+$if not $ C.null searchResults
+  <div #header .item data-width="400">
+    <div .inner>
+      <h1>
+        Results:
+      <p>
+        #{C.unpack searchResults}
