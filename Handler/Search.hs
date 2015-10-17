@@ -12,18 +12,13 @@ import System.FilePath.Posix
 getSearchR :: Handler Html
 getSearchR = do
   ((res, widget), _) <- runFormGet searchForm
-  results <-
-    case res of
-      FormSuccess query -> do
-        (ru, ra, rm, rc) <- getResults query
-        a <- return $ (decode (responseBody ru) :: Maybe (SearchResult SearchUser))
-        b <- return $ (decode (responseBody ra) :: Maybe (SearchResult SearchAlbum))
-        c <- return $ (decode (responseBody rm) :: Maybe (SearchResult SearchMedium))
-        d <- return $ (decode (responseBody rc) :: Maybe (SearchResult SearchComment))
-        return $ Just (a, b, c, d)
-      _ -> return $ Nothing
-  case results of
-    Just (a, b, c, d) -> do
+  case res of
+    FormSuccess query -> do
+      (ru, ra, rm, rc) <- getResults query
+      a <- return $ (decode (responseBody ru) :: Maybe (SearchResult SearchUser))
+      b <- return $ (decode (responseBody ra) :: Maybe (SearchResult SearchAlbum))
+      c <- return $ (decode (responseBody rm) :: Maybe (SearchResult SearchMedium))
+      d <- return $ (decode (responseBody rc) :: Maybe (SearchResult SearchComment))
       hitListA <- case a of
         Just as -> return $ hits $ searchHits as
         Nothing -> return []
@@ -77,10 +72,12 @@ getSearchR = do
       mediumList <- return . catMaybes =<< mapM (\i -> runDB $ selectFirst [MediumId ==. i] []) mediumIdList
       commentList <- return . catMaybes =<< mapM (\i -> runDB $ selectFirst [CommentId ==. i] []) commentIdList
       let allEmpty = (null userList) && (null albumList) && (null mediumList) && (null commentList)
-      defaultLayout $
+      defaultLayout $ do
+        setTitle $ toHtml $ "Eidolon :: Search results for " ++ (T.unpack query)
         $(widgetFile "result")
-    Nothing ->
-      defaultLayout $
+    _ ->
+      defaultLayout $ do
+        setTitle "Eidolon :: Search"
         $(widgetFile "search")
 
 searchForm :: Form T.Text
