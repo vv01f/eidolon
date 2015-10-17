@@ -209,13 +209,17 @@ multiFileField = Field
     , fieldEnctype = Multipart
     }
 
--- <putIndexES :: ESInput -> Handler ()
+putIndexES :: ESInput -> Handler ()
 putIndexES input = do
+  master <- getYesod
+  shards <- appShards $ appSettings master
+  replicas <- appReplicas $ appSettings master
+  let is = return $ IndexSettings (ShardCount shards) (ReplicaCount replicas)
   resp <- case input of
     ESUser uId user -> do
       ex <- runBH' $ indexExists (IndexName "user")
       when (not ex) ((\ _ -> do
-        runBH' $ createIndex singleIndexSettings (IndexName "user")
+        runBH' $ createIndex is (IndexName "user")
         return ()
         ) ex)
       _ <- runBH' $ openIndex (IndexName "user")
@@ -223,7 +227,7 @@ putIndexES input = do
     ESAlbum aId album -> do
       ex <- runBH' $ indexExists (IndexName "album")
       when (not ex) ((\ _ -> do
-        runBH' $ createIndex singleIndexSettings (IndexName "album")
+        runBH' $ createIndex is (IndexName "album")
         return ()
         ) ex)
       _ <- runBH' $ openIndex (IndexName "album")
@@ -231,7 +235,7 @@ putIndexES input = do
     ESMedium mId medium -> do
       ex <- runBH' $ indexExists (IndexName "medium")
       when (not ex) ((\ _ -> do
-        runBH' $ createIndex singleIndexSettings (IndexName "medium")
+        runBH' $ createIndex is (IndexName "medium")
         return ()
         ) ex)
       _ <- runBH' $ openIndex (IndexName "medium")
@@ -239,7 +243,7 @@ putIndexES input = do
     ESComment cId comment -> do
       ex <- runBH' $ indexExists (IndexName "comment")
       when (not ex) ((\ _ -> do
-        runBH' $ createIndex singleIndexSettings (IndexName "comment")
+        runBH' $ createIndex is (IndexName "comment")
         return ()
         ) ex)
       _ <- runBH' $ openIndex (IndexName "comment")
@@ -266,9 +270,9 @@ deleteIndexES input = do
     _ -> error $ C.unpack $ BL.toStrict $ responseBody resp 
 
 runBH' action = do
-  let server = Server "http://localhost:9200"
+  master <- getYesod
+  server <- appSearchHost $ appSettings master
+  port <- return . show =<< (appSearchPort $ appSettings master)
+  let server = Server $ server ++ ":" ++ port
   manager <- newManager defaultManagerSettings
   runBH (BHEnv server manager) action
-
-singleIndexSettings :: IndexSettings
-singleIndexSettings = IndexSettings (ShardCount 1) (ReplicaCount 1)
