@@ -17,6 +17,7 @@
 module Handler.NewAlbum where
 
 import Import
+import Handler.Commons
 import Data.Text
 import System.Directory
 import System.FilePath
@@ -54,7 +55,7 @@ postNewAlbumR = do
           -- create folder
           liftIO $ createDirectory $ "static" </> "data" </> unpack (extractKey userId) </> unpack (extractKey albumId)
           -- update elasticsearch
-          liftIO $ putIndexES (ESAlbum albumId album)
+          putIndexES (ESAlbum albumId album)
           -- outro
           setMessage "Album successfully created"
           redirect $ ProfileR userId

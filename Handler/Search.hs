@@ -1,6 +1,7 @@
 module Handler.Search where
 
 import Import
+import Handler.Commons
 import Data.Time.Clock
 import Data.Aeson
 import Data.Maybe
@@ -86,10 +87,10 @@ searchForm = renderDivs $ areq (searchField True) "Search" Nothing
 getResults :: Text -> Handler (Reply, Reply, Reply, Reply)
 getResults query = do
   let esQuery = QuerySimpleQueryStringQuery (SimpleQueryStringQuery (QueryString query) Nothing Nothing Nothing Nothing Nothing Nothing)
-  su <- liftIO $ runBH' $ searchByIndex (IndexName "user") $ mkSearch (Just esQuery) Nothing
-  sa <- liftIO $ runBH' $ searchByIndex (IndexName "album") $ mkSearch (Just esQuery) Nothing
-  sm <- liftIO $ runBH' $ searchByIndex (IndexName "medium") $ mkSearch (Just esQuery) Nothing
-  sc <- liftIO $ runBH' $ searchByIndex (IndexName "comment") $ mkSearch (Just esQuery) Nothing
+  su <- runBH' $ searchByIndex (IndexName "user") $ mkSearch (Just esQuery) Nothing
+  sa <- runBH' $ searchByIndex (IndexName "album") $ mkSearch (Just esQuery) Nothing
+  sm <- runBH' $ searchByIndex (IndexName "medium") $ mkSearch (Just esQuery) Nothing
+  sc <- runBH' $ searchByIndex (IndexName "comment") $ mkSearch (Just esQuery) Nothing
   return (su, sa, sm, sc)
 
 data SearchUser = SearchUser
