@@ -215,35 +215,35 @@ putIndexES input = do
     ESUser uId user -> do
       ex <- runBH' $ indexExists (IndexName "user")
       when (not ex) ((\ _ -> do
-        runBH' $ createIndex defaultIndexSettings (IndexName "user")
+        runBH' $ createIndex singleIndexSettings (IndexName "user")
         return ()
         ) ex)
       _ <- runBH' $ openIndex (IndexName "user")
-      runBH' $ indexDocument (IndexName "user") (MappingName "object") defaultIndexDocumentSettings user (DocId $ extractKey uId)
+      runBH' $ indexDocument (IndexName "user") (MappingName "user") defaultIndexDocumentSettings user (DocId $ extractKey uId)
     ESAlbum aId album -> do
       ex <- runBH' $ indexExists (IndexName "album")
       when (not ex) ((\ _ -> do
-        runBH' $ createIndex defaultIndexSettings (IndexName "album")
+        runBH' $ createIndex singleIndexSettings (IndexName "album")
         return ()
         ) ex)
       _ <- runBH' $ openIndex (IndexName "album")
-      runBH' $ indexDocument (IndexName "album") (MappingName "object") defaultIndexDocumentSettings album (DocId $ extractKey aId)
+      runBH' $ indexDocument (IndexName "album") (MappingName "album") defaultIndexDocumentSettings album (DocId $ extractKey aId)
     ESMedium mId medium -> do
       ex <- runBH' $ indexExists (IndexName "medium")
       when (not ex) ((\ _ -> do
-        runBH' $ createIndex defaultIndexSettings (IndexName "medium")
+        runBH' $ createIndex singleIndexSettings (IndexName "medium")
         return ()
         ) ex)
       _ <- runBH' $ openIndex (IndexName "medium")
-      runBH' $ indexDocument (IndexName "medium") (MappingName "object") defaultIndexDocumentSettings medium (DocId $ extractKey mId)
+      runBH' $ indexDocument (IndexName "medium") (MappingName "medium") defaultIndexDocumentSettings medium (DocId $ extractKey mId)
     ESComment cId comment -> do
       ex <- runBH' $ indexExists (IndexName "comment")
       when (not ex) ((\ _ -> do
-        runBH' $ createIndex defaultIndexSettings (IndexName "comment")
+        runBH' $ createIndex singleIndexSettings (IndexName "comment")
         return ()
         ) ex)
       _ <- runBH' $ openIndex (IndexName "comment")
-      runBH' $ indexDocument (IndexName "comment") (MappingName "object") defaultIndexDocumentSettings comment (DocId $ extractKey cId)
+      runBH' $ indexDocument (IndexName "comment") (MappingName "comment") defaultIndexDocumentSettings comment (DocId $ extractKey cId)
   case statusCode (responseStatus resp) of
     201 -> return ()
     -- 200 -> return ()
@@ -253,13 +253,13 @@ putIndexES input = do
 deleteIndexES input = do
   resp <- case input of
     ESUser uId user ->
-      runBH' $ deleteDocument (IndexName "user") (MappingName "object") (DocId $ extractKey uId)
+      runBH' $ deleteDocument (IndexName "user") (MappingName "user") (DocId $ extractKey uId)
     ESAlbum aId album ->
-      runBH' $ deleteDocument (IndexName "album") (MappingName "object") (DocId $ extractKey aId)
+      runBH' $ deleteDocument (IndexName "album") (MappingName "album") (DocId $ extractKey aId)
     ESMedium mId medium ->
-      runBH' $ deleteDocument (IndexName "medium") (MappingName "object") (DocId $ extractKey mId)
+      runBH' $ deleteDocument (IndexName "medium") (MappingName "medium") (DocId $ extractKey mId)
     ESComment cId comment ->
-      runBH' $ deleteDocument (IndexName "comment") (MappingName "object") (DocId $ extractKey cId)
+      runBH' $ deleteDocument (IndexName "comment") (MappingName "comment") (DocId $ extractKey cId)
   case statusCode (responseStatus resp) of
     201 -> return ()
     -- 200 -> return ()
@@ -269,3 +269,6 @@ runBH' action = do
   let server = Server "http://localhost:9200"
   manager <- newManager defaultManagerSettings
   runBH (BHEnv server manager) action
+
+singleIndexSettings :: IndexSettings
+singleIndexSettings = IndexSettings (ShardCount 1) (ReplicaCount 1)

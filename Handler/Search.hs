@@ -1,16 +1,12 @@
 module Handler.Search where
 
 import Import
-import Helper
 import Data.Time.Clock
 import Data.Aeson
 import Data.Maybe
-import qualified Data.ByteString.Char8 as C
-import qualified Data.ByteString.Lazy.Char8 as L
 import qualified Data.Text as T
 import Database.Bloodhound
-import Database.Bloodhound.Client
-import Network.HTTP.Client (defaultManagerSettings, responseBody)
+import Network.HTTP.Client (responseBody)
 
 getSearchR :: Handler Html
 getSearchR = do
@@ -18,11 +14,11 @@ getSearchR = do
   results <-
     case res of
       FormSuccess query -> do
-        res <- getResults query
-        a <- return $ (decode (responseBody res) :: Maybe (SearchResult SearchUser))
-        b <- return $ (decode (responseBody res) :: Maybe (SearchResult SearchAlbum))
-        c <- return $ (decode (responseBody res) :: Maybe (SearchResult SearchMedium))
-        d <- return $ (decode (responseBody res) :: Maybe (SearchResult SearchComment))
+        r <- getResults query
+        a <- return $ (decode (responseBody r) :: Maybe (SearchResult SearchUser))
+        b <- return $ (decode (responseBody r) :: Maybe (SearchResult SearchAlbum))
+        c <- return $ (decode (responseBody r) :: Maybe (SearchResult SearchMedium))
+        d <- return $ (decode (responseBody r) :: Maybe (SearchResult SearchComment))
         return $ Just (a, b, c, d)
       _ -> return $ Nothing
   case results of
@@ -75,19 +71,14 @@ getSearchR = do
           else
             Nothing
         ) hitListD
-      userList <- return . catMaybes =<< mapM (\a -> runDB $ selectFirst [UserId ==. a] []) userIdList
-      albumList <- return . catMaybes =<< mapM (\a -> runDB $ selectFirst [AlbumId ==. a] []) albumIdList
-      mediumList <- return . catMaybes =<< mapM (\a -> runDB $ selectFirst [MediumId ==. a] []) mediumIdList
-      commentList <- return . catMaybes =<< mapM (\a -> runDB $ selectFirst [CommentId ==. a] []) commentIdList
-      let allEmpty = (null userList && null albumList && null mediumList && null commentList)
+      userList <- return . catMaybes =<< mapM (\i -> runDB $ selectFirst [UserId ==. i] []) userIdList
+      albumList <- return . catMaybes =<< mapM (\i -> runDB $ selectFirst [AlbumId ==. i] []) albumIdList
+      mediumList <- return . catMaybes =<< mapM (\i -> runDB $ selectFirst [MediumId ==. i] []) mediumIdList
+      commentList <- return . catMaybes =<< mapM (\i -> runDB $ selectFirst [CommentId ==. i] []) commentIdList
+      let allEmpty = (null userList) && (null albumList) && (null mediumList) && (null commentList)
       defaultLayout $
-        $(widgetFile "search")
-    Nothing -> do
-      let userList = []
-      let albumList = []
-      let mediumList = []
-      let commentList = []
-      let allEmpty = True
+        $(widgetFile "result")
+    Nothing ->
       defaultLayout $
         $(widgetFile "search")
 
