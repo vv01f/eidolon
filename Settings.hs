@@ -76,7 +76,7 @@ data AppSettings = AppSettings
     , appTos2                   :: Text
     -- ^ Terms of Service
     , appSearchHost		:: Text
-    , appSearchPort		:: Text
+    , appSearchPort		:: Int
     , appShards                    :: Int
     , appReplicas                  :: Int
     -- ^ Settings for Elasticsearch
