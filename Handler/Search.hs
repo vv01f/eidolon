@@ -7,6 +7,7 @@ import Data.Maybe
 import qualified Data.Text as T
 import Database.Bloodhound
 import Network.HTTP.Client (responseBody)
+import System.FilePath.Posix
 
 getSearchR :: Handler Html
 getSearchR = do
@@ -14,11 +15,11 @@ getSearchR = do
   results <-
     case res of
       FormSuccess query -> do
-        r <- getResults query
-        a <- return $ (decode (responseBody r) :: Maybe (SearchResult SearchUser))
-        b <- return $ (decode (responseBody r) :: Maybe (SearchResult SearchAlbum))
-        c <- return $ (decode (responseBody r) :: Maybe (SearchResult SearchMedium))
-        d <- return $ (decode (responseBody r) :: Maybe (SearchResult SearchComment))
+        (ru, ra, rm, rc) <- getResults query
+        a <- return $ (decode (responseBody ru) :: Maybe (SearchResult SearchUser))
+        b <- return $ (decode (responseBody ra) :: Maybe (SearchResult SearchAlbum))
+        c <- return $ (decode (responseBody rm) :: Maybe (SearchResult SearchMedium))
+        d <- return $ (decode (responseBody rc) :: Maybe (SearchResult SearchComment))
         return $ Just (a, b, c, d)
       _ -> return $ Nothing
   case results of
@@ -85,9 +86,14 @@ getSearchR = do
 searchForm :: Form T.Text
 searchForm = renderDivs $ areq (searchField True) "Search" Nothing
 
+getResults :: Text -> Handler (Reply, Reply, Reply, Reply)
 getResults query = do
   let esQuery = QuerySimpleQueryStringQuery (SimpleQueryStringQuery (QueryString query) Nothing Nothing Nothing Nothing Nothing Nothing)
-  liftIO $ runBH' $ searchAll $ mkSearch (Just esQuery) Nothing
+  su <- liftIO $ runBH' $ searchByIndex (IndexName "user") $ mkSearch (Just esQuery) Nothing
+  sa <- liftIO $ runBH' $ searchByIndex (IndexName "album") $ mkSearch (Just esQuery) Nothing
+  sm <- liftIO $ runBH' $ searchByIndex (IndexName "medium") $ mkSearch (Just esQuery) Nothing
+  sc <- liftIO $ runBH' $ searchByIndex (IndexName "comment") $ mkSearch (Just esQuery) Nothing
+  return (su, sa, sm, sc)
 
 data SearchUser = SearchUser
   { suName :: T.Text

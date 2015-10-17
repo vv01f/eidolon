@@ -18,7 +18,7 @@ $forall (Entity albumId album) <- userAlbs
     <a href=@{AlbumR albumId}>
       <figure class="thumbnail">
         $if (albumSamplePic album) == Nothing
-          <img src=@{StaticR img_album_jpg}>
+          <img src=@{StaticR img_album_jpg} title=#{albumTitle album}>
         $else
           <img src=@{StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ fromJust $ albumSamplePic album) []} title=#{albumTitle album}>
         <figcaption>#{albumTitle album}

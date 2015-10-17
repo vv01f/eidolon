@@ -219,9 +219,20 @@
 		padding: 1em 2em;
 	}
 
+	#user-nav
+	{
+		display: inline-block;
+	}
+
 	nav li
 	{
 		display: inline-block;
+	}
+
+	#search
+	{
+		display: inline-block;
+		float: right;
 	}
 
 	.comment

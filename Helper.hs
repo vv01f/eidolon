@@ -262,7 +262,7 @@ deleteIndexES input = do
       runBH' $ deleteDocument (IndexName "comment") (MappingName "comment") (DocId $ extractKey cId)
   case statusCode (responseStatus resp) of
     201 -> return ()
-    -- 200 -> return ()
+    200 -> return ()
     _ -> error $ C.unpack $ BL.toStrict $ responseBody resp 
 
 runBH' action = do
