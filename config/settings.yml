@@ -54,5 +54,5 @@ tos2: "Terms of Service 2"
 
 # Elasticsearcha settings
 searchhost: "http://localhost:9200"
-shards: 1
-replicas: 2
+shards: 2
+replicas: 1
