@@ -9,6 +9,7 @@ import Database.HDBC.PostgreSQL
 import System.IO
 import Control.Exception
 import qualified Data.Text as T
+import Data.Text.Encoding (decodeUtf8)
 import qualified Data.ByteString.Char8 as B
 import Data.Aeson as A
 import Data.Time.Clock
@@ -72,7 +73,7 @@ main = do
     _ <- sequence $ map (\entry ->
       case entry of
         [("id", SqlInteger theId), ("name", SqlByteString name), ("slug", SqlByteString slug), _, _, _, _, _] -> do
-           let u = SUser (bToT name) (bToT slug)
+           let u = SUser (decodeUtf8 name) (decodeUtf8 slug)
            let dId = DocId $ T.pack $ show theId
            liftIO $ putStrLn $ (show u) ++ "\n"
            indexDocument (IndexName "user") (MappingName "user") defaultIndexDocumentSettings u dId
@@ -82,7 +83,7 @@ main = do
     _ <- sequence $ map (\entry ->
       case entry of
         [("id", SqlInteger theId), ("title", SqlByteString title), _, _, _, _, _] -> do
-           let a = SAlbum (bToT title)
+           let a = SAlbum (decodeUtf8 title)
            let dId = DocId $ T.pack $ show theId
            liftIO $ putStrLn $ (show a) ++ "\n"
            indexDocument (IndexName "album") (MappingName "album") defaultIndexDocumentSettings a dId
@@ -92,7 +93,7 @@ main = do
     _ <- sequence $ map (\entry ->
       case entry of
         [("id", SqlInteger theId), ("title", SqlByteString title), _, _, _, ("time", SqlZonedTime time), _, ("description", SqlByteString desc), ("tags", SqlByteString tags), _, _, _, _, _] -> do
-           let m = SMedium (bToT title) (zonedTimeToUTC time) (bToT desc) (parseTags tags)
+           let m = SMedium (decodeUtf8 title) (zonedTimeToUTC time) (decodeUtf8 desc) (parseTags tags)
            let dId = DocId $ T.pack $ show theId
            liftIO $ putStrLn $ (show m) ++ "\n"
            indexDocument (IndexName "medium") (MappingName "medium") defaultIndexDocumentSettings m dId
@@ -102,7 +103,7 @@ main = do
     _ <- sequence $ map (\entry ->
       case entry of
         [("id", SqlInteger theId), _, ("author_slug", SqlByteString author), _, _, ("time", SqlZonedTime time), ("content", SqlByteString content)] -> do
-           let c = SComment (bToT author) (zonedTimeToUTC time) (bToT content)
+           let c = SComment (decodeUtf8 author) (zonedTimeToUTC time) (decodeUtf8 content)
            let dId = DocId $ T.pack $ show theId
            liftIO $ putStrLn $ (show c) ++ "\n"
            indexDocument (IndexName "medium") (MappingName "medium") defaultIndexDocumentSettings c dId
@@ -163,9 +164,6 @@ parseTags bs = map handle' inner
   where
     inner = T.splitOn "," $ T.pack $ B.unpack $ B.init $ B.tail bs
     handle' = T.dropEnd 1 . T.drop 2
-
-bToT :: B.ByteString -> T.Text
-bToT = T.pack . B.unpack
 
 getPasswd :: IO String
 getPasswd = do
