@@ -10,6 +10,8 @@ Visit the test instance at [eidolon.nek0.eu][eidolon]
 
 ###Dependencies
 
+####Build dependencies
+
 A working Haskell capable environment. For that you will need `haskell-stack` and `cabal-install`, which you can install with:
 
 ```bash
@@ -47,6 +49,15 @@ cabal install alex happy
 sudo apt-get install libmagick++-dev
 ```
 
+####Elasticsearch dependencies
+
+Since version 0.0.5 there is an Elasticsearch integration for Eidolon. To Be able to run eidolon , you need to install `elasticsearch` additionally with:
+
+```bash
+sudo apt-get install elasticsearch
+```
+On how to configure your elasticsearch server, look into the [elasticsearch documentation][elasticdocu].
+
 ###Building
 
 get the source with
@@ -80,7 +91,7 @@ cabal build
 
 After compiling you will find an executable called `eidolon` in `dist/build/eidolon/`. Copy or link it anywhere you want. The executable needs to be accompanied by the folders `config` and `static` and their contents. It's best to copy them to your desired destination.
 
-Also check `config/settings.yml` and set the values there accrding to your configuration.
+Also check `config/settings.yml` and set the values there accrding to your configuration. Especially the settings for elasticsearch are vital.
 
 It may also be necessery to create a reverse proxy to your gallery. I would recommend using [nginx](http://nginx.org/).
 
@@ -105,6 +116,14 @@ Since eidolon will block your console, I recommend wrapping a init-script around
 	* without sandbox: `runghc /path/to/eidolon/Migrations/0.0.3-0.0.4/Migration.hs`
 * start or restart your eidolon service
 
+###0.0.4-0.0.5
+
+* run migration script from your run location (where your `static` folder with all the images is located)
+	* if you are building in a sandbox run `runghc -package-db/full/path/to/sandbox/XXX-ghc-version-packages.conf.d /path/to/eidolon/Migrations/0.0.4-0.0.5/Migration.hs`
+		* Note: No space between the option `-package-db` and its argument
+	* without sandbox: `runghc /path/to/eidolon/Migrations/0.0.4-0.0.5/Migration.hs`
+* start or restart your eidolon service
+
 ##Acknowledgements:
 
 * This software uses the web Framework "Yesod" by Michael Snoyman. See more at: <http://www.yesodweb.com/>
@@ -113,3 +132,4 @@ Since eidolon will block your console, I recommend wrapping a init-script around
 
 [eidolon]: http://eidolon.nek0.eu
 [stack]: https://github.com/commercialhaskell/stack/releases
+[elasticdocu]: https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-configuration.html
