@@ -113,6 +113,7 @@ postAdminProfileSettingsR ownerId = do
                 , UserEmail =. userEmail temp
                 , UserAdmin =. userAdmin temp
                 ]
+              putIndexES $ ESUser ownerId temp
               setMessage "User data updated successfully"
               redirect AdminR
             _ -> do
@@ -151,16 +152,27 @@ getAdminProfileDeleteR ownerId = do
             _ <- mapM (\med -> do
               -- delete comments
               commEnts <- runDB $ selectList [CommentOrigin ==. med] []
-              _ <- mapM (runDB . delete . entityKey) commEnts
+              _ <- mapM (\ent -> do
+                children <- runDB $ selectList [CommentParent ==. (Just $ entityKey ent)] []
+                _ <- mapM (\child -> do
+                  -- delete comment children
+                  deleteIndexES $ ESComment (entityKey child) (entityVal child)
+                  runDB $ delete $ entityKey child
+                  ) children
+                runDB $ delete $ entityKey ent) commEnts
               -- delete media files
               medium <- runDB $ getJust med
               liftIO $ removeFile (normalise $ L.tail $ mediumPath medium)
               liftIO $ removeFile (normalise $ L.tail $ mediumThumb medium)
-              -- delete medium database entry
+              -- delete medium database entry and search
+              ium <- runDB $ getJust med
+              deleteIndexES $ ESMedium med ium
               runDB $ delete med
               ) mediaList
+            deleteIndexES $ ESAlbum albumId album
             runDB $ delete albumId
             ) albumList
+          deleteIndexES $ ESUser ownerId owner
           runDB $ delete ownerId
           liftIO $ removeDirectoryRecursive $ "static" </> "data" </> T.unpack (extractKey ownerId)
           setMessage "User successfully deleted"

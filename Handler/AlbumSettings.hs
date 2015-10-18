@@ -17,6 +17,7 @@
 module Handler.AlbumSettings where
 
 import Import
+import Handler.Commons
 import qualified Data.Text as T
 import Data.Maybe
 import System.Directory
@@ -110,6 +111,7 @@ postAlbumSettingsR albumId = do
                     , AlbumSamplePic =. albumSamplePic temp
                     , AlbumSampleWidth =. width
                     ]
+                  putIndexES (ESAlbum albumId temp)
                   setMessage "Album settings changed succesfully"
                   redirect $ AlbumR albumId
                 _ -> do
@@ -194,15 +196,28 @@ postAlbumDeleteR albumId = do
                     medium <- runDB $ getJust a
                     liftIO $ removeFile (normalise $ L.tail $ mediumPath medium)
                     liftIO $ removeFile (normalise $ L.tail $ mediumThumb medium)
+                    -- delete medium from elasticsearch
+                    deleteIndexES (ESMedium a medium)
                     -- delete comments
                     commEnts <- runDB $ selectList [CommentOrigin ==. a] []
-                    _ <- mapM (runDB . delete . entityKey) commEnts
+                    _ <- mapM (\c -> do
+                      children <- runDB $ selectList [CommentParent ==. (Just $ entityKey c)] []
+                      _ <- mapM (\child -> do
+                        -- delete comment children from elasticsearch and db
+                        deleteIndexES (ESComment (entityKey child) (entityVal child))
+                        runDB $ delete $ entityKey child
+                        ) children
+                      -- delete comment from elasticsearch
+                      deleteIndexES (ESComment (entityKey c) (entityVal c))
+                      runDB $ delete $ entityKey c) commEnts
                     runDB $ delete a
                     ) (albumContent album)
                   -- delete album
                   runDB $ delete albumId
                   -- delete files
                   liftIO $ removeDirectoryRecursive $ "static" </> "data" </> T.unpack (extractKey userId) </> T.unpack (extractKey albumId)
+                  -- delete from elasticsearch
+                  deleteIndexES (ESAlbum albumId album)
                   -- outro
                   setMessage "Album deleted succesfully"
                   redirect HomeR

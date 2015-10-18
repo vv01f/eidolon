@@ -17,6 +17,7 @@
 module Handler.Upload where
 
 import Import as I
+import Handler.Commons
 import Data.Time
 import Data.Maybe
 import qualified Data.Text as T
@@ -90,6 +91,7 @@ postDirectUploadR albumId = do
                           inALbum <- runDB $ getJust albumId
                           let newMediaList = mId : albumContent inALbum
                           runDB $ update albumId [AlbumContent =. newMediaList]
+                          putIndexES (ESMedium mId medium)
                           return Nothing
                         else
                           return $ Just $ fileName file
@@ -251,6 +253,7 @@ postUploadR = do
                   inALbum <- runDB $ getJust inAlbumId
                   let newMediaList = mId : albumContent inALbum
                   runDB $ update inAlbumId [AlbumContent =. newMediaList]
+                  putIndexES (ESMedium mId medium)
                   return Nothing
                 else
                   return $ Just $ fileName file

@@ -22,6 +22,7 @@ import Model
 import Data.Maybe
 import Data.List as L
 import qualified Data.ByteString as B
+import qualified Data.ByteString.Char8 as C
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.Text as T
 import Data.Time
@@ -35,6 +36,10 @@ import Network.Mail.Mime
 import Text.Blaze.Html.Renderer.Utf8
 import Graphics.ImageMagick.MagickWand
 import Filesystem.Path.CurrentOS
+import Database.Bloodhound
+import Network.HTTP.Client
+import Network.HTTP.Types.Status as S
+import Control.Monad (when)
 
 getUserIdFromText :: T.Text -> UserId
 getUserIdFromText tempUserId =
@@ -52,6 +57,14 @@ extractKey = extractKey' . keyToValues
   where
     extractKey' [PersistInt64 k] = T.pack $ show k
     extractKey' _ = ""
+
+packKey :: PersistEntity record => T.Text -> Key record
+packKey = keyFromValues' . readText
+  where
+    readText t = PersistInt64 $ (fromIntegral $ read $ T.unpack t)
+    keyFromValues' v = case keyFromValues [v] of
+      Left err -> error $ T.unpack err
+      Right k -> k
 
 fromHex :: String -> BL.ByteString
 fromHex = BL.pack . hexToWords

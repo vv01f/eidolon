@@ -17,6 +17,7 @@
 module Handler.Medium where
 
 import Import
+import Handler.Commons
 import Data.Time
 import Data.Maybe
 import qualified Data.Text as T
@@ -85,7 +86,8 @@ postMediumR mediumId = do
           ((res, _), _) <- runFormPost $ commentForm userId userSl mediumId Nothing
           case res of
             FormSuccess temp -> do
-              _ <- runDB $ insert temp
+              cId <- runDB $ insert temp
+              putIndexES (ESComment cId temp)
               --send mail to medium owner
               owner <- runDB $ getJust $ mediumOwner medium
               link <- ($ MediumR (commentOrigin temp)) <$> getUrlRender
@@ -158,7 +160,8 @@ postCommentReplyR commentId = do
           ((res, _), _) <- runFormPost $ commentForm userId userSl mediumId (Just commentId)
           case res of
             FormSuccess temp -> do
-              _ <- runDB $ insert temp
+              cId <- runDB $ insert temp
+              putIndexES (ESComment cId temp)
               --send mail to parent author
               parent <- runDB $ getJust $ fromJust $ commentParent temp
               parAuth <- runDB $ getJust $ commentAuthor parent
@@ -240,9 +243,14 @@ postCommentDeleteR commentId = do
                 Just "confirm" -> do
                   -- delete comment children
                   childEnts <- runDB $ selectList [CommentParent ==. (Just commentId)] []
-                  _ <- mapM (\ent -> runDB $ delete $ entityKey ent) childEnts
+                  _ <- mapM (\ent -> do
+                    -- delete comment children from elasticsearch
+                    deleteIndexES (ESComment (entityKey ent) (entityVal ent))
+                    runDB $ delete $ entityKey ent) childEnts
                   -- delete comment itself
                   runDB $ delete commentId
+                  -- delete from elasticsearch
+                  deleteIndexES (ESComment commentId comment)
                   -- outro
                   setMessage "Your comment has been deleted"
                   redirect $ MediumR $ commentOrigin comment

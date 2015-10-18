@@ -75,6 +75,10 @@ data AppSettings = AppSettings
     , appTos1                   :: Text
     , appTos2                   :: Text
     -- ^ Terms of Service
+    , appSearchHost             :: Text
+    , appShards                 :: Int
+    , appReplicas               :: Int
+    -- ^ Settings for Elasticsearch
     }
 
 instance FromJSON AppSettings where
@@ -105,6 +109,10 @@ instance FromJSON AppSettings where
         appSignupBlocked          <- o .: "signupBlocked"
         appTos1                   <- o .: "tos1"
         appTos2                   <- o .: "tos2"
+
+        appSearchHost             <- o .: "searchhost"
+        appShards                 <- o .: "shards"
+        appReplicas               <- o .: "replicas"
 
         return AppSettings {..}
 

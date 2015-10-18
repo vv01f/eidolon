@@ -18,6 +18,14 @@ module Handler.Commons where
 
 import Import
 import Data.String
+import Database.Bloodhound
+import Control.Monad (when)
+import Network.HTTP.Client
+import Network.HTTP.Types.Status as S
+import qualified Data.ByteString.Char8 as C
+import qualified Data.ByteString.Lazy as BL
+import qualified Data.Text as T
+
 
 loginIsAdmin :: IsString t => Handler (Either (t, Route App)  ())
 loginIsAdmin = do
@@ -78,3 +86,71 @@ mediumCheck mediumId = do
           return $ Left ("You must be logged in to change settings", LoginR)
     Nothing ->
       return $ Left ("This medium does not exist", HomeR)
+
+putIndexES :: ESInput -> Handler ()
+putIndexES input = do
+  master <- getYesod
+  let shards = appShards $ appSettings master
+  let replicas = appReplicas $ appSettings master
+  let is = IndexSettings (ShardCount shards) (ReplicaCount replicas)
+  resp <- case input of
+    ESUser uId user -> do
+      ex <- runBH' $ indexExists (IndexName "user")
+      when (not ex) ((\ _ -> do
+        runBH' $ createIndex is (IndexName "user")
+        return ()
+        ) ex)
+      _ <- runBH' $ openIndex (IndexName "user")
+      runBH' $ indexDocument (IndexName "user") (MappingName "user") defaultIndexDocumentSettings user (DocId $ extractKey uId)
+    ESAlbum aId album -> do
+      ex <- runBH' $ indexExists (IndexName "album")
+      when (not ex) ((\ _ -> do
+        runBH' $ createIndex is (IndexName "album")
+        return ()
+        ) ex)
+      _ <- runBH' $ openIndex (IndexName "album")
+      runBH' $ indexDocument (IndexName "album") (MappingName "album") defaultIndexDocumentSettings album (DocId $ extractKey aId)
+    ESMedium mId medium -> do
+      ex <- runBH' $ indexExists (IndexName "medium")
+      when (not ex) ((\ _ -> do
+        runBH' $ createIndex is (IndexName "medium")
+        return ()
+        ) ex)
+      _ <- runBH' $ openIndex (IndexName "medium")
+      runBH' $ indexDocument (IndexName "medium") (MappingName "medium") defaultIndexDocumentSettings medium (DocId $ extractKey mId)
+    ESComment cId comment -> do
+      ex <- runBH' $ indexExists (IndexName "comment")
+      when (not ex) ((\ _ -> do
+        runBH' $ createIndex is (IndexName "comment")
+        return ()
+        ) ex)
+      _ <- runBH' $ openIndex (IndexName "comment")
+      runBH' $ indexDocument (IndexName "comment") (MappingName "comment") defaultIndexDocumentSettings comment (DocId $ extractKey cId)
+  case statusCode (responseStatus resp) of
+    201 -> return ()
+    200 -> return ()
+    code -> error $ (show code) ++ ": " ++ (C.unpack $ BL.toStrict $ responseBody resp)
+
+deleteIndexES :: ESInput -> Handler ()
+deleteIndexES input = do
+  resp <- case input of
+    ESUser uId user ->
+      runBH' $ deleteDocument (IndexName "user") (MappingName "user") (DocId $ extractKey uId)
+    ESAlbum aId album ->
+      runBH' $ deleteDocument (IndexName "album") (MappingName "album") (DocId $ extractKey aId)
+    ESMedium mId medium ->
+      runBH' $ deleteDocument (IndexName "medium") (MappingName "medium") (DocId $ extractKey mId)
+    ESComment cId comment ->
+      runBH' $ deleteDocument (IndexName "comment") (MappingName "comment") (DocId $ extractKey cId)
+  case statusCode (responseStatus resp) of
+    201 -> return ()
+    200 -> return ()
+    _ -> error $ C.unpack $ BL.toStrict $ responseBody resp 
+
+-- runBH' :: BH m a -> Handler resp
+runBH' action = do
+  master <- getYesod
+  let s = appSearchHost $ appSettings master
+  let server = Server s
+  manager <- liftIO $ newManager defaultManagerSettings
+  runBH (BHEnv server manager) action

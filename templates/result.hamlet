@@ -1,0 +1,56 @@
+<div #header .item data-width="400">
+  <div .inner>
+    <h1>
+      Results for: #{query}
+
+$if allEmpty
+  <div #header .item data-width="400">
+    <div .inner>
+      <h2>
+        Sorry, no results
+$else
+  $if not $ null userList
+    <div #header .item data-width="400">
+      <div .inner>
+        <h2>
+          Results in Users:
+    $forall (Entity uId user) <- userList
+      <div #header .item data-width="400">
+        <div .inner>
+          <a href=@{ProfileR uId}>
+            #{userSlug user}
+  $if not $ null albumList
+    <div #header .item data-width="400">
+      <div .inner>
+        <h2>
+          Results in Albums:
+    $forall (Entity aId album) <- albumList
+      <article .item data-width="#{albumSampleWidth album}">
+        <a href=@{AlbumR aId}>
+          <figure .thumbnail>
+            $if (albumSamplePic album) == Nothing
+              <img src=@{StaticR img_album_jpg} title=#{albumTitle album}>
+            $else
+              <img src=@{StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ fromJust $ albumSamplePic album) []} title=#{albumTitle album}>
+            <figcaption>#{albumTitle album}
+  $if not $ null mediumList
+    <article #header .item data-width="400">
+      <div .inner>
+        <h2>
+          Results in Media:
+    $forall (Entity mId medium) <- mediumList
+      <article .item data-width="#{mediumThumbWidth medium}">
+        <a href=@{MediumR mId}>
+          <figure .thumbnail>
+            <img src=@{StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumThumb medium) []} title=#{mediumTitle medium}>
+            <figcaption>#{mediumTitle medium}
+  $if not $ null commentList
+    <div #header .item data-width="400">
+      <div .inner>
+        <h2>
+          Results in Comments:
+    $forall (Entity _ comment) <- commentList
+      <div #header .item data-width="400">
+        <div .inner>
+          <a href=@{MediumR $ commentOrigin comment}>
+            #{commentContent comment}

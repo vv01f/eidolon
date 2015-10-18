@@ -1,0 +1,5 @@
+<div #header .item data-width="400">
+  <div .inner>
+    <form method=GET action=@{SearchR}>
+      ^{widget}
+      <input type="submit" value="Search">

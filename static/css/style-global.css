@@ -198,6 +198,16 @@
 
 /*custom*/
 
+	#search > form 
+	{
+		display: flex;
+	}
+
+	#search > form .required > *
+	{
+		margin: 0;
+	}
+
 	a:hover
 	{
 		color: black;
@@ -219,9 +229,20 @@
 		padding: 1em 2em;
 	}
 
+	#user-nav
+	{
+		display: inline-block;
+	}
+
 	nav li
 	{
 		display: inline-block;
+	}
+
+	#search
+	{
+		display: inline-block;
+		float: right;
 	}
 
 	.comment

@@ -17,6 +17,8 @@
       $if block == False
         <li>
           <a href=@{SignupR}>Signup
+  <div #search .right>
+    ^{pageBody searchWidget}
 
 $maybe msg <- mmsg
   <div #message>#{msg}
