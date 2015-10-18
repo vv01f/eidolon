@@ -1,19 +1,18 @@
 <div #header .item data-width="400">
   <div .inner>
-    <form method=GET action=@{SearchR}>
-      ^{widget}
-      <input type="submit" value="Search">
+    <h1>
+      Results for: #{query}
 
 $if allEmpty
   <div #header .item data-width="400">
     <div .inner>
-      <h1>
+      <h2>
         Sorry, no results
 $else
   $if not $ null userList
     <div #header .item data-width="400">
       <div .inner>
-        <h1>
+        <h2>
           Results in Users:
     $forall (Entity uId user) <- userList
       <div #header .item data-width="400">
@@ -23,7 +22,7 @@ $else
   $if not $ null albumList
     <div #header .item data-width="400">
       <div .inner>
-        <h1>
+        <h2>
           Results in Albums:
     $forall (Entity aId album) <- albumList
       <article .item data-width="#{albumSampleWidth album}">
@@ -37,7 +36,7 @@ $else
   $if not $ null mediumList
     <article #header .item data-width="400">
       <div .inner>
-        <h1>
+        <h2>
           Results in Media:
     $forall (Entity mId medium) <- mediumList
       <article .item data-width="#{mediumThumbWidth medium}">
@@ -48,7 +47,7 @@ $else
   $if not $ null commentList
     <div #header .item data-width="400">
       <div .inner>
-        <h1>
+        <h2>
           Results in Comments:
     $forall (Entity _ comment) <- commentList
       <div #header .item data-width="400">

@@ -86,7 +86,16 @@ searchForm = renderDivs $ areq (searchField True) "Search" Nothing
 
 getResults :: Text -> Handler (Reply, Reply, Reply, Reply)
 getResults query = do
-  let esQuery = QuerySimpleQueryStringQuery (SimpleQueryStringQuery (QueryString query) Nothing Nothing Nothing Nothing Nothing Nothing)
+  esQuery <- return $ QueryFuzzyLikeThisQuery $ FuzzyLikeThisQuery
+    { fuzzyLikeFields              = [FieldName "_all"]
+    , fuzzyLikeText                = query
+    , fuzzyLikeMaxQueryTerms       = MaxQueryTerms 25
+    , fuzzyLikeIgnoreTermFrequency = IgnoreTermFrequency False
+    , fuzzyLikeFuzziness           = Fuzziness 0.6
+    , fuzzyLikePrefixLength        = PrefixLength 0
+    , fuzzyLikeBoost               = Boost 1.0
+    , fuzzyLikeAnalyzer            = Nothing
+    }
   su <- runBH' $ searchByIndex (IndexName "user") $ mkSearch (Just esQuery) Nothing
   sa <- runBH' $ searchByIndex (IndexName "album") $ mkSearch (Just esQuery) Nothing
   sm <- runBH' $ searchByIndex (IndexName "medium") $ mkSearch (Just esQuery) Nothing

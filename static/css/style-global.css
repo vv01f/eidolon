@@ -198,6 +198,16 @@
 
 /*custom*/
 
+	#search > form 
+	{
+		display: flex;
+	}
+
+	#search > form .required > *
+	{
+		margin: 0;
+	}
+
 	a:hover
 	{
 		color: black;
