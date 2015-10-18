@@ -17,6 +17,7 @@ import Data.Yaml as Y
 import Data.Time.LocalTime
 import Database.Bloodhound
 import Network.HTTP.Client
+import Network.HTTP.Types.Status
 
 data ESSettings = ESSettings
   { esHost :: T.Text
@@ -76,7 +77,11 @@ main = do
            let u = SUser (decodeUtf8 name) (decodeUtf8 slug)
            let dId = DocId $ T.pack $ show theId
            liftIO $ putStrLn $ (show u) ++ "\n"
-           indexDocument (IndexName "user") (MappingName "user") defaultIndexDocumentSettings u dId
+           resp <- indexDocument (IndexName "user") (MappingName "user") defaultIndexDocumentSettings u dId
+           case statusCode (responseStatus resp) of
+             200 -> liftIO $ putStrLn $ "OK: " ++ (show $ responseBody resp)
+             201 -> liftIO $ putStrLn $ "OK: " ++ (show $ responseBody resp)
+             _   -> liftIO $ putStrLn $ "!!Failure!!: " ++ (show $ responseBody resp)
         bla ->
           error $ "malformed entry" ++ show bla
       ) userRows
@@ -86,7 +91,11 @@ main = do
            let a = SAlbum (decodeUtf8 title)
            let dId = DocId $ T.pack $ show theId
            liftIO $ putStrLn $ (show a) ++ "\n"
-           indexDocument (IndexName "album") (MappingName "album") defaultIndexDocumentSettings a dId
+           resp <- indexDocument (IndexName "album") (MappingName "album") defaultIndexDocumentSettings a dId
+           case statusCode (responseStatus resp) of
+             200 -> liftIO $ putStrLn $ "OK: " ++ (show $ responseBody resp)
+             201 -> liftIO $ putStrLn $ "OK: " ++ (show $ responseBody resp)
+             _   -> liftIO $ putStrLn $ "!!Failure!!: " ++ (show $ responseBody resp)
         bla ->
           error $ "malformed entry: " ++ show bla
       ) albumRows
@@ -96,7 +105,11 @@ main = do
            let m = SMedium (decodeUtf8 title) (zonedTimeToUTC time) (decodeUtf8 desc) (parseTags tags)
            let dId = DocId $ T.pack $ show theId
            liftIO $ putStrLn $ (show m) ++ "\n"
-           indexDocument (IndexName "medium") (MappingName "medium") defaultIndexDocumentSettings m dId
+           resp <- indexDocument (IndexName "medium") (MappingName "medium") defaultIndexDocumentSettings m dId
+           case statusCode (responseStatus resp) of
+             200 -> liftIO $ putStrLn $ "OK: " ++ (show $ responseBody resp)
+             201 -> liftIO $ putStrLn $ "OK: " ++ (show $ responseBody resp)
+             _   -> liftIO $ putStrLn $ "!!Failure!!: " ++ (show $ responseBody resp)
         bla ->
           error $ "malformed entry" ++ show bla
       ) mediumRows
@@ -106,7 +119,11 @@ main = do
            let c = SComment (decodeUtf8 author) (zonedTimeToUTC time) (decodeUtf8 content)
            let dId = DocId $ T.pack $ show theId
            liftIO $ putStrLn $ (show c) ++ "\n"
-           indexDocument (IndexName "medium") (MappingName "medium") defaultIndexDocumentSettings c dId
+           resp <- indexDocument (IndexName "medium") (MappingName "medium") defaultIndexDocumentSettings c dId
+           case statusCode (responseStatus resp) of
+             200 -> liftIO $ putStrLn $ "OK: " ++ (show $ responseBody resp)
+             201 -> liftIO $ putStrLn $ "OK: " ++ (show $ responseBody resp)
+             _   -> liftIO $ putStrLn $ "!!Failure!!: " ++ (show $ responseBody resp)
         bla ->
           error $ "malformed entry" ++ show bla
       ) commentRows
