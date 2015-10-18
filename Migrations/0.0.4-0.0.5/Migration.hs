@@ -11,6 +11,7 @@ import Control.Exception
 import qualified Data.Text as T
 import Data.Text.Encoding (decodeUtf8)
 import qualified Data.ByteString.Char8 as B
+import qualified Data.ByteString.Lazy.Char8 as BL
 import Data.Aeson as A
 import Data.Time.Clock
 import Data.Yaml as Y
@@ -79,9 +80,9 @@ main = do
            liftIO $ putStrLn $ (show u) ++ "\n"
            resp <- indexDocument (IndexName "user") (MappingName "user") defaultIndexDocumentSettings u dId
            case statusCode (responseStatus resp) of
-             200 -> liftIO $ putStrLn $ "OK: " ++ (show $ responseBody resp)
-             201 -> liftIO $ putStrLn $ "OK: " ++ (show $ responseBody resp)
-             _   -> liftIO $ putStrLn $ "!!Failure!!: " ++ (show $ responseBody resp)
+             200 -> liftIO $ putStrLn $ "OK: " ++ (BL.unpack $ responseBody resp)
+             201 -> liftIO $ putStrLn $ "OK: " ++ (BL.unpack $ responseBody resp)
+             _   -> liftIO $ putStrLn $ "!!Failure!!: " ++ (BL.unpack $ responseBody resp)
         bla ->
           error $ "malformed entry" ++ show bla
       ) userRows
@@ -93,9 +94,9 @@ main = do
            liftIO $ putStrLn $ (show a) ++ "\n"
            resp <- indexDocument (IndexName "album") (MappingName "album") defaultIndexDocumentSettings a dId
            case statusCode (responseStatus resp) of
-             200 -> liftIO $ putStrLn $ "OK: " ++ (show $ responseBody resp)
-             201 -> liftIO $ putStrLn $ "OK: " ++ (show $ responseBody resp)
-             _   -> liftIO $ putStrLn $ "!!Failure!!: " ++ (show $ responseBody resp)
+             200 -> liftIO $ putStrLn $ "OK: " ++ (BL.unpack $ responseBody resp)
+             201 -> liftIO $ putStrLn $ "OK: " ++ (BL.unpack $ responseBody resp)
+             _   -> liftIO $ putStrLn $ "!!Failure!!: " ++ (BL.unpack $ responseBody resp)
         bla ->
           error $ "malformed entry: " ++ show bla
       ) albumRows
@@ -107,9 +108,9 @@ main = do
            liftIO $ putStrLn $ (show m) ++ "\n"
            resp <- indexDocument (IndexName "medium") (MappingName "medium") defaultIndexDocumentSettings m dId
            case statusCode (responseStatus resp) of
-             200 -> liftIO $ putStrLn $ "OK: " ++ (show $ responseBody resp)
-             201 -> liftIO $ putStrLn $ "OK: " ++ (show $ responseBody resp)
-             _   -> liftIO $ putStrLn $ "!!Failure!!: " ++ (show $ responseBody resp)
+             200 -> liftIO $ putStrLn $ "OK: " ++ (BL.unpack $ responseBody resp)
+             201 -> liftIO $ putStrLn $ "OK: " ++ (BL.unpack $ responseBody resp)
+             _   -> liftIO $ putStrLn $ "!!Failure!!: " ++ (BL.unpack $ responseBody resp)
         bla ->
           error $ "malformed entry" ++ show bla
       ) mediumRows
@@ -121,9 +122,9 @@ main = do
            liftIO $ putStrLn $ (show c) ++ "\n"
            resp <- indexDocument (IndexName "medium") (MappingName "medium") defaultIndexDocumentSettings c dId
            case statusCode (responseStatus resp) of
-             200 -> liftIO $ putStrLn $ "OK: " ++ (show $ responseBody resp)
-             201 -> liftIO $ putStrLn $ "OK: " ++ (show $ responseBody resp)
-             _   -> liftIO $ putStrLn $ "!!Failure!!: " ++ (show $ responseBody resp)
+             200 -> liftIO $ putStrLn $ "OK: " ++ (BL.unpack $ responseBody resp)
+             201 -> liftIO $ putStrLn $ "OK: " ++ (BL.unpack $ responseBody resp)
+             _   -> liftIO $ putStrLn $ "!!Failure!!: " ++ (BL.unpack $ responseBody resp)
         bla ->
           error $ "malformed entry" ++ show bla
       ) commentRows
