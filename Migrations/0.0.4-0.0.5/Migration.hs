@@ -3,6 +3,7 @@
 module Migrate2 where
 
 import Prelude
+import Yesod.Core (liftIO)
 import Database.HDBC
 import Database.HDBC.PostgreSQL
 import System.IO
@@ -73,6 +74,7 @@ main = do
         [("id", SqlInteger theId), ("name", SqlByteString name), ("slug", SqlByteString slug), _, _, _, _, _] -> do
            let u = SUser (bToT name) (bToT slug)
            let dId = DocId $ T.pack $ show theId
+           liftIO $ putStrLn $ (show u) ++ "\n"
            indexDocument (IndexName "user") (MappingName "user") defaultIndexDocumentSettings u dId
         bla ->
           error $ "malformed entry" ++ show bla
@@ -82,6 +84,7 @@ main = do
         [("id", SqlInteger theId), ("title", SqlByteString title), _, _, _, _, _] -> do
            let a = SAlbum (bToT title)
            let dId = DocId $ T.pack $ show theId
+           liftIO $ putStrLn $ (show a) ++ "\n"
            indexDocument (IndexName "album") (MappingName "album") defaultIndexDocumentSettings a dId
         bla ->
           error $ "malformed entry: " ++ show bla
@@ -91,6 +94,7 @@ main = do
         [("id", SqlInteger theId), ("title", SqlByteString title), _, _, _, ("time", SqlZonedTime time), _, ("description", SqlByteString desc), ("tags", SqlByteString tags), _, _, _, _, _] -> do
            let m = SMedium (bToT title) (zonedTimeToUTC time) (bToT desc) (parseTags tags)
            let dId = DocId $ T.pack $ show theId
+           liftIO $ putStrLn $ (show m) ++ "\n"
            indexDocument (IndexName "medium") (MappingName "medium") defaultIndexDocumentSettings m dId
         bla ->
           error $ "malformed entry" ++ show bla
@@ -100,6 +104,7 @@ main = do
         [("id", SqlInteger theId), _, ("author_slug", SqlByteString author), _, _, ("time", SqlZonedTime time), ("content", SqlByteString content)] -> do
            let c = SComment (bToT author) (zonedTimeToUTC time) (bToT content)
            let dId = DocId $ T.pack $ show theId
+           liftIO $ putStrLn $ (show c) ++ "\n"
            indexDocument (IndexName "medium") (MappingName "medium") defaultIndexDocumentSettings c dId
         bla ->
           error $ "malformed entry" ++ show bla
@@ -110,7 +115,7 @@ main = do
 data SUser = SUser
   { suName :: T.Text
   , suSlug :: T.Text
-  }
+  } deriving Show
 
 instance A.ToJSON SUser where
   toJSON (SUser n s) = object
@@ -119,7 +124,7 @@ instance A.ToJSON SUser where
     ]
 
 data SAlbum = SAlbum
-  { saName :: T.Text }
+  { saName :: T.Text } deriving Show
 
 instance A.ToJSON SAlbum where
   toJSON (SAlbum n) = object
@@ -130,7 +135,7 @@ data SMedium = SMedium
   , smTime :: UTCTime
   , smDesc :: T.Text
   , smTags :: [T.Text]
-  }
+  } deriving Show
 
 instance A.ToJSON SMedium where
   toJSON (SMedium n t d g) = object
@@ -144,7 +149,7 @@ data SComment = SComment
   { scAuthor :: T.Text
   , scTime :: UTCTime
   , scContent :: T.Text
-  }
+  } deriving Show
 
 instance A.ToJSON SComment where
   toJSON (SComment a t c) = object
