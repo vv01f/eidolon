@@ -162,7 +162,7 @@ parseTags :: B.ByteString -> [T.Text]
 parseTags bs = map handle' inner
   where
     inner = T.splitOn "," $ T.pack $ B.unpack $ B.init $ B.tail bs
-    handle' = T.dropEnd 2 . T.drop 3
+    handle' = T.dropEnd 1 . T.drop 2
 
 bToT :: B.ByteString -> T.Text
 bToT = T.pack . B.unpack
