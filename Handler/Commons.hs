@@ -128,8 +128,8 @@ putIndexES input = do
       runBH' $ indexDocument (IndexName "comment") (MappingName "comment") defaultIndexDocumentSettings comment (DocId $ extractKey cId)
   case statusCode (responseStatus resp) of
     201 -> return ()
-    -- 200 -> return ()
-    _ -> error $ C.unpack $ BL.toStrict $ responseBody resp
+    200 -> return ()
+    code -> error $ (show code) ++ ": " ++ (C.unpack $ BL.toStrict $ responseBody resp)
 
 deleteIndexES :: ESInput -> Handler ()
 deleteIndexES input = do
