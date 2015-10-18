@@ -151,7 +151,6 @@ deleteIndexES input = do
 runBH' action = do
   master <- getYesod
   let s = appSearchHost $ appSettings master
-  let p = show $ appSearchPort $ appSettings master
-  let server = Server $ T.pack $ (T.unpack s) ++ ":" ++ show p
+  let server = Server s
   manager <- liftIO $ newManager defaultManagerSettings
   runBH (BHEnv server manager) action
