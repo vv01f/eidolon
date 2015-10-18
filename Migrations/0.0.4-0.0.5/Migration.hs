@@ -1,3 +1,4 @@
+{-# LANGUAGE RecordWildCards #-}
 module Migrate2 where
 
 import Prelude
