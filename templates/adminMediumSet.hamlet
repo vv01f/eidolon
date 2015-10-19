@@ -3,7 +3,5 @@ $newline always
   <form class="inner" method="post" enctype=#{enctype}>
     <h1>Medium settings
     ^{adminMediumSetWidget}
-    <div>
-      <input type=submit value="Change settings">
 
   <a href=@{AdminMediumDeleteR mediumId}>Delete this medium

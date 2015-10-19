@@ -2,16 +2,17 @@ $newline always
 
 <div id="header" class="item" data-width="300">
   <noscript>Please enable Javascript
+  <h3>Login
   <form class="inner r">
-    <h3>Login
-    <p>
+    <div .form-group .required>
       <label for="username">User:
-      <input id="username" type="text" required>
-    <p>
+      <input #username type="text" required>
+    <div .form-group .required>
       <label for="password">Password:
-      <input id="password" type="password" required>
-    <p id="progress">
-    <input id="login" type="submit" value="Login">
+      <input #password type="password" required>
+    <div .form-group .required>
+      <button .btn .btn-default #login type="submit">Login
+    <div #progress>
 
   <a href=@{ReactivateR}>Forgot your Password?
 

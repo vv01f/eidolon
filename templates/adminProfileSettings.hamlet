@@ -3,8 +3,6 @@ $newline always
   <form class="inner" method="post" enctype=#{enctype}>
     <h1>Profile Settings
     ^{adminProfileSetWidget}
-    <div>
-      <input type=submit value="Change settings">
 
   <a href=@{AdminProfileDeleteR userId}>Delete user
 

@@ -100,8 +100,8 @@ tagField = Field
           False -> return $ Right $ Just $ removeItem "" $ T.splitOn " " x
           True -> return $ Right $ Nothing
         _   -> return $ Left  $ error "unexpected tag list"
-  , fieldView = \idAttr nameAttr _ eResult _ ->
-      [whamlet|<input id=#{idAttr} type="text" name=#{nameAttr} value=#{either id (T.intercalate " ") eResult}>|]
+  , fieldView = \idAttr nameAttr attrs eResult _ ->
+      [whamlet|<input id=#{idAttr} type="text" name=#{nameAttr} *{attrs} value=#{either id (T.intercalate " ") eResult}>|]
   , fieldEnctype = UrlEncoded
   }
 
@@ -118,8 +118,8 @@ userField users = Field
                 True -> return $ Left $ error "Invalid username list"
           True -> return $ Right $ Just $ []
         _ -> return $ Left $ error "unexpected username list"
-  , fieldView = \idAttr nameAttr _ eResult _ ->
-      [whamlet|<input id=#{idAttr} type="text" name=#{nameAttr} value=#{either id (getUsersFromResult users) eResult}>|]
+  , fieldView = \idAttr nameAttr attrs eResult _ ->
+      [whamlet|<input id=#{idAttr} type="text" name=#{nameAttr} *{attrs} value=#{either id (getUsersFromResult users) eResult}>|]
   , fieldEnctype = UrlEncoded
   }
 

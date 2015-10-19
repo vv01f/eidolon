@@ -40,7 +40,9 @@ getAlbumSettingsR albumId = do
             True -> do
               entities <- runDB $ selectList [UserId !=. (albumOwner album)] [Desc UserName]
               let users = map (\u -> (userName $ entityVal u, entityKey u)) entities
-              (albumSettingsWidget, enctype) <- generateFormPost $ albumSettingsForm album albumId users
+              (albumSettingsWidget, enctype) <- generateFormPost $
+                renderBootstrap3 BootstrapBasicForm $
+                albumSettingsForm album albumId users
               formLayout $ do
                 setTitle "Eidolon :: Album Settings"
                 $(widgetFile "albumSettings")
@@ -73,7 +75,9 @@ postAlbumSettingsR albumId = do
             then do
               entities <- runDB $ selectList [UserId !=. (albumOwner album)] [Desc UserName]
               let users = map (\u -> (userName $ entityVal u, entityKey u)) entities
-              ((result, _), _) <- runFormPost $ albumSettingsForm album albumId users
+              ((result, _), _) <- runFormPost $
+                renderBootstrap3 BootstrapBasicForm $
+                albumSettingsForm album albumId users
               case result of
                 FormSuccess temp -> do
                   let newShares = L.sort $ albumShares temp
@@ -127,21 +131,19 @@ postAlbumSettingsR albumId = do
       setMessage "This album does not exist"
       redirect HomeR
 
-albumSettingsForm :: Album -> AlbumId -> [(Text, UserId)]-> Form Album
-albumSettingsForm album albumId users = renderDivs $ Album
-  <$> areq textField "Title" (Just $ albumTitle album)
+albumSettingsForm :: Album -> AlbumId -> [(Text, UserId)]-> AForm Handler Album
+albumSettingsForm album albumId users = Album
+  <$> areq textField (bfs ("Title" :: T.Text)) (Just $ albumTitle album)
   <*> pure (albumOwner album)
-  <*> areq (userField users) "Share this album with" (Just $ albumShares album)
+  <*> areq (userField users) (bfs ("Share this album with" :: T.Text)) (Just $ albumShares album)
   <*> pure (albumContent album)
-  <*> aopt (selectField media) "Sample picture" (Just $ albumSamplePic album)
+  <*> aopt (selectField media) (bfs ("Sample picture" :: T.Text)) (Just $ albumSamplePic album)
   <*> pure 230
+  <*  bootstrapSubmit ("Change settings" :: BootstrapSubmit Text)
   where
     media = do
       entities <- runDB $ selectList [MediumAlbum ==. albumId] [Asc MediumTitle]
       optionsPairs $ map (\med -> (mediumTitle $ entityVal med, mediumThumb (entityVal med))) entities
---    users = do
---      entities <- runDB $ selectList [UserId !=. (albumOwner album)] [Desc UserName]
---      return $ map (\u -> (userName $ entityVal u, entityKey u)) entities
 
 getAlbumDeleteR :: AlbumId -> Handler Html
 getAlbumDeleteR albumId = do

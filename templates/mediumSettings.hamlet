@@ -5,8 +5,6 @@ $newline always
 
     <form method="post" enctype=#{enctype}>
       ^{mediumSettingsWidget}
-      <div>
-        <input type=submit value="Change settings">
 
   <a href=@{MediumDeleteR mediumId}>Delete this image
 

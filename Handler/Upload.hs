@@ -41,7 +41,7 @@ getDirectUploadR albumId = do
             userId == ownerId || userId `elem` albumShares album
             -- is the owner present or a user with whom the album is shared
             then do
-              (dUploadWidget, enctype) <- generateFormPost $ dUploadForm userId albumId
+              (dUploadWidget, enctype) <- generateFormPost $ renderBootstrap3 BootstrapBasicForm $ dUploadForm userId albumId
               formLayout $ do
                 setTitle $ toHtml ("Eidolon :: Upload medium to " `T.append` albumTitle album)
                 $(widgetFile "dUpload")
@@ -65,11 +65,10 @@ postDirectUploadR albumId = do
       case msu of -- is anybody logged in
         Just tempUserId -> do
           let userId = getUserIdFromText tempUserId
-          if
-            userId == ownerId || userId `elem` albumShares album
+          if userId == ownerId || userId `elem` albumShares album
             -- is the logged in user the owner or is the album shared with him
             then do
-              ((result, _), _) <- runFormPost (dUploadForm userId albumId)
+              ((result, _), _) <- runFormPost $ renderBootstrap3 BootstrapBasicForm $ dUploadForm userId albumId
               case result of
                 FormSuccess temp -> do
                   let fils = fileBulkFiles temp
@@ -160,15 +159,17 @@ writeOnDrive fil userId albumId = do
   liftIO $ fileMove fil path
   return path
 
-dUploadForm :: UserId -> AlbumId -> Form FileBulk
-dUploadForm userId albumId = renderDivs $ FileBulk
-  <$> areq textField "Title" Nothing
+dUploadForm :: UserId -> AlbumId -> AForm Handler FileBulk
+dUploadForm userId albumId = FileBulk
+  <$> areq textField (bfs ("Title" :: T.Text)) Nothing
   <*> areq multiFileField "Select file(s)" Nothing
   <*> lift (liftIO getCurrentTime)
   <*> pure userId
-  <*> aopt textareaField "Description" Nothing
-  <*> areq tagField "Enter tags" Nothing
+  <*> aopt textareaField (bfs ("Description" :: T.Text)) Nothing
+  <*> areq tagField (bfs ("Enter tags" :: T.Text)) Nothing
   <*> pure albumId
+  <*  bootstrapSubmit ("Upload" :: BootstrapSubmit Text)
+      
 
 data FileBulk = FileBulk
   { fileBulkPrefix :: Text
@@ -194,7 +195,7 @@ getUploadR = do
           setMessage "Please create an album first"
           redirect NewAlbumR
         else do
-          (uploadWidget, enctype) <- generateFormPost (bulkUploadForm userId)
+          (uploadWidget, enctype) <- generateFormPost $ renderBootstrap3 BootstrapBasicForm $ bulkUploadForm userId
           formLayout $ do
             setTitle "Eidolon :: Upload Medium"
             $(widgetFile "bulkUpload")
@@ -202,15 +203,16 @@ getUploadR = do
       setMessage "You need to be logged in"
       redirect LoginR
 
-bulkUploadForm :: UserId -> Form FileBulk
-bulkUploadForm userId = renderDivs $ (\a b c d e f g -> FileBulk b c d e f g a)
-  <$> areq (selectField albums) "Album" Nothing
-  <*> areq textField "Title" Nothing
+bulkUploadForm :: UserId -> AForm Handler FileBulk
+bulkUploadForm userId = (\a b c d e f g -> FileBulk b c d e f g a)
+  <$> areq (selectField albums) (bfs ("Album" :: T.Text)) Nothing
+  <*> areq textField (bfs ("Title" :: T.Text)) Nothing
   <*> areq multiFileField "Select file(s)" Nothing
   <*> lift (liftIO getCurrentTime)
   <*> pure userId
-  <*> aopt textareaField "Description" Nothing
-  <*> areq tagField "Enter tags" Nothing
+  <*> aopt textareaField (bfs ("Description" :: T.Text)) Nothing
+  <*> areq tagField (bfs ("Enter tags" :: T.Text)) Nothing
+  <*  bootstrapSubmit ("Upload" :: BootstrapSubmit Text)
   where
     albums = do
       allEnts <- runDB $ selectList [] [Desc AlbumTitle]
@@ -228,7 +230,7 @@ postUploadR = do
   case msu of
     Just tempUserId -> do
       let userId = getUserIdFromText tempUserId
-      ((result, _), _) <- runFormPost (bulkUploadForm userId)
+      ((result, _), _) <- runFormPost $ renderBootstrap3 BootstrapBasicForm $ bulkUploadForm userId
       case result of
         FormSuccess temp -> do
           let fils = fileBulkFiles temp

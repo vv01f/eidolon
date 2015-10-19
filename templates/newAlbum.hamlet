@@ -1,7 +1,5 @@
 <div id="header" class="item" data-width="300">
 
+  <h3>Create new Album
   <form class="inner r" method=post enctype=#{enctype}>
-    <h3>Create new Album
     ^{albumWidget}
-    <div>
-      <input type=submit value="Create">

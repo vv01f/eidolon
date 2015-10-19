@@ -44,7 +44,9 @@ getAdminMediumSettingsR mediumId = do
       tempMedium <- runDB $ get mediumId
       case tempMedium of
         Just medium -> do
-          (adminMediumSetWidget, enctype) <- generateFormPost $ adminMediumSetForm medium
+          (adminMediumSetWidget, enctype) <- generateFormPost $
+            renderBootstrap3 BootstrapBasicForm $
+            adminMediumSetForm medium
           formLayout $ do
             setTitle "Administration: Medium Settings"
             $(widgetFile "adminMediumSet")
@@ -63,7 +65,9 @@ postAdminMediumSettingsR mediumId = do
       tempMedium <- runDB $ get mediumId
       case tempMedium of
         Just medium -> do
-          ((res, _), _) <- runFormPost $ adminMediumSetForm medium
+          ((res, _), _) <- runFormPost $
+            renderBootstrap3 BootstrapBasicForm $
+            adminMediumSetForm medium
           case res of
             FormSuccess temp -> do
               runDB $ update mediumId
@@ -84,21 +88,22 @@ postAdminMediumSettingsR mediumId = do
       setMessage errorMsg
       redirect route
 
-adminMediumSetForm :: Medium -> Form Medium
-adminMediumSetForm medium = renderDivs $ Medium
-  <$> areq textField "Title" (Just $ mediumTitle medium)
+adminMediumSetForm :: Medium -> AForm Handler Medium
+adminMediumSetForm medium = Medium
+  <$> areq textField (bfs ("Title" :: T.Text)) (Just $ mediumTitle medium)
   <*> pure (mediumPath medium)
   <*> pure (mediumThumb medium)
   <*> pure (mediumMime medium)
   <*> pure (mediumTime medium)
   <*> pure (mediumOwner medium)
-  <*> aopt textareaField "Description" (Just $ mediumDescription medium)
-  <*> areq tagField "Tags" (Just $ mediumTags medium)
+  <*> aopt textareaField (bfs ("Description" :: T.Text)) (Just $ mediumDescription medium)
+  <*> areq tagField (bfs ("Tags" :: T.Text))  (Just $ mediumTags medium)
   <*> pure (mediumWidth medium)
   <*> pure (mediumThumbWidth medium)
   <*> pure (mediumAlbum medium)
   <*> pure (mediumPreview medium)
   <*> pure (mediumPreviewWidth medium)
+  <*  bootstrapSubmit ("Change settings" :: BootstrapSubmit Text)
 
 getAdminMediumDeleteR :: MediumId -> Handler Html
 getAdminMediumDeleteR mediumId = do

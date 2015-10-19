@@ -18,7 +18,7 @@ module Handler.NewAlbum where
 
 import Import
 import Handler.Commons
-import Data.Text
+import Data.Text as T
 import System.Directory
 import System.FilePath
 
@@ -28,7 +28,9 @@ getNewAlbumR = do
   case msu of
     Just tempUserId -> do
       userId <- lift $ pure $ getUserIdFromText tempUserId
-      (albumWidget, enctype) <- generateFormPost (albumForm userId)
+      (albumWidget, enctype) <- generateFormPost $
+        renderBootstrap3 BootstrapBasicForm $
+        albumForm userId
       formLayout $ do
         setTitle "Eidolon :: Create new Album"
         $(widgetFile "newAlbum")
@@ -42,7 +44,9 @@ postNewAlbumR = do
   case msu of
     Just tempUserId -> do
       let userId = getUserIdFromText tempUserId
-      ((result, _), _) <- runFormPost (albumForm userId)
+      ((result, _), _) <- runFormPost $
+        renderBootstrap3 BootstrapBasicForm $
+        albumForm userId
       case result of
         FormSuccess album -> do
           -- Put album in Database
@@ -66,11 +70,12 @@ postNewAlbumR = do
       setMessage "You must be logged in to create albums"
       redirect LoginR
 
-albumForm :: UserId -> Form Album
-albumForm userId = renderDivs $ Album
-  <$> areq textField "Title" Nothing
+albumForm :: UserId -> AForm Handler Album
+albumForm userId = Album
+  <$> areq textField (bfs ("Title" :: T.Text)) Nothing
   <*> pure userId
   <*> pure []
   <*> pure []
   <*> pure Nothing
   <*> pure 230
+  <*  bootstrapSubmit ("Create album" :: BootstrapSubmit Text)

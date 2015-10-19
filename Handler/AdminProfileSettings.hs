@@ -85,7 +85,9 @@ getAdminProfileSettingsR ownerId = do
         Just owner -> do
           tempUserId <- lookupSession "userId"
           let userId = getUserIdFromText $ fromJust tempUserId
-          (adminProfileSetWidget, enctype) <- generateFormPost $ adminProfileForm owner
+          (adminProfileSetWidget, enctype) <- generateFormPost $
+            renderBootstrap3 BootstrapBasicForm $
+            adminProfileForm owner
           formLayout $ do
             setTitle "Administration: Profile settings"
             $(widgetFile "adminProfileSettings")
@@ -104,7 +106,9 @@ postAdminProfileSettingsR ownerId = do
       tempOwner <- runDB $ get ownerId
       case tempOwner of
         Just owner -> do
-          ((result, _), _) <- runFormPost $ adminProfileForm owner
+          ((result, _), _) <- runFormPost $
+            renderBootstrap3 BootstrapBasicForm $
+            adminProfileForm owner
           case result of
             FormSuccess temp -> do
               runDB $ update ownerId 
@@ -127,15 +131,16 @@ postAdminProfileSettingsR ownerId = do
       redirect route
 
 
-adminProfileForm :: User -> Form User
-adminProfileForm owner = renderDivs $ User
-  <$> areq textField "Username" (Just $ userName owner)
-  <*> areq textField "Userslug" (Just $ userSlug owner)
-  <*> areq emailField "Email" (Just $ userEmail owner)
+adminProfileForm :: User -> AForm Handler User
+adminProfileForm owner = User
+  <$> areq textField (bfs ("Username" :: T.Text)) (Just $ userName owner)
+  <*> areq textField (bfs ("Userslug" :: T.Text)) (Just $ userSlug owner)
+  <*> areq emailField (bfs ("Email" :: T.Text)) (Just $ userEmail owner)
   <*> pure (userSalt owner)
   <*> pure (userSalted owner)
   <*> pure (userAlbums owner)
-  <*> areq boolField "Admin" (Just $ userAdmin owner)
+  <*> areq boolField (bfs ("Admin" :: T.Text)) (Just $ userAdmin owner)
+  <*  bootstrapSubmit ("Change settings" :: BootstrapSubmit T.Text)
 
 getAdminProfileDeleteR :: UserId -> Handler Html
 getAdminProfileDeleteR ownerId = do

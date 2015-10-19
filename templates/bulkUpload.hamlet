@@ -3,5 +3,3 @@
     <h3>Upload multiple images
     <p>Here you can upload your images.
     ^{uploadWidget}
-    <div>
-      <input type=submit value="Upload">

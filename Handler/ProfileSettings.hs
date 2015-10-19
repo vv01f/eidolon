@@ -17,6 +17,7 @@
 module Handler.ProfileSettings where
 
 import Import
+import qualified Data.Text as T
 import Handler.Commons
 
 getProfileSettingsR :: UserId -> Handler Html
@@ -24,7 +25,8 @@ getProfileSettingsR userId = do
   checkRes <- profileCheck userId
   case checkRes of
     Right user -> do
-      (profileSettingsWidget, enctype) <- generateFormPost $ profileSettingsForm user
+      (profileSettingsWidget, enctype) <- generateFormPost $
+        renderBootstrap3 BootstrapBasicForm $ profileSettingsForm user
       formLayout $ do
         setTitle "Eidolon :: Profile settings"
         $(widgetFile "profileSettings")
@@ -37,7 +39,8 @@ postProfileSettingsR userId = do
   checkRes <- profileCheck userId
   case checkRes of
     Right user -> do
-      ((result, _), _) <- runFormPost $ profileSettingsForm user
+      ((result, _), _) <- runFormPost $
+        renderBootstrap3 BootstrapBasicForm$ profileSettingsForm user
       case result of
         FormSuccess temp -> do
          runDB $ update userId [
@@ -56,12 +59,13 @@ postProfileSettingsR userId = do
       redirect route
 
 
-profileSettingsForm :: User -> Form User
-profileSettingsForm user = renderDivs $ User
-  <$> areq textField "Username" (Just $ userName user)
-  <*> areq textField "Userslug" (Just $ userSlug user)
-  <*> areq emailField "Email" (Just $ userEmail user)
+profileSettingsForm :: User -> AForm Handler User
+profileSettingsForm user = User
+  <$> areq textField (bfs ("Username" :: T.Text)) (Just $ userName user)
+  <*> areq textField (bfs ("Userslug" :: T.Text)) (Just $ userSlug user)
+  <*> areq emailField (bfs ("Email" :: T.Text)) (Just $ userEmail user)
   <*> pure (userSalt user)
   <*> pure (userSalted user)
   <*> pure (userAlbums user)
   <*> pure (userAdmin user)
+  <*  bootstrapSubmit ("Change settings" :: BootstrapSubmit Text)

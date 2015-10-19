@@ -97,12 +97,12 @@ renderLayout widget = do
     searchWidget <- widgetToPageContent $ [whamlet|
       <form action=@{SearchR} method=GET>
         <input type="hidden" name="_hasdata">
-        <div .required>
-          <label for="hident2">
-          <input #hident2 type="search" autofocus="" required="" name="f1">
-          <script>
-            if (!('autofocus' in document.createElement('input'))) {document.getElementById('hident2').focus();}
-        <input value="Search" type="submit">
+        <div .input-group .required>
+          <input #hident2 .form-control type="text" autofocus="" required="" name="f1" placeholder="Search for ...">
+          <span .input-group-btn>
+            <button .btn .btn-default type="submit">Go!
+        <script>
+          if (!('autofocus' in document.createElement('input'))) {document.getElementById('hident2').focus();}
       |]
 
     wc <- widgetToPageContent widget
@@ -119,7 +119,7 @@ renderLayout widget = do
         $(combineStylesheets 'StaticR
             [
             --  css_normalize_css
-              css_bootstrap_css
+              css_bootstrap_min_css
             ])
         $(widgetFile "default-layout")
 
