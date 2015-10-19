@@ -3,7 +3,5 @@ $newline always
   <form class="inner" method="post" enctype=#{enctype}>
     <h3>Profile settings
     ^{profileSettingsWidget}
-    <div>
-      <input type=submit value="Change settings">
 
   <a href=@{ProfileDeleteR userId}>Delete user

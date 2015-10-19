@@ -22,6 +22,7 @@ import           Prelude              as Import hiding (head, init, last,
                                                  readFile, tail, writeFile)
 import           Yesod                as Import hiding (Route (..))
 import           Yesod.Static         as Import
+import           Yesod.Form.Bootstrap3 as Import
 
 import           Data.Text            as Import (Text)
 

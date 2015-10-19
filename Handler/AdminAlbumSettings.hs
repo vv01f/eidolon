@@ -66,7 +66,9 @@ getAdminAlbumSettingsR albumId = do
         Just album -> do
           entities <- runDB $ selectList [UserId !=. albumOwner album] [Desc UserName]
           let users = map (\u -> (userName $ entityVal u, entityKey u)) entities
-          (adminAlbumSettingsWidget, enctype) <- generateFormPost $ adminAlbumSettingsForm album albumId users
+          (adminAlbumSettingsWidget, enctype) <- generateFormPost $
+            renderBootstrap3 BootstrapBasicForm $
+            adminAlbumSettingsForm album albumId users
           formLayout $ do
             setTitle "Administration: Album settings"
             $(widgetFile "adminAlbumSet")
@@ -87,7 +89,9 @@ postAdminAlbumSettingsR albumId = do
         Just album -> do
           entities <- runDB $ selectList [UserId !=. albumOwner album] [Desc UserName]
           let users = map (\u -> (userName $ entityVal u, entityKey u)) entities
-          ((res, _), _) <- runFormPost $ adminAlbumSettingsForm album albumId users
+          ((res, _), _) <- runFormPost $
+            renderBootstrap3 BootstrapBasicForm $
+            adminAlbumSettingsForm album albumId users
           case res of
             FormSuccess temp -> do
               width <- getThumbWidth $ Just $ L.tail $ fromMaybe "a" $ albumSamplePic temp
@@ -110,14 +114,15 @@ postAdminAlbumSettingsR albumId = do
       setMessage errorMsg
       redirect route
 
-adminAlbumSettingsForm :: Album -> AlbumId -> [(Text, UserId)] -> Form Album
-adminAlbumSettingsForm album albumId users = renderDivs $ Album
-  <$> areq textField "Title" (Just $ albumTitle album)
+adminAlbumSettingsForm :: Album -> AlbumId -> [(Text, UserId)] -> AForm Handler Album
+adminAlbumSettingsForm album albumId users = Album
+  <$> areq textField (bfs ("Title" :: T.Text)) (Just $ albumTitle album)
   <*> pure (albumOwner album)
-  <*> areq (userField users) "This album shared with" (Just $ albumShares album)
+  <*> areq (userField users) (bfs ("This album shared with" :: T.Text)) (Just $ albumShares album)
   <*> pure (albumContent album)
-  <*> aopt (selectField media) "Sample picture" (Just $ albumSamplePic album)
+  <*> aopt (selectField media) (bfs ("Sample picture" :: T.Text)) (Just $ albumSamplePic album)
   <*> pure 230
+  <*  bootstrapSubmit ("Change settings" :: BootstrapSubmit Text)
   where
     media = do
       entities <- runDB $ selectList [MediumAlbum ==. albumId] [Asc MediumTitle]

@@ -1,20 +1,21 @@
 $newline always
 <div id="header" class="item" data-width="300">
   <noscript>You need to have Javscript enabled
-  <form class="inner" method="POST" action="/signup">
-    <h3>Signup
-    <p>
+  <h3>Signup
+  <form role="form" class="inner" method="POST" action=@{SignupR}>
+    <div .form-group .required>
       <label for="username">Username:
-      <input id="username" name="username" type="text" required>
-    <p>
+      <input .form-control #username name="username" type="text" required>
+    <div .form-group .required>
       <label for="email">E-Mail:
-      <input id="email" name="email" type="email" required>
-    <p class="tos">
-      <input type="checkbox" id="tos-1" name="tos-1" value="tos-1" required>
+      <input .form-control #email name="email" type="email" required>
+    <div .form-group .required>
+      <input .form-control type="checkbox" #tos-1 name="tos-1" value="tos-1" required>
       <label for="tos-1">#{appTos1 $ appSettings master}
-    <p class="tos">
-      <input type="checkbox" id="tos-2" name="tos-2" value="tos-2" required>
+    <div .form-group .required>
+      <input .form-control type="checkbox" #tos-2 name="tos-2" value="tos-2" required>
       <label for="tos-2">#{appTos2 $ appSettings master}
-    <input id="signup" type="submit" value="Signup">
+    <div .form-group .optional>
+      <button .btn .btn-default #signup type="submit">Signup
   <script src="/static/js/jquery.min.js" type="text/javascript">
   <script src="/static/js/signup.js" type="text/javascript">

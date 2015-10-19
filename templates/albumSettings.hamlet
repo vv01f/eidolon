@@ -3,7 +3,5 @@ $newline always
   <form class="inner" method="post" enctype=#{enctype}>
     <h3>Album settings
     ^{albumSettingsWidget}
-    <div>
-      <input type=submit value="Change settings">
-    $if ownerPresence == True
-      <a href=@{AlbumDeleteR albumId}>Delete this album
+  $if ownerPresence == True
+    <a href=@{AlbumDeleteR albumId}>Delete this album

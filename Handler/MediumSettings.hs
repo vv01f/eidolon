@@ -28,7 +28,9 @@ getMediumSettingsR mediumId = do
   checkRes <- mediumCheck mediumId
   case checkRes of
     Right medium -> do
-      (mediumSettingsWidget, enctype) <- generateFormPost $ mediumSettingsForm medium
+      (mediumSettingsWidget, enctype) <- generateFormPost $
+        renderBootstrap3 BootstrapBasicForm $
+        mediumSettingsForm medium
       formLayout $ do
         setTitle "Eidolon :: Medium Settings"
         $(widgetFile "mediumSettings")
@@ -41,7 +43,9 @@ postMediumSettingsR mediumId = do
   checkRes <- mediumCheck mediumId
   case checkRes of
     Right medium -> do
-      ((result, _), _) <- runFormPost $ mediumSettingsForm medium
+      ((result, _), _) <- runFormPost $
+        renderBootstrap3 BootstrapBasicForm $
+        mediumSettingsForm medium
       case result of
         FormSuccess temp -> do
           _ <- runDB $ update mediumId
@@ -59,21 +63,22 @@ postMediumSettingsR mediumId = do
       setMessage errorMsg
       redirect route
 
-mediumSettingsForm :: Medium -> Form Medium
-mediumSettingsForm medium = renderDivs $ Medium
-  <$> areq textField "Title" (Just $ mediumTitle medium)
+mediumSettingsForm :: Medium -> AForm Handler Medium
+mediumSettingsForm medium = Medium
+  <$> areq textField (bfs ("Title" :: T.Text)) (Just $ mediumTitle medium)
   <*> pure (mediumPath medium)
   <*> pure (mediumThumb medium)
   <*> pure (mediumMime medium)
   <*> pure (mediumTime medium)
   <*> pure (mediumOwner medium)
-  <*> aopt textareaField "Description" (Just $ mediumDescription medium)
-  <*> areq tagField "tags" (Just $ mediumTags medium)
+  <*> aopt textareaField (bfs ("Description" :: T.Text)) (Just $ mediumDescription medium)
+  <*> areq tagField (bfs ("tags" :: T.Text)) (Just $ mediumTags medium)
   <*> pure (mediumWidth medium)
   <*> pure (mediumThumbWidth medium)
   <*> pure (mediumAlbum medium)
   <*> pure (mediumPreview medium)
   <*> pure (mediumPreviewWidth medium)
+  <*  bootstrapSubmit ("Change settings" :: BootstrapSubmit T.Text)
 
 getMediumDeleteR :: MediumId -> Handler Html
 getMediumDeleteR mediumId = do

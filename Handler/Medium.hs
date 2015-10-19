@@ -50,7 +50,9 @@ getMediumR mediumId = do
         Nothing ->
           return Nothing
       let presence = userId == (Just ownerId) || userId == Just (albumOwner album)
-      (commentWidget, enctype) <- generateFormPost $ commentForm (fromJust userId) (fromJust userSl) mediumId Nothing
+      (commentWidget, enctype) <- generateFormPost $
+        renderBootstrap3 BootstrapBasicForm $
+        commentForm (fromJust userId) (fromJust userSl) mediumId Nothing
       comments <- runDB $ selectList
         [ CommentOrigin ==. mediumId
         , CommentParent ==. Nothing ]
@@ -83,7 +85,9 @@ postMediumR mediumId = do
           let userId = getUserIdFromText tempUserId
           u <- runDB $ getJust userId
           let userSl = userSlug u
-          ((res, _), _) <- runFormPost $ commentForm userId userSl mediumId Nothing
+          ((res, _), _) <- runFormPost $
+            renderBootstrap3 BootstrapBasicForm $
+            commentForm userId userSl mediumId Nothing
           case res of
             FormSuccess temp -> do
               cId <- runDB $ insert temp
@@ -113,14 +117,15 @@ postMediumR mediumId = do
       setMessage "This image does not exist"
       redirect HomeR
 
-commentForm :: UserId -> Text -> MediumId -> Maybe CommentId -> Form Comment
-commentForm authorId authorSlug originId parentId = renderDivs $ Comment
+commentForm :: UserId -> Text -> MediumId -> Maybe CommentId -> AForm Handler Comment
+commentForm authorId authorSlug originId parentId = Comment
   <$> pure authorId
   <*> pure authorSlug
   <*> pure originId
   <*> pure parentId
   <*> lift (liftIO getCurrentTime)
-  <*> areq markdownField "Comment this medium" Nothing
+  <*> areq markdownField (bfs ("Comment this medium" :: T.Text)) Nothing
+  <*  bootstrapSubmit ("Post comment" :: BootstrapSubmit Text)
 
 getCommentReplyR :: CommentId -> Handler Html
 getCommentReplyR commentId = do
@@ -134,7 +139,9 @@ getCommentReplyR commentId = do
           u <- runDB $ getJust userId
           let userSl = userSlug u
           let mediumId = commentOrigin comment
-          (replyWidget, enctype) <- generateFormPost $ commentForm userId userSl mediumId (Just commentId)
+          (replyWidget, enctype) <- generateFormPost $
+            renderBootstrap3 BootstrapBasicForm $
+            commentForm userId userSl mediumId (Just commentId)
           formLayout $ do
             setTitle "Eidolon :: Reply to comment"
             $(widgetFile "commentReply")
@@ -157,7 +164,9 @@ postCommentReplyR commentId = do
           u <- runDB $ getJust userId
           let userSl = userSlug u
           let mediumId = commentOrigin comment
-          ((res, _), _) <- runFormPost $ commentForm userId userSl mediumId (Just commentId)
+          ((res, _), _) <- runFormPost $
+            renderBootstrap3 BootstrapBasicForm $
+            commentForm userId userSl mediumId (Just commentId)
           case res of
             FormSuccess temp -> do
               cId <- runDB $ insert temp

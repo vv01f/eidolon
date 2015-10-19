@@ -7,5 +7,3 @@
     <hr>
       <form method=post enctype=#{enctype}>
         ^{replyWidget}
-        <div>
-          <input type=submit value="Post reply">

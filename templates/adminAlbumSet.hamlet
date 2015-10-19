@@ -3,8 +3,6 @@ $newline always
   <form class="inner" method="post" enctype=#{enctype}>
     <h1>Album settings
     ^{adminAlbumSettingsWidget}
-    <div>
-      <input type=submit value="Change settings">
 
   <a href=@{AdminAlbumDeleteR albumId}>Delete this album
 
