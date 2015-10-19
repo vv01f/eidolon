@@ -27,7 +27,7 @@ $else
     $forall (Entity aId album) <- albumList
       <article .item data-width="#{albumSampleWidth album}">
         <a href=@{AlbumR aId}>
-          <figure .thumbnail>
+          <figure>
             $if (albumSamplePic album) == Nothing
               <img src=@{StaticR img_album_jpg} title=#{albumTitle album}>
             $else
@@ -41,7 +41,7 @@ $else
     $forall (Entity mId medium) <- mediumList
       <article .item data-width="#{mediumThumbWidth medium}">
         <a href=@{MediumR mId}>
-          <figure .thumbnail>
+          <figure>
             <img src=@{StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumThumb medium) []} title=#{mediumTitle medium}>
             <figcaption>#{mediumTitle medium}
   $if not $ null commentList

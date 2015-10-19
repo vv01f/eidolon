@@ -17,6 +17,6 @@ $else
   $forall (Entity mediumId medium) <- media
     <article class="item" data-width=#{mediumThumbWidth medium}>
       <a href=@{MediumR mediumId}>
-        <figure class="thumbnail">
+        <figure>
           <img src=@{StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumThumb medium) []} title=#{mediumTitle medium}>
           <figcaption>#{mediumTitle medium}

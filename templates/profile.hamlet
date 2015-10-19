@@ -16,7 +16,7 @@ $newline always
 $forall (Entity albumId album) <- userAlbs
   <article class="item" data-width=#{albumSampleWidth album}>
     <a href=@{AlbumR albumId}>
-      <figure class="thumbnail">
+      <figure>
         $if (albumSamplePic album) == Nothing
           <img src=@{StaticR img_album_jpg} title=#{albumTitle album}>
         $else
@@ -32,7 +32,7 @@ $else
   $forall Just (Entity albumId album) <- sharedAlbs
     <article class="shared item" data-width=#{albumSampleWidth album}>
       <a href=@{AlbumR albumId}>
-        <figure class="thumbnail">
+        <figure>
           $if (albumSamplePic album) == Nothing
             <img src=@{StaticR img_album_jpg}>
           $else
@@ -48,6 +48,6 @@ $else
   $forall (Entity mediumId medium) <- take 10 recentMedia
     <article class="recent item" data-width=#{mediumThumbWidth medium}>
       <a href=@{MediumR mediumId}>
-        <figure class="thumbnail">
+        <figure>
           <img src=@{StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumThumb medium) []} title=#{mediumTitle medium}>
           <figcaption>#{mediumTitle medium}

@@ -9,7 +9,7 @@ $newline always
 $forall (Entity aId a) <- albums
   <article class="item" data-width=#{albumSampleWidth a}>
     <a href=@{AdminAlbumSettingsR aId}>#{albumTitle a}
-      <figure class="thumbnail">
+      <figure>
         $if (albumSamplePic a) == Nothing
           <img src="/static/img/album.jpg">
         $else
