@@ -117,9 +117,8 @@ renderLayout widget = do
             , js_picturefill_js
             ])
         $(combineStylesheets 'StaticR
-            [
-            --  css_normalize_css
-              css_bootstrap_min_css
+            [ css_bootstrap_min_css
+            , css_style_global_css
             ])
         $(widgetFile "default-layout")
 
