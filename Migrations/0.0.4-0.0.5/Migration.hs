@@ -120,7 +120,7 @@ main = do
            let c = SComment (decodeUtf8 author) (zonedTimeToUTC time) (decodeUtf8 content)
            let dId = DocId $ T.pack $ show theId
            liftIO $ putStrLn $ (show c) ++ "\n"
-           resp <- indexDocument (IndexName "medium") (MappingName "medium") defaultIndexDocumentSettings c dId
+           resp <- indexDocument (IndexName "comment") (MappingName "comment") defaultIndexDocumentSettings c dId
            case statusCode (responseStatus resp) of
              200 -> liftIO $ putStrLn $ "OK: " ++ (BL.unpack $ responseBody resp)
              201 -> liftIO $ putStrLn $ "OK: " ++ (BL.unpack $ responseBody resp)
