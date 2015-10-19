@@ -8,7 +8,7 @@
     <div class="inner">
       <a href=@{ir}>
         <picture>
-          <source srcset="@{pr}, @{ir} 2x" media="(min-width: 1400px)">
+          <source srcset="@{pr}, @{ir} 2x" media="(min-width: 600px)">
           <source srcset="@{tr}, @{pr} 2x">
           <img src=@{pr} title=#{mediumTitle medium}>
 
