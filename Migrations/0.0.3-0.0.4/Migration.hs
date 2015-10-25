@@ -29,7 +29,7 @@ main = do
   _ <- execute stmt1 []
   rows <- fetchAllRowsAL stmt1
   -- mapM_ (putStrLn . show) rows
-  tups <- sequence $ map (\entry ->
+  tups <- mapM (\entry ->
     case entry of
       [("id", theId), _, ("path", SqlByteString path), _, _, _, ("owner", SqlInteger owner), _, _, _, _, ("album", SqlInteger album), _, _] -> do
         let newName = takeBaseName (B.unpack path) ++ "_preview.jpg"

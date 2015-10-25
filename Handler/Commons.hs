@@ -19,7 +19,7 @@ module Handler.Commons where
 import Import
 import Data.String
 import Database.Bloodhound
-import Control.Monad (when)
+import Control.Monad (unless)
 import Network.HTTP.Client
 import Network.HTTP.Types.Status as S
 import qualified Data.ByteString.Char8 as C
@@ -96,7 +96,7 @@ putIndexES input = do
   resp <- case input of
     ESUser uId user -> do
       ex <- runBH' $ indexExists (IndexName "user")
-      when (not ex) ((\ _ -> do
+      unless ex ((\ _ -> do
         runBH' $ createIndex is (IndexName "user")
         return ()
         ) ex)
@@ -104,7 +104,7 @@ putIndexES input = do
       runBH' $ indexDocument (IndexName "user") (MappingName "user") defaultIndexDocumentSettings user (DocId $ extractKey uId)
     ESAlbum aId album -> do
       ex <- runBH' $ indexExists (IndexName "album")
-      when (not ex) ((\ _ -> do
+      unless ex ((\ _ -> do
         runBH' $ createIndex is (IndexName "album")
         return ()
         ) ex)
@@ -112,7 +112,7 @@ putIndexES input = do
       runBH' $ indexDocument (IndexName "album") (MappingName "album") defaultIndexDocumentSettings album (DocId $ extractKey aId)
     ESMedium mId medium -> do
       ex <- runBH' $ indexExists (IndexName "medium")
-      when (not ex) ((\ _ -> do
+      unless ex ((\ _ -> do
         runBH' $ createIndex is (IndexName "medium")
         return ()
         ) ex)
@@ -120,7 +120,7 @@ putIndexES input = do
       runBH' $ indexDocument (IndexName "medium") (MappingName "medium") defaultIndexDocumentSettings medium (DocId $ extractKey mId)
     ESComment cId comment -> do
       ex <- runBH' $ indexExists (IndexName "comment")
-      when (not ex) ((\ _ -> do
+      unless ex ((\ _ -> do
         runBH' $ createIndex is (IndexName "comment")
         return ()
         ) ex)

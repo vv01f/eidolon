@@ -72,7 +72,7 @@ main = do
     _ <- createIndex indexSettings (IndexName "album")
     _ <- createIndex indexSettings (IndexName "medium")
     _ <- createIndex indexSettings (IndexName "comment")
-    _ <- sequence $ map (\entry ->
+    _ <- mapM (\entry ->
       case entry of
         [("id", SqlInteger theId), ("name", SqlByteString name), ("slug", SqlByteString slug), _, _, _, _, _] -> do
            let u = SUser (decodeUtf8 name) (decodeUtf8 slug)
@@ -86,7 +86,7 @@ main = do
         bla ->
           error $ "malformed entry" ++ show bla
       ) userRows
-    _ <- sequence $ map (\entry ->
+    _ <- mapM (\entry ->
       case entry of
         [("id", SqlInteger theId), ("title", SqlByteString title), _, _, _, _, _] -> do
            let a = SAlbum (decodeUtf8 title)
@@ -100,7 +100,7 @@ main = do
         bla ->
           error $ "malformed entry: " ++ show bla
       ) albumRows
-    _ <- sequence $ map (\entry ->
+    _ <- mapM (\entry ->
       case entry of
         [("id", SqlInteger theId), ("title", SqlByteString title), _, _, _, ("time", SqlZonedTime time), _, ("description", SqlByteString desc), ("tags", SqlByteString tags), _, _, _, _, _] -> do
            let m = SMedium (decodeUtf8 title) (zonedTimeToUTC time) (decodeUtf8 desc) (parseTags tags)
@@ -114,7 +114,7 @@ main = do
         bla ->
           error $ "malformed entry" ++ show bla
       ) mediumRows
-    _ <- sequence $ map (\entry ->
+    _ <- mapM (\entry ->
       case entry of
         [("id", SqlInteger theId), _, ("author_slug", SqlByteString author), _, _, ("time", SqlZonedTime time), ("content", SqlByteString content)] -> do
            let c = SComment (decodeUtf8 author) (zonedTimeToUTC time) (decodeUtf8 content)

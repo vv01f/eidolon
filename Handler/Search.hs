@@ -32,23 +32,23 @@ getSearchR = do
   case res of
     FormSuccess query -> do
       (ru, ra, rm, rc) <- getResults query
-      a <- return $ (decode (responseBody ru) :: Maybe (SearchResult SearchUser))
-      b <- return $ (decode (responseBody ra) :: Maybe (SearchResult SearchAlbum))
-      c <- return $ (decode (responseBody rm) :: Maybe (SearchResult SearchMedium))
-      d <- return $ (decode (responseBody rc) :: Maybe (SearchResult SearchComment))
-      hitListA <- case a of
-        Just as -> return $ hits $ searchHits as
-        Nothing -> return []
-      hitListB <- case b of
-        Just bs -> return $ hits $ searchHits bs
-        Nothing -> return []
-      hitListC <- case c of
-        Just cs -> return $ hits $ searchHits cs
-        Nothing -> return []
-      hitListD <- case d of
-        Just ds -> return $ hits $ searchHits ds
-        Nothing -> return []
-      userIdList <- return $ catMaybes $ map (\h -> do
+      let a = decode (responseBody ru) :: Maybe (SearchResult SearchUser)
+      let b = decode (responseBody ra) :: Maybe (SearchResult SearchAlbum)
+      let c = decode (responseBody rm) :: Maybe (SearchResult SearchMedium)
+      let d = decode (responseBody rc) :: Maybe (SearchResult SearchComment)
+      let hitListA = case a of {
+          Just as -> hits $ searchHits as;
+          Nothing -> []}
+      let hitListB = case b of {
+          Just bs -> hits $ searchHits bs;
+          Nothing -> []}
+      let hitListC = case c of {
+          Just cs -> hits $ searchHits cs;
+          Nothing -> []}
+      let hitListD = case d of {
+          Just ds -> hits $ searchHits ds;
+          Nothing -> []}
+      userIdList <- return $ mapMaybe (\h -> do
         if
           hitIndex h == IndexName "user"
           then do
@@ -57,7 +57,7 @@ getSearchR = do
           else
             Nothing
         ) hitListA
-      albumIdList <- return $ catMaybes $ map (\h -> do
+      albumIdList <- return $ mapMaybe (\h -> do
         if
           hitIndex h == IndexName "album"
           then do
@@ -66,7 +66,7 @@ getSearchR = do
           else
             Nothing
         ) hitListB
-      mediumIdList <- return $ catMaybes $ map (\h -> do
+      mediumIdList <- return $ mapMaybe (\h -> do
         if
           hitIndex h == IndexName "medium"
           then do
@@ -75,7 +75,7 @@ getSearchR = do
           else
             Nothing
         ) hitListC
-      commentIdList <- return $ catMaybes $ map (\h -> do
+      commentIdList <- return $ mapMaybe (\h -> do
         if
           hitIndex h == IndexName "comment"
           then do
