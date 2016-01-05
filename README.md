@@ -66,30 +66,15 @@ get the source with
 git clone https://github.com/nek0/eidolon.git
 ```
 
-It's generally a good idea to create a sandbox for compiling. To do so `cd` into the project directory and invoke
+build the source with
 
 ```bash
-cabal sandbox init
-```
-
-If the sandbox generation fails, please make sure, you are using the latest version of `cabal istall`.
-
-Then install all dependencies with the following command. This may lead you into dependency hell, as I am working with very new libraries. I am trying my best to avoid this.
-
-```bash
-cabal install --only-dependencies
-```
-
-After installing all dependencies you can configure and build the software with
-
-```bash
-cabal configure
-cabal build
+stack build
 ```
 
 ##Deploying
 
-After compiling you will find an executable called `eidolon` in `dist/build/eidolon/`. Copy or link it anywhere you want. The executable needs to be accompanied by the folders `config` and `static` and their contents. It's best to copy them to your desired destination.
+After compiling you will find an executable called `eidolon` in `.stack-work/dist/<arch>/Cabal-<version>/build/eidolon/`, where `<arch>` is your system architecture and `<version>` your current cabal version. Copy or link it anywhere you want. The executable needs to be accompanied by the folders `config` and `static` and their contents. It's best to copy them to your desired destination.
 
 Also check `config/settings.yml` and set the values there accrding to your configuration. Especially the settings for elasticsearch are vital.
 
