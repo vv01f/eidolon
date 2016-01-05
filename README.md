@@ -18,12 +18,6 @@ A working Haskell capable environment. For that you will need `haskell-stack` an
 sudo apt-get install haskell-stack cabal-install
 ```
 
-Additionally you will need `postgresql` and `libpq-dev` you can install with:
-
-```bash
-sudo apt-get install postgresql libpq-dev
-```
-
 Shouldn't stack be available through your package repositories you can get it [here][stack].
 
 Now you can set up your stack with `stack setup` and follow its instructions. This will install the latest GHC Haskell compiler on your system.
@@ -47,12 +41,15 @@ Additionally to Haskell and its dependencies you will need the following softwar
 * alex
 * happy
 * libmagick++-dev
+* libpq-dev
+* postgresql
+* libmagickwand-dev
 
 which can be installed through
 
 ```bash
 cabal install alex happy
-sudo apt-get install libmagick++-dev
+sudo apt-get install libmagick++-dev libpq-dev postgresql libmagickwand-dev
 ```
 
 ####Elasticsearch dependencies
