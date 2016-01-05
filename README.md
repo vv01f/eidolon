@@ -18,6 +18,12 @@ A working Haskell capable environment. For that you will need `haskell-stack` an
 sudo apt-get install haskell-stack cabal-install
 ```
 
+Additionally you will need `postgresql` and `libpq-dev` you can install with:
+
+```bash
+sudo apt-get install postgresql libpq-dev
+```
+
 Shouldn't stack be available through your package repositories you can get it [here][stack].
 
 Now you can set up your stack with `stack setup` and follow its instructions. This will install the latest GHC Haskell compiler on your system.
