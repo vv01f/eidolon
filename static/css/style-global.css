@@ -243,6 +243,7 @@
 	{
 		display: inline-block;
 		float: right;
+		width: 250px;
 	}
 
 	.comment
