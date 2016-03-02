@@ -198,6 +198,16 @@
 
 /*custom*/
 
+	.right
+	{
+		padding-left: ;
+	}
+
+	#search
+	{
+		padding: 10px 15px;
+	}
+
 	#search > form 
 	{
 		display: flex;
@@ -224,25 +234,16 @@
 		margin-right: auto;
 	}
 
-	nav
-	{
-		padding: 1em 2em;
-	}
-
 	#user-nav
 	{
-		display: inline-block;
-	}
-
-	nav li
-	{
-		display: inline-block;
+		display: flex;
+		flex-flow: row wrap;
+		justify-content: flex-start;
 	}
 
 	#search
 	{
-		display: inline-block;
-		float: right;
+		align-self: flex-end;
 		width: 250px;
 	}
 

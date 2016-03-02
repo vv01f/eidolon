@@ -1,24 +1,25 @@
 <nav id="header">
-  <div id="top-nav">
-  <ul id="user-nav">
-    <li>
+  <ul id="user-nav" .nav .nav-pills>
+    <li role="presentation">
       <a href=@{HomeR}>Home
     $maybe su <- msu
-      Logged in as <a href=@{UserR $ getUsername su}>#{getSlug su}<br>
-      <li>
+      <li role="presentation">
+        <a href=@{UserR username}>#{slug}<br>
+      <li role="presentation">
         <a href=@{LogoutR}>Logout
-      <li>
+      <li role="presentation">
         <a href=@{NewAlbumR}>Create album
-      <li>
+      <li role="presentation">
         <a href=@{UploadR}>Upload images
     $nothing
-      <li>
+      <li role="presentation">
         <a href=@{LoginR}>Login
       $if block == False
-        <li>
+        <li role="presentation">
           <a href=@{SignupR}>Signup
-  <div #search .right>
-    ^{pageBody searchWidget}
+    <li role="presentation" #search>
+      <div #search>
+        ^{pageBody searchWidget}
 
 $maybe msg <- mmsg
   <div #message>#{msg}
