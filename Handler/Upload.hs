@@ -128,8 +128,8 @@ generateThumb path userId albumId = do
   (iWidth, tWidth, pWidth) <- liftIO $ withMagickWandGenesis $ do
     (_, w) <- magickWand
     (_, p) <- magickWand
-    readImage w (decodeString path)
-    readImage p (decodeString path)
+    readImage w (T.pack path)
+    readImage p (T.pack path)
     w1 <- getImageWidth w
     h1 <- getImageHeight w
     let h2 = 230
@@ -144,8 +144,8 @@ generateThumb path userId albumId = do
     resizeImage p w3 h3 lanczosFilter 1
     setImageCompressionQuality w 95
     setImageCompressionQuality p 95
-    writeImage w (Just (decodeString newPath))
-    writeImage p (Just (decodeString prevPath))
+    writeImage w (Just (T.pack newPath))
+    writeImage p (Just (T.pack prevPath))
     return (w1, w2, w3)
   return (newPath, prevPath, iWidth, tWidth, pWidth)
 

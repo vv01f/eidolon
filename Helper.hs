@@ -194,7 +194,7 @@ getThumbWidth path
   | path == Nothing = pure 230
   | otherwise       = liftIO $ withMagickWandGenesis $ do
                         (_, w) <- magickWand
-                        readImage w (decodeString $ fromJust path)
+                        readImage w (T.pack $ fromJust path)
                         getImageWidth w
 
 multiFileField :: (Monad m, RenderMessage (HandlerSite m) FormMessage) => Field m [FileInfo]

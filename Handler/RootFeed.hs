@@ -190,11 +190,10 @@ mediumToEntry ent = do
     , feedEntryUpdated = mediumTime (entityVal ent)
     , feedEntryTitle = mediumTitle (entityVal ent)
     , feedEntryContent = toHtml (fromMaybe (Textarea "") $ mediumDescription $ entityVal ent)
-    , feedEntryEnclosure = Just
-        ( StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumPreview $ entityVal ent) []
-        , size
-        , "image/jpeg"
-        )
+    , feedEntryEnclosure = Just $ EntryEnclosure
+        (StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumPreview $ entityVal ent) [])
+        size
+        "image/jpeg"
     }
 
 getSize :: FilePath -> IO Int
