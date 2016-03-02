@@ -12,7 +12,8 @@ Visit the test instance at [eidolon.nek0.eu][eidolon]
 
 ####Build dependencies
 
-A working Haskell capable environment. For that you will need `haskell-stack` and `cabal-install`, which you can install with:
+A working Haskell capable environment. For that you will need `haskell-stack` and `cabal-install`, which
+you can install with:
 
 ```bash
 sudo apt-get install haskell-stack cabal-install
@@ -20,7 +21,8 @@ sudo apt-get install haskell-stack cabal-install
 
 Shouldn't stack be available through your package repositories you can get it [here][stack].
 
-Now you can set up your stack with `stack setup` and follow its instructions. This will install the latest GHC Haskell compiler on your system.
+Now you can set up your stack with `stack setup` and follow its instructions. This will install the
+latest GHC Haskell compiler on your system.
 
 update your package list with
 
@@ -54,7 +56,8 @@ sudo apt-get install libmagick++-dev libpq-dev postgresql libmagickwand-dev
 
 ####Elasticsearch dependencies
 
-Since version 0.0.5 there is an Elasticsearch integration for Eidolon. To Be able to run eidolon , you need to install `elasticsearch` additionally with:
+Since version 0.0.5 there is an Elasticsearch integration for Eidolon. To Be able to run eidolon , you
+need to install `elasticsearch` additionally with:
 
 ```bash
 sudo apt-get install elasticsearch
@@ -77,21 +80,31 @@ stack build
 
 ##Deploying
 
-After compiling you will find an executable called `eidolon` in `.stack-work/dist/<arch>/Cabal-<version>/build/eidolon/`, where `<arch>` is your system architecture and `<version>` your current cabal version. Copy or link it anywhere you want. The executable needs to be accompanied by the folders `config` and `static` and their contents. It's best to copy them to your desired destination.
+After compiling you will find an executable called `eidolon` in
+`.stack-work/dist/<arch>/Cabal-<version>/build/eidolon/`, where `<arch>` is your system architecture and
+`<version>` your current cabal version. Copy or link it anywhere you want. The executable needs to be
+accompanied by the folders `config` and `static` and their contents. It's best to copy them to your
+desired destination.
 
-Also check `config/settings.yml` and set the values there accrding to your configuration. Especially the settings for elasticsearch are vital.
+Also check `config/settings.yml` and set the values there accrding to your configuration. Especially the
+settings for elasticsearch are vital.
 
-It may also be necessery to create a reverse proxy to your gallery. I would recommend using [nginx](http://nginx.org/).
+It may also be necessery to create a reverse proxy to your gallery. I would recommend using
+[nginx](http://nginx.org/).
 
 ##Customizing
 
-Unfortunately the gallery is not highly customizable, but you can change most of its appearance by changing the files `static/css/static-*.css`. Especially the default background image can be changed by replacing `static/css/img/bg.jpg`.
+Unfortunately the gallery is not highly customizable, but you can change most of its appearance by
+changing the files `static/css/style-*.css`. Especially the default background image can be changed by
+replacing `static/css/img/bg.jpg`.
 
 ##Starting
 
-You can start the gallery now by running the executable. You need to provide a settings file, normally found in `config/settings.yml`
+You can start the gallery now by running the executable. You need to provide a settings file, normally
+found in `config/settings.yml`
 
-Since eidolon will block your console, I recommend wrapping a init-script around it. how you can do that is written in my [blog](http://nek0.eu/posts/2014-10-23-Daemonize-a-yesod-app.html).
+Since eidolon will block your console, I recommend wrapping a init-script around it. how you can do that
+is written in my [blog](http://nek0.eu/posts/2014-10-23-Daemonize-a-yesod-app.html).
 
 ##Migrations
 
@@ -99,7 +112,9 @@ Since eidolon will block your console, I recommend wrapping a init-script around
 
 * do not start or restart your eidolon service before migration
 * run migration script from your run location (where your `static` folder with all the images is located)
-	* if you are building in a sandbox run `runghc -package-db/full/path/to/sandbox/XXX-ghc-version-packages.conf.d /path/to/eidolon/Migrations/0.0.3-0.0.4/Migration.hs`
+	* if you are building in a sandbox run
+`runghc -package-db/full/path/to/sandbox/XXX-ghc-version-packages.conf.d
+/path/to/eidolon/Migrations/0.0.3-0.0.4/Migration.hs`
 		* Note: No space between the option `-package-db` and its argument
 	* without sandbox: `runghc /path/to/eidolon/Migrations/0.0.3-0.0.4/Migration.hs`
 * start or restart your eidolon service
@@ -107,14 +122,17 @@ Since eidolon will block your console, I recommend wrapping a init-script around
 ###0.0.4-0.0.5
 
 * run migration script from your run location (where your `static` folder with all the images is located)
-	* if you are building in a sandbox run `runghc -package-db/full/path/to/sandbox/XXX-ghc-version-packages.conf.d /path/to/eidolon/Migrations/0.0.4-0.0.5/Migration.hs`
+	* if you are building in a sandbox run `runghc
+-package-db/full/path/to/sandbox/XXX-ghc-version-packages.conf.d
+/path/to/eidolon/Migrations/0.0.4-0.0.5/Migration.hs`
 		* Note: No space between the option `-package-db` and its argument
 	* without sandbox: `runghc /path/to/eidolon/Migrations/0.0.4-0.0.5/Migration.hs`
 * start or restart your eidolon service
 
 ##Acknowledgements:
 
-* This software uses the web Framework "Yesod" by Michael Snoyman. See more at: <http://www.yesodweb.com/>
+* This software uses the web Framework "Yesod" by Michael Snoyman. See more at:
+<http://www.yesodweb.com/>
 
 * This software uses parts of the template "Parallelism" by n33co. see more at: <http://html5up.net/>
 
