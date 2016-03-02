@@ -41,24 +41,6 @@ import Network.HTTP.Client
 import Network.HTTP.Types.Status as S
 import Control.Monad (when)
 
-getUsername :: Maybe T.Text -> Handler (Maybe T.Text)
-getUsername mtid =
-  getSkel mtid userName
-
-getSlug :: Maybe T.Text -> Handler (Maybe T.Text)
-getSlug mtid =
-  getSkel mtid userSlug
-
-getSkel :: Maybe T.Text -> (User -> a) -> Handler (Maybe a)
-getSkel mtid fun =
-  case mtid of
-    Just tid -> do
-      let uId = getUserIdFromText tid
-      user <- runDB $ getJust uId
-      return $ Just $ fun user
-    Nothing ->
-      return Nothing
-
 getUserIdFromText :: T.Text -> UserId
 getUserIdFromText tempUserId =
   case key of

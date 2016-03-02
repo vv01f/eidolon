@@ -69,20 +69,20 @@ renderLayout widget = do
     route <- getCurrentRoute
     mmsg <- getMessage
     msu <- lookupSession "userId"
-    -- username <- case msu of
-    --   Just a -> do
-    --     let uId = getUserIdFromText a
-    --     user <- runDB $ getJust uId
-    --     return $ userName user
-    --   Nothing ->
-    --     return ("" :: T.Text)
-    -- slug <- case msu of
-    --   Just a -> do
-    --     let uId = getUserIdFromText a
-    --     user <- runDB $ getJust uId
-    --     return $ userSlug user
-    --   Nothing ->
-    --     return ("" :: T.Text)
+    username <- case msu of
+      Just a -> do
+        let uId = getUserIdFromText a
+        user <- runDB $ getJust uId
+        return $ userName user
+      Nothing ->
+        return ("" :: T.Text)
+    slug <- case msu of
+      Just a -> do
+        let uId = getUserIdFromText a
+        user <- runDB $ getJust uId
+        return $ userSlug user
+      Nothing ->
+        return ("" :: T.Text)
     let block = appSignupBlocked $ appSettings master
 
     -- We break up the default layout into two components:
