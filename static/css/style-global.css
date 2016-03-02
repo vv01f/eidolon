@@ -205,7 +205,7 @@
 
 	#search
 	{
-		padding: 10px 15px;
+		padding: 10px 15px !important;
 	}
 
 	#search > form 
@@ -239,12 +239,6 @@
 		display: flex;
 		flex-flow: row wrap;
 		justify-content: flex-start;
-	}
-
-	#search
-	{
-		align-self: flex-end;
-		width: 250px;
 	}
 
 	.comment

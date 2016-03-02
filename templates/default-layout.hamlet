@@ -1,25 +1,26 @@
 <nav id="header">
-  <ul id="user-nav" .nav .nav-pills>
-    <li role="presentation">
-      <a href=@{HomeR}>Home
-    $maybe su <- msu
-      <li role="presentation">
-        <a href=@{UserR username}>#{slug}<br>
-      <li role="presentation">
-        <a href=@{LogoutR}>Logout
-      <li role="presentation">
-        <a href=@{NewAlbumR}>Create album
-      <li role="presentation">
-        <a href=@{UploadR}>Upload images
-    $nothing
-      <li role="presentation">
-        <a href=@{LoginR}>Login
-      $if block == False
+  <div .row>
+    <div .col-md-9>
+      <ul id="user-nav" .nav .nav-pills>
         <li role="presentation">
-          <a href=@{SignupR}>Signup
-    <li role="presentation" #search>
-      <div #search>
-        ^{pageBody searchWidget}
+          <a href=@{HomeR}>Home
+        $maybe su <- msu
+          <li role="presentation">
+            <a href=@{UserR username}>#{slug}<br>
+          <li role="presentation">
+            <a href=@{LogoutR}>Logout
+          <li role="presentation">
+            <a href=@{NewAlbumR}>Create album
+          <li role="presentation">
+            <a href=@{UploadR}>Upload images
+        $nothing
+          <li role="presentation">
+            <a href=@{LoginR}>Login
+          $if block == False
+            <li role="presentation">
+              <a href=@{SignupR}>Signup
+    <div .col-md-3 #search>
+      ^{pageBody searchWidget}
 
 $maybe msg <- mmsg
   <div #message>#{msg}
