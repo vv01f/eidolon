@@ -169,6 +169,7 @@ getAdminProfileDeleteR ownerId = do
               medium <- runDB $ getJust med
               liftIO $ removeFile (normalise $ L.tail $ mediumPath medium)
               liftIO $ removeFile (normalise $ L.tail $ mediumThumb medium)
+              liftIO $ removeFile (normalise $ L.tail $ mediumPreview medium)
               -- delete medium database entry and search
               ium <- runDB $ getJust med
               deleteIndexES $ ESMedium med ium

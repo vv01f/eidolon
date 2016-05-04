@@ -112,6 +112,7 @@ postMediumDeleteR mediumId = do
           runDB $ update albumId [AlbumContent =. newMediaList]
           liftIO $ removeFile (normalise $ tail $ mediumPath medium)
           liftIO $ removeFile (normalise $ tail $ mediumThumb medium)
+          liftIO $ removeFile (normalise $ tail $ mediumPreview medium)
           runDB $ delete mediumId
           -- delete form elasticsearch
           deleteIndexES (ESMedium mediumId medium)

@@ -136,6 +136,7 @@ getAdminMediumDeleteR mediumId = do
           -- delete files
           liftIO $ removeFile (normalise $ tail $ mediumPath medium)
           liftIO $ removeFile (normalise $ tail $ mediumThumb medium)
+          liftIO $ removeFile (normalise $ tail $ mediumPreview medium)
           -- outro
           setMessage "Medium deleted successfully"
           redirect AdminR

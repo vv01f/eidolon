@@ -64,6 +64,7 @@ postProfileDeleteR userId = do
                 medium <- runDB $ getJust med
                 liftIO $ removeFile (normalise $ L.tail $ mediumPath medium)
                 liftIO $ removeFile (normalise $ L.tail $ mediumThumb medium)
+                liftIO $ removeFile (normalise $ L.tail $ mediumPreview medium)
                 deleteIndexES (ESMedium med medium)
                 runDB $ delete med
                 ) mediaList

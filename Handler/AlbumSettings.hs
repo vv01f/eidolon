@@ -198,6 +198,7 @@ postAlbumDeleteR albumId = do
                     medium <- runDB $ getJust a
                     liftIO $ removeFile (normalise $ L.tail $ mediumPath medium)
                     liftIO $ removeFile (normalise $ L.tail $ mediumThumb medium)
+                    liftIO $ removeFile (normalise $ L.tail $ mediumPreview medium)
                     -- delete medium from elasticsearch
                     deleteIndexES (ESMedium a medium)
                     -- delete comments
