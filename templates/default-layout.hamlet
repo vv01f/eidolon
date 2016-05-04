@@ -1,24 +1,36 @@
 <nav id="header">
   <div .row>
     <div .col-md-9>
-      <ul id="user-nav" .nav .nav-pills>
+      <ul #user-nav .nav .nav-pills>
         <li role="presentation">
-          <a href=@{HomeR}>Home
+          <a href=@{HomeR}>
+            Home
         $maybe su <- msu
-          <li role="presentation">
-            <a href=@{UserR username}>#{slug}<br>
-          <li role="presentation">
-            <a href=@{LogoutR}>Logout
-          <li role="presentation">
-            <a href=@{NewAlbumR}>Create album
-          <li role="presentation">
-            <a href=@{UploadR}>Upload images
+          <li .dropdown role="presentation">
+            <a .dropdown-toggle data-toggle="dropdown" role="button"
+              aria-haspopup="true" aria-expanded="false">
+                #{slug} <span class="caret"></span>
+            <ul .dropdown-menu>
+              <li>
+                <a href=@{UserR username}>
+                  Your Profile
+              <li >
+                <a href=@{NewAlbumR}>
+                  Create album
+              <li >
+                <a href=@{UploadR}>
+                  Upload images
+              <li >
+                <a href=@{LogoutR}>
+                  Logout
         $nothing
           <li role="presentation">
-            <a href=@{LoginR}>Login
+            <a href=@{LoginR}>
+              Login
           $if block == False
             <li role="presentation">
-              <a href=@{SignupR}>Signup
+              <a href=@{SignupR}>
+                Signup
     <div .col-md-3 #search>
       ^{pageBody searchWidget}
 
