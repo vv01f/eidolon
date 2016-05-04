@@ -1,5 +1,5 @@
 name:                eidolon
-version:             0.0.5
+version:             0.0.6
 synopsis:            Image gallery in Yesod
 homepage:            https://eidolon.nek0.eu
 license:             AGPL-3
@@ -117,6 +117,7 @@ library
                  , unix                          >= 2.7
                  , bloodhound                    >= 0.8
                  , http-types
+                 , image-type
                  -- for Migrations
                  , HDBC
                  , HDBC-postgresql

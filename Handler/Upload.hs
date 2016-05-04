@@ -23,9 +23,11 @@ import Data.Maybe
 import qualified Data.Text as T
 import Data.List as L
 import qualified System.FilePath as FP
+import System.Directory
 import Filesystem.Path.CurrentOS
 import Graphics.ImageMagick.MagickWand
 import Text.Blaze.Internal
+import Codec.ImageType
 
 getDirectUploadR :: AlbumId -> Handler Html
 getDirectUploadR albumId = do
@@ -76,22 +78,27 @@ postDirectUploadR albumId = do
                   errNames <- mapM
                     (\(index, file) -> do
                       let mime = fileContentType file
-                      if
-                        mime `elem` acceptedTypes
+                      if mime `elem` acceptedTypes
                         then do
                           path <- writeOnDrive file ownerId albumId
-                          (thumbPath, prevPath, iWidth, tWidth, pWidth) <- generateThumb path ownerId albumId
-                          tempName <- if
-                            length indFils == 1
-                            then return $ fileBulkPrefix temp
-                            else return (fileBulkPrefix temp `T.append` " " `T.append` T.pack (show (index :: Int)) `T.append` " of " `T.append` T.pack (show (length indFils)))
-                          let medium = Medium tempName ('/' : path) ('/' : thumbPath) mime (fileBulkTime temp) (fileBulkOwner temp) (fileBulkDesc temp) (fileBulkTags temp) iWidth tWidth albumId ('/' : prevPath) pWidth
-                          mId <- runDB $ I.insert medium
-                          inALbum <- runDB $ getJust albumId
-                          let newMediaList = mId : albumContent inALbum
-                          runDB $ update albumId [AlbumContent =. newMediaList]
-                          putIndexES (ESMedium mId medium)
-                          return Nothing
+                          isOk <- liftIO $ checkCVE_2016_3714 path mime
+                          if isOk
+                            then do
+                              (thumbPath, prevPath, iWidth, tWidth, pWidth) <- generateThumb path ownerId albumId
+                              tempName <- if
+                                length indFils == 1
+                                then return $ fileBulkPrefix temp
+                                else return (fileBulkPrefix temp `T.append` " " `T.append` T.pack (show (index :: Int)) `T.append` " of " `T.append` T.pack (show (length indFils)))
+                              let medium = Medium tempName ('/' : path) ('/' : thumbPath) mime (fileBulkTime temp) (fileBulkOwner temp) (fileBulkDesc temp) (fileBulkTags temp) iWidth tWidth albumId ('/' : prevPath) pWidth
+                              mId <- runDB $ I.insert medium
+                              inALbum <- runDB $ getJust albumId
+                              let newMediaList = mId : albumContent inALbum
+                              runDB $ update albumId [AlbumContent =. newMediaList]
+                              putIndexES (ESMedium mId medium)
+                              return Nothing
+                          else do
+                            liftIO $ removeFile (FP.normalise path)
+                            return $ Just $ fileName file
                         else
                           return $ Just $ fileName file
                       ) indFils
@@ -119,7 +126,11 @@ postDirectUploadR albumId = do
       setMessage "This Album does not exist"
       redirect $ AlbumR albumId
 
-generateThumb :: FP.FilePath -> UserId -> AlbumId -> Handler (FP.FilePath, FP.FilePath, Int, Int, Int)
+generateThumb
+  :: FP.FilePath
+  -> UserId
+  -> AlbumId
+  -> Handler (FP.FilePath, FP.FilePath, Int, Int, Int)
 generateThumb path userId albumId = do
   let newName = FP.takeBaseName path ++ "_thumb.jpg"
   let newPath = "static" FP.</> "data" FP.</> T.unpack (extractKey userId) FP.</> T.unpack (extractKey albumId) FP.</> newName
@@ -148,6 +159,21 @@ generateThumb path userId albumId = do
     writeImage p (Just (T.pack prevPath))
     return (w1, w2, w3)
   return (newPath, prevPath, iWidth, tWidth, pWidth)
+
+checkCVE_2016_3714 :: FP.FilePath -> Text -> IO Bool
+checkCVE_2016_3714 p m =
+  case m of
+    "image/jpeg"     -> isJpeg p
+    "image/jpg"      -> isJpeg p
+    "image/png"      -> isPng p
+    "image/x-ms-bmp" -> isBmp p
+    "image/x-bmp"    -> isBmp p
+    "image/bmp"      -> isBmp p
+    "image/tiff"     -> isTiff p
+    "image/tiff-fx"  -> isTiff p
+    "image/svg+xml"  -> return True -- TODO: have to check XML for that.
+    "image/gif"      -> isGif p
+    _                -> return False
 
 writeOnDrive :: FileInfo -> UserId -> AlbumId -> Handler FP.FilePath
 writeOnDrive fil userId albumId = do
@@ -238,25 +264,30 @@ postUploadR = do
           errNames <- mapM
             (\(index, file) -> do
               let mime = fileContentType file
-              if
-                mime `elem` acceptedTypes
+              if mime `elem` acceptedTypes
                 then do
                   let inAlbumId = fileBulkAlbum temp
                   albRef <- runDB $ getJust inAlbumId
                   let ownerId = albumOwner albRef
                   path <- writeOnDrive file ownerId inAlbumId
-                  (thumbPath, prevPath, iWidth, tWidth, pWidth) <- generateThumb path ownerId inAlbumId
-                  tempName <- if
-                    length indFils == 1
-                    then return $ fileBulkPrefix temp
-                    else return (fileBulkPrefix temp `T.append` " " `T.append` T.pack (show (index :: Int)) `T.append` " of " `T.append` T.pack (show (length indFils)))
-                  let medium = Medium tempName ('/' : path) ('/' : thumbPath) mime (fileBulkTime temp) (fileBulkOwner temp) (fileBulkDesc temp) (fileBulkTags temp) iWidth tWidth inAlbumId ('/' : prevPath) pWidth
-                  mId <- runDB $ I.insert medium
-                  inALbum <- runDB $ getJust inAlbumId
-                  let newMediaList = mId : albumContent inALbum
-                  runDB $ update inAlbumId [AlbumContent =. newMediaList]
-                  putIndexES (ESMedium mId medium)
-                  return Nothing
+                  isOk <- liftIO $ checkCVE_2016_3714 path mime
+                  if isOk
+                    then do
+                      (thumbPath, prevPath, iWidth, tWidth, pWidth) <- generateThumb path ownerId inAlbumId
+                      tempName <- if
+                        length indFils == 1
+                        then return $ fileBulkPrefix temp
+                        else return (fileBulkPrefix temp `T.append` " " `T.append` T.pack (show (index :: Int)) `T.append` " of " `T.append` T.pack (show (length indFils)))
+                      let medium = Medium tempName ('/' : path) ('/' : thumbPath) mime (fileBulkTime temp) (fileBulkOwner temp) (fileBulkDesc temp) (fileBulkTags temp) iWidth tWidth inAlbumId ('/' : prevPath) pWidth
+                      mId <- runDB $ I.insert medium
+                      inALbum <- runDB $ getJust inAlbumId
+                      let newMediaList = mId : albumContent inALbum
+                      runDB $ update inAlbumId [AlbumContent =. newMediaList]
+                      putIndexES (ESMedium mId medium)
+                      return Nothing
+                    else do
+                      liftIO $ removeFile (FP.normalise path)
+                      return $ Just $ fileName file
                 else
                   return $ Just $ fileName file
               ) indFils
