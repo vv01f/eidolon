@@ -24,10 +24,11 @@ import qualified Data.Text as T
 import Data.List as L
 import qualified System.FilePath as FP
 import System.Directory
-import Filesystem.Path.CurrentOS
-import Graphics.ImageMagick.MagickWand
 import Text.Blaze.Internal
 import Codec.ImageType
+import Codec.Picture
+import Codec.Picture.Metadata as PM
+import Codec.Picture.ScaleDCT
 
 getDirectUploadR :: AlbumId -> Handler Html
 getDirectUploadR albumId = do
@@ -84,12 +85,11 @@ postDirectUploadR albumId = do
                           isOk <- liftIO $ checkCVE_2016_3714 path mime
                           if isOk
                             then do
-                              (thumbPath, prevPath, iWidth, tWidth, pWidth) <- generateThumb path ownerId albumId
-                              tempName <- if
-                                length indFils == 1
+                              meta <- generateThumbs path ownerId albumId
+                              tempName <- if length indFils == 1
                                 then return $ fileBulkPrefix temp
                                 else return (fileBulkPrefix temp `T.append` " " `T.append` T.pack (show (index :: Int)) `T.append` " of " `T.append` T.pack (show (length indFils)))
-                              let medium = Medium tempName ('/' : path) ('/' : thumbPath) mime (fileBulkTime temp) (fileBulkOwner temp) (fileBulkDesc temp) (fileBulkTags temp) iWidth tWidth albumId ('/' : prevPath) pWidth
+                              let medium = Medium tempName ('/' : path) ('/' : metaThumbPath meta) mime (fileBulkTime temp) (fileBulkOwner temp) (fileBulkDesc temp) (fileBulkTags temp) (metaImageWidth meta) (metaThumbWidth meta) albumId ('/' : metaPreviewPath meta) (metaPreviewWidth meta)
                               mId <- runDB $ I.insert medium
                               inALbum <- runDB $ getJust albumId
                               let newMediaList = mId : albumContent inALbum
@@ -126,39 +126,50 @@ postDirectUploadR albumId = do
       setMessage "This Album does not exist"
       redirect $ AlbumR albumId
 
-generateThumb
-  :: FP.FilePath
-  -> UserId
-  -> AlbumId
-  -> Handler (FP.FilePath, FP.FilePath, Int, Int, Int)
-generateThumb path userId albumId = do
-  let newName = FP.takeBaseName path ++ "_thumb.jpg"
-  let newPath = "static" FP.</> "data" FP.</> T.unpack (extractKey userId) FP.</> T.unpack (extractKey albumId) FP.</> newName
-  let prevName = FP.takeBaseName path ++ "_preview.jpg"
-  let prevPath = "static" FP.</> "data" FP.</> T.unpack (extractKey userId) FP.</> T.unpack (extractKey albumId) FP.</> prevName
-  (iWidth, tWidth, pWidth) <- liftIO $ withMagickWandGenesis $ do
-    (_, w) <- magickWand
-    (_, p) <- magickWand
-    readImage w (T.pack path)
-    readImage p (T.pack path)
-    w1 <- getImageWidth w
-    h1 <- getImageHeight w
-    let h2 = 230
-    let w2 = floor (fromIntegral w1 / fromIntegral h1 * fromIntegral h2 :: Double)
-    let w3 = 1380
-    let h3 = floor (fromIntegral h1 / fromIntegral w1 * fromIntegral w3 :: Double)
-    setImageAlphaChannel w deactivateAlphaChannel
-    setImageAlphaChannel p deactivateAlphaChannel
-    setImageFormat w "jpeg"
-    setImageFormat p "jpeg"
-    resizeImage w w2 h2 lanczosFilter 1
-    resizeImage p w3 h3 lanczosFilter 1
-    setImageCompressionQuality w 95
-    setImageCompressionQuality p 95
-    writeImage w (Just (T.pack newPath))
-    writeImage p (Just (T.pack prevPath))
-    return (w1, w2, w3)
-  return (newPath, prevPath, iWidth, tWidth, pWidth)
+-- | Type to pass metadata about imgaes around.
+data ThumbsMeta = ThumbsMeta
+  { metaThumbPath    :: FP.FilePath -- ^ Filepath of the new thumbnail image
+  , metaPreviewPath  :: FP.FilePath -- ^ Filepath of the new preview image
+  , metaImageWidth   :: Int         -- ^ Width of the original image
+  , metaThumbWidth   :: Int         -- ^ Width of the generated thumbnail image
+  , metaPreviewWidth :: Int         -- ^ Width of the generated preview image
+  }
+
+-- | generate thumbnail and preview images from uploaded image
+generateThumbs
+  :: FP.FilePath        -- ^ Path to original image
+  -> UserId             -- ^ Uploading user
+  -> AlbumId            -- ^ Destination album
+  -> Handler ThumbsMeta -- ^ Resulting metadata to store
+generateThumbs path uId aId = do
+  eimg <- liftIO $ readImageWithMetadata path
+  case eimg of
+    Left e -> error e
+    Right (orig, meta) -> do
+      let thumbName = FP.takeBaseName path ++ "_thumb.jpg"
+          prevName = FP.takeBaseName path ++ "_preview.jpg"
+          pathPrefix = "static" FP.</> "data" FP.</> T.unpack (extractKey uId) FP.</> T.unpack (extractKey aId)
+          tPath = pathPrefix FP.</> thumbName
+          pPath = pathPrefix FP.</> prevName
+          origPix = convertRGBA8 orig
+          oWidth = fromIntegral $ fromJust $ PM.lookup Width meta :: Int
+          oHeight = fromIntegral $ fromJust $ PM.lookup Height meta :: Int
+          tWidth = floor (fromIntegral oWidth / fromIntegral oHeight * fromIntegral tHeight :: Double)
+          tHeight = 230 :: Int
+          pWidth = 1380 :: Int
+          pScale = (fromIntegral pWidth :: Double) / (fromIntegral oWidth :: Double)
+          pHeight = floor (fromIntegral oHeight * pScale)
+          tPix = scale (tWidth, tHeight) origPix
+          pPix = scale (pWidth, pHeight) origPix
+      liftIO $ saveJpgImage 95 tPath $ ImageRGBA8 tPix
+      liftIO $ saveJpgImage 95 pPath $ ImageRGBA8 pPix
+      return $ ThumbsMeta
+        { metaThumbPath    = tPath
+        , metaPreviewPath  = pPath
+        , metaImageWidth   = oWidth
+        , metaThumbWidth   = tWidth
+        , metaPreviewWidth = pWidth
+        }
 
 checkCVE_2016_3714 :: FP.FilePath -> Text -> IO Bool
 checkCVE_2016_3714 p m =
@@ -273,12 +284,18 @@ postUploadR = do
                   isOk <- liftIO $ checkCVE_2016_3714 path mime
                   if isOk
                     then do
-                      (thumbPath, prevPath, iWidth, tWidth, pWidth) <- generateThumb path ownerId inAlbumId
+                      meta <- generateThumbs path ownerId inAlbumId
                       tempName <- if
                         length indFils == 1
                         then return $ fileBulkPrefix temp
-                        else return (fileBulkPrefix temp `T.append` " " `T.append` T.pack (show (index :: Int)) `T.append` " of " `T.append` T.pack (show (length indFils)))
-                      let medium = Medium tempName ('/' : path) ('/' : thumbPath) mime (fileBulkTime temp) (fileBulkOwner temp) (fileBulkDesc temp) (fileBulkTags temp) iWidth tWidth inAlbumId ('/' : prevPath) pWidth
+                        else
+                          return
+                            (fileBulkPrefix temp `T.append`
+                            " " `T.append`
+                            T.pack (show (index :: Int)) `T.append`
+                            " of " `T.append`
+                            T.pack (show (length indFils)))
+                      let medium = Medium tempName ('/' : path) ('/' : metaThumbPath meta) mime (fileBulkTime temp) (fileBulkOwner temp) (fileBulkDesc temp) (fileBulkTags temp) (metaImageWidth meta) (metaThumbWidth meta) inAlbumId ('/' : metaPreviewPath meta) (metaPreviewWidth meta)
                       mId <- runDB $ I.insert medium
                       inALbum <- runDB $ getJust inAlbumId
                       let newMediaList = mId : albumContent inALbum

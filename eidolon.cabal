@@ -118,6 +118,8 @@ library
                  , bloodhound                    >= 0.8
                  , http-types
                  , image-type
+                 , JuicyPixels                   >= 3.2.7
+                 , JuicyPixels-scale-dct
                  -- for Migrations
                  , HDBC
                  , HDBC-postgresql
