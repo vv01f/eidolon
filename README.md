@@ -44,6 +44,7 @@ Additionally to Haskell and its dependencies you will need the following softwar
 * happy
 * libpq-dev
 * postgresql
+* libfftw3-dev
 
 which can be installed through
 
