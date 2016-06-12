@@ -101,7 +101,7 @@
 	#header
 	{
 		padding: 2em 3em;
-		xmin-height: 212px;
+		min-height: 212px;
 		vertical-align: middle;
 	}
 
