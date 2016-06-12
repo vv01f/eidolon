@@ -2,15 +2,14 @@
   <div .row>
     <div .col-md-9>
       <ul #user-nav .nav .nav-pills>
-        <li role="presentation">
+        <li>
           <a href=@{HomeR}>
             Home
         $maybe su <- msu
-          <li .dropdown role="presentation">
-            <a .dropdown-toggle data-toggle="dropdown" role="button"
-              aria-haspopup="true" aria-expanded="false">
-                #{slug} <span class="caret"></span>
-            <ul .dropdown-menu>
+          <li>
+            <a>
+              #{slug} <span class="caret"></span>
+            <ul>
               <li>
                 <a href=@{UserR username}>
                   Your Profile
@@ -24,11 +23,11 @@
                 <a href=@{LogoutR}>
                   Logout
         $nothing
-          <li role="presentation">
+          <li>
             <a href=@{LoginR}>
               Login
           $if block == False
-            <li role="presentation">
+            <li>
               <a href=@{SignupR}>
                 Signup
     <div .col-md-3 #search>
