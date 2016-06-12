@@ -1,14 +1,50 @@
-.nav {
+#user-nav {
 	list-style: none;
 	font-weight: bold;
 	margin-bottom: 10px;
+	position: relative;
 	z-index: 5;
 }
 
-.nav ul {
+#user-nav ul {
 	display: none;
+	position: absolute;
 }
 
-.nav li:hover ul {
-	display: inline-block;
+#user-nav li {
+	margin-right: 20px;
+}
+
+#user-nav li a {
+	padding: 10px 20px 10px;
+	border-radius: 5px;
+	background-color: white;
+}
+
+#user-nav input[type="checkbox"]:checked + ul {
+	display: block;
+	background-color: white;
+	border-radius: 5px;
+}
+
+#user-nav a {
+	display: block;
+	text-decoration: none;
+	color: #d64760;
+}
+
+#user-nav a:hover {
+	color: black;
+	transition-timing-function: linear
+	transition-duration: 0.25s;
+}
+
+#user-nav label {
+	margin: 0;
+}
+
+.vanish {
+	/*position: absolute;
+	left: -9999px;*/
+	display: none;
 }

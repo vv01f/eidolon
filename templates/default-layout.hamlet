@@ -1,25 +1,27 @@
 <nav id="header">
   <div .row>
     <div .col-md-9>
-      <ul #user-nav .nav .nav-pills>
+      <ul #user-nav>
         <li>
           <a href=@{HomeR}>
             Home
         $maybe su <- msu
           <li>
-            <a>
-              #{slug} <span class="caret"></span>
+            <label for="cb1">
+              <a>
+                #{slug}<span class="caret"></span>
+            <input type="checkbox" #cb1 .vanish aria-hidden="true">
             <ul>
               <li>
                 <a href=@{UserR username}>
                   Your Profile
-              <li >
+              <li>
                 <a href=@{NewAlbumR}>
                   Create album
-              <li >
+              <li>
                 <a href=@{UploadR}>
                   Upload images
-              <li >
+              <li>
                 <a href=@{LogoutR}>
                   Logout
         $nothing
