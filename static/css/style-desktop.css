@@ -159,7 +159,7 @@
 		#footer .left
 		{
 			display: inline-block;
-			padding: 2em;
+			padding: 1ex 2.5ex 2.5ex;
 			text-align: left;
 			float: left;
 		}
@@ -173,7 +173,7 @@
 			*/
 			float: right;
 			display:inline-block;
-			padding: 2em;
+			padding: 1ex 2.5ex 2.5ex;
 			text-align: right;
 		}
 
