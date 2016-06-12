@@ -1,24 +1,37 @@
 <nav id="header">
   <div .row>
     <div .col-md-9>
-      <ul id="user-nav" .nav .nav-pills>
-        <li role="presentation">
-          <a href=@{HomeR}>Home
+      <ul #user-nav>
+        <li>
+          <a href=@{HomeR}>
+            Home
         $maybe su <- msu
-          <li role="presentation">
-            <a href=@{UserR username}>#{slug}<br>
-          <li role="presentation">
-            <a href=@{LogoutR}>Logout
-          <li role="presentation">
-            <a href=@{NewAlbumR}>Create album
-          <li role="presentation">
-            <a href=@{UploadR}>Upload images
+          <li>
+            <label for="cb1">
+              <a>
+                #{slug}<span class="caret"></span>
+            <input type="checkbox" #cb1 .vanish aria-hidden="true">
+            <ul>
+              <li>
+                <a href=@{UserR username}>
+                  Your Profile
+              <li>
+                <a href=@{NewAlbumR}>
+                  Create album
+              <li>
+                <a href=@{UploadR}>
+                  Upload images
+              <li>
+                <a href=@{LogoutR}>
+                  Logout
         $nothing
-          <li role="presentation">
-            <a href=@{LoginR}>Login
+          <li>
+            <a href=@{LoginR}>
+              Login
           $if block == False
-            <li role="presentation">
-              <a href=@{SignupR}>Signup
+            <li>
+              <a href=@{SignupR}>
+                Signup
     <div .col-md-3 #search>
       ^{pageBody searchWidget}
 

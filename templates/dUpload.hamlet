@@ -1,5 +1,4 @@
 <div id="header" class="item" data-width="400">
   <form class="inner" method=post enctype=#{enctype}>
-    <h1>Image upload to album #{albumTitle album}
-    <p>Here you can upload your image.
+    Image upload to album #{albumTitle album}
     ^{dUploadWidget}
