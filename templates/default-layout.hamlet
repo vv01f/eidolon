@@ -1,4 +1,4 @@
-<nav id="header">
+<nav>
   <div .row>
     <div .col-md-9>
       <ul #user-nav>

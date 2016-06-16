@@ -205,7 +205,7 @@
 
 	#search
 	{
-		padding: 10px 15px !important;
+		padding: 10px 15px 0 !important;
 	}
 
 	#search > form 
@@ -239,6 +239,7 @@
 		display: flex;
 		flex-flow: row wrap;
 		justify-content: flex-start;
+		margin-bottom: 0;
 	}
 
 	.comment
@@ -280,4 +281,6 @@
 
 	nav {
 		min-height: 0 !important;
+		background: #d64760 url('images/overlay.png');
+		padding: 1em 2em;
 	}
