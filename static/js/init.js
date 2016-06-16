@@ -45,7 +45,7 @@ var parallelism = (function($) { var _ = {
 						marginBottom: 0,
 						
 					// Margin (in px) to preserve at the top of the viewport.
-						marginTop: 220,
+						marginTop: 150,
 					
 					// Nudge the reel by this value (in px) after it's been vertically centered.
 						verticalNudge: 0,
