@@ -102,6 +102,7 @@ putIndexES input = do
         ) ex)
       _ <- runBH' $ openIndex (IndexName "user")
       runBH' $ indexDocument (IndexName "user") (MappingName "user") defaultIndexDocumentSettings user (DocId $ extractKey uId)
+      _ <- runBH' $ refreshIndex $ IndexName "user"
     ESAlbum aId album -> do
       ex <- runBH' $ indexExists (IndexName "album")
       unless ex ((\ _ -> do
@@ -110,6 +111,7 @@ putIndexES input = do
         ) ex)
       _ <- runBH' $ openIndex (IndexName "album")
       runBH' $ indexDocument (IndexName "album") (MappingName "album") defaultIndexDocumentSettings album (DocId $ extractKey aId)
+      _ <- runBH' $ refreshIndex $ IndexName "album"
     ESMedium mId medium -> do
       ex <- runBH' $ indexExists (IndexName "medium")
       unless ex ((\ _ -> do
@@ -118,6 +120,7 @@ putIndexES input = do
         ) ex)
       _ <- runBH' $ openIndex (IndexName "medium")
       runBH' $ indexDocument (IndexName "medium") (MappingName "medium") defaultIndexDocumentSettings medium (DocId $ extractKey mId)
+      _ <- runBH' $ refreshIndex $ IndexName "medium"
     ESComment cId comment -> do
       ex <- runBH' $ indexExists (IndexName "comment")
       unless ex ((\ _ -> do
@@ -126,6 +129,7 @@ putIndexES input = do
         ) ex)
       _ <- runBH' $ openIndex (IndexName "comment")
       runBH' $ indexDocument (IndexName "comment") (MappingName "comment") defaultIndexDocumentSettings comment (DocId $ extractKey cId)
+      _ <- runBH' $ refreshIndex $ IndexName "comment"
   case statusCode (responseStatus resp) of
     201 -> return ()
     200 -> return ()
