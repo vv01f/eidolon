@@ -83,6 +83,13 @@ renderLayout widget = do
         return $ userSlug user
       Nothing ->
         return ("" :: T.Text)
+    madmin <- case msu of
+      Just a -> do
+        let uId = getUserIdFromText a
+        user <- runDB $ getJust uId
+        return $ Just $ userAdmin user
+      Nothing ->
+        return Nothing
     let block = appSignupBlocked $ appSettings master
 
     -- We break up the default layout into two components:

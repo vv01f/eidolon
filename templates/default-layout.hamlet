@@ -24,6 +24,10 @@
               <li>
                 <a href=@{LogoutR}>
                   Logout
+              $maybe admin <- madmin
+                <li>
+                  <a href=@{AdminR} .red>
+                    Administration
         $nothing
           <li>
             <a href=@{LoginR}>

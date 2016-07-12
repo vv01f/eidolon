@@ -264,6 +264,11 @@
 		background: #47d65f url('/static/css/images/overlay.png');
 	}
 
+	.red
+	{
+		background: #ffeeee url('/static/css/images/overlay.png') !important;
+	}
+
 	#message
 	{
 		padding: 20px;
