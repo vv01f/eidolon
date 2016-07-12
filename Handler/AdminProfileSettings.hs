@@ -117,7 +117,7 @@ postAdminProfileSettingsR ownerId = do
                 , UserEmail =. userEmail temp
                 , UserAdmin =. userAdmin temp
                 ]
-              putIndexES $ ESUser ownerId temp
+              updateIndexES $ ESUser ownerId temp
               setMessage "User data updated successfully"
               redirect AdminR
             _ -> do

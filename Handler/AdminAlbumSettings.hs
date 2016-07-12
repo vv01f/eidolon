@@ -101,7 +101,7 @@ postAdminAlbumSettingsR albumId = do
                 , AlbumSamplePic =. albumSamplePic temp
                 , AlbumSampleWidth =. width
                 ]
-              putIndexES (ESAlbum albumId temp)
+              updateIndexES (ESAlbum albumId temp)
               setMessage "Album settings changed successfully"
               redirect AdminR
             _ -> do

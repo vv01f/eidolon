@@ -115,7 +115,7 @@ postAlbumSettingsR albumId = do
                     , AlbumSamplePic =. albumSamplePic temp
                     , AlbumSampleWidth =. width
                     ]
-                  putIndexES (ESAlbum albumId temp)
+                  updateIndexES (ESAlbum albumId temp)
                   setMessage "Album settings changed succesfully"
                   redirect $ AlbumR albumId
                 _ -> do

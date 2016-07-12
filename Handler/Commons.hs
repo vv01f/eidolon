@@ -146,6 +146,27 @@ deleteIndexES input = do
       runBH' $ deleteDocument (IndexName "medium") (MappingName "medium") (DocId $ extractKey mId)
     ESComment cId comment ->
       runBH' $ deleteDocument (IndexName "comment") (MappingName "comment") (DocId $ extractKey cId)
+  checkResponseES resp
+
+updateIndexES :: ESInput -> Handler ()
+updateIndexES input = do
+  resp <- case input of
+    ESUser uId user ->
+      runBH' $ updateDocument (IndexName "user") (MappingName "user")
+        defaultIndexDocumentSettings user (DocId $ extractKey uId)
+    ESAlbum aId album ->
+      runBH' $ updateDocument (IndexName "album") (MappingName "album")
+        defaultIndexDocumentSettings album (DocId $ extractKey aId)
+    ESMedium mId medium ->
+      runBH' $ updateDocument (IndexName "medium") (MappingName "medium")
+        defaultIndexDocumentSettings medium (DocId $ extractKey mId)
+    ESComment cId comment ->
+      runBH' $ updateDocument (IndexName "comment") (MappingName "comment")
+        defaultIndexDocumentSettings comment (DocId $ extractKey cId)
+  checkResponseES resp
+
+checkResponseES :: Reply -> Handler ()
+checkResponseES resp =
   case statusCode (responseStatus resp) of
     201 -> return ()
     200 -> return ()
