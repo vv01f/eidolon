@@ -101,8 +101,9 @@ putIndexES input = do
         return ()
         ) ex)
       _ <- runBH' $ openIndex (IndexName "user")
-      runBH' $ indexDocument (IndexName "user") (MappingName "user") defaultIndexDocumentSettings user (DocId $ extractKey uId)
-      _ <- runBH' $ refreshIndex $ IndexName "user"
+      _ <- runBH' $ indexDocument (IndexName "user") (MappingName "user")
+        defaultIndexDocumentSettings user (DocId $ extractKey uId)
+      runBH' $ refreshIndex $ IndexName "user"
     ESAlbum aId album -> do
       ex <- runBH' $ indexExists (IndexName "album")
       unless ex ((\ _ -> do
@@ -110,8 +111,9 @@ putIndexES input = do
         return ()
         ) ex)
       _ <- runBH' $ openIndex (IndexName "album")
-      runBH' $ indexDocument (IndexName "album") (MappingName "album") defaultIndexDocumentSettings album (DocId $ extractKey aId)
-      _ <- runBH' $ refreshIndex $ IndexName "album"
+      _ <- runBH' $ indexDocument (IndexName "album") (MappingName "album")
+        defaultIndexDocumentSettings album (DocId $ extractKey aId)
+      runBH' $ refreshIndex $ IndexName "album"
     ESMedium mId medium -> do
       ex <- runBH' $ indexExists (IndexName "medium")
       unless ex ((\ _ -> do
@@ -119,8 +121,9 @@ putIndexES input = do
         return ()
         ) ex)
       _ <- runBH' $ openIndex (IndexName "medium")
-      runBH' $ indexDocument (IndexName "medium") (MappingName "medium") defaultIndexDocumentSettings medium (DocId $ extractKey mId)
-      _ <- runBH' $ refreshIndex $ IndexName "medium"
+      _ <- runBH' $ indexDocument (IndexName "medium") (MappingName "medium")
+        defaultIndexDocumentSettings medium (DocId $ extractKey mId)
+      runBH' $ refreshIndex $ IndexName "medium"
     ESComment cId comment -> do
       ex <- runBH' $ indexExists (IndexName "comment")
       unless ex ((\ _ -> do
@@ -128,23 +131,21 @@ putIndexES input = do
         return ()
         ) ex)
       _ <- runBH' $ openIndex (IndexName "comment")
-      runBH' $ indexDocument (IndexName "comment") (MappingName "comment") defaultIndexDocumentSettings comment (DocId $ extractKey cId)
-      _ <- runBH' $ refreshIndex $ IndexName "comment"
-  case statusCode (responseStatus resp) of
-    201 -> return ()
-    200 -> return ()
-    code -> error $ (show code) ++ ": " ++ (C.unpack $ BL.toStrict $ responseBody resp)
+      _ <- runBH' $ indexDocument (IndexName "comment") (MappingName "comment")
+        defaultIndexDocumentSettings comment (DocId $ extractKey cId)
+      runBH' $ refreshIndex $ IndexName "comment"
+  checkResponseES resp
 
 deleteIndexES :: ESInput -> Handler ()
 deleteIndexES input = do
   resp <- case input of
-    ESUser uId user ->
+    ESUser uId _ ->
       runBH' $ deleteDocument (IndexName "user") (MappingName "user") (DocId $ extractKey uId)
-    ESAlbum aId album ->
+    ESAlbum aId _ ->
       runBH' $ deleteDocument (IndexName "album") (MappingName "album") (DocId $ extractKey aId)
-    ESMedium mId medium ->
+    ESMedium mId _ ->
       runBH' $ deleteDocument (IndexName "medium") (MappingName "medium") (DocId $ extractKey mId)
-    ESComment cId comment ->
+    ESComment cId _ ->
       runBH' $ deleteDocument (IndexName "comment") (MappingName "comment") (DocId $ extractKey cId)
   checkResponseES resp
 
@@ -170,7 +171,7 @@ checkResponseES resp =
   case statusCode (responseStatus resp) of
     201 -> return ()
     200 -> return ()
-    _ -> error $ C.unpack $ BL.toStrict $ responseBody resp 
+    code -> error $ (show code) ++ ": " ++ (C.unpack $ BL.toStrict $ responseBody resp)
 
 -- runBH' :: BH m a -> Handler resp
 runBH' action = do
@@ -178,4 +179,4 @@ runBH' action = do
   let s = appSearchHost $ appSettings master
   let server = Server s
   manager <- liftIO $ newManager defaultManagerSettings
-  runBH (BHEnv server manager) action
+  runBH (mkBHEnv server manager) action

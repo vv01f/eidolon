@@ -1,5 +1,5 @@
 name:                eidolon
-version:             0.0.6
+version:             0.0.7
 synopsis:            Image gallery in Yesod
 homepage:            https://eidolon.nek0.eu
 license:             AGPL-3
@@ -115,11 +115,12 @@ library
                  , wai                           >= 3.0
                  , yesod-newsfeed                >= 1.6
                  , unix                          >= 2.7
-                 , bloodhound                    >= 0.8
+                 , bloodhound                    >= 0.11
                  , http-types
                  , image-type
                  , JuicyPixels                   >= 3.2.7
                  , JuicyPixels-scale-dct
+                 , classy-prelude-yesod          >= 1.0
                  -- for Migrations
                  , HDBC
                  , HDBC-postgresql
@@ -129,7 +130,7 @@ library
                  , system-filepath
                  , bytestring
                  , http-client
-                 , yesod-form
+                 , yesod-form                    >= 1.4.7
 
 executable         eidolon
     if flag(library-only)

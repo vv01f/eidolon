@@ -53,7 +53,7 @@ postMediumSettingsR mediumId = do
             , MediumDescription =. mediumDescription temp
             , MediumTags =. mediumTags temp
             ]
-          putIndexES (ESMedium mediumId temp)
+          updateIndexES (ESMedium mediumId temp)
           setMessage "Medium settings changed succesfully"
           redirect $ MediumR mediumId
         _ -> do
