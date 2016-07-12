@@ -25,3 +25,8 @@ $newline always
   <div class="inner">
     <p>
       <a href=@{AdminCommentR}>Comments
+
+<div id="header" class="item" data-width="400">
+  <div class="inner">
+    <p>
+      <a href=@{AdminSearchReloadR}>Repopulate search index

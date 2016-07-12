@@ -18,6 +18,7 @@ module Handler.Admin where
 
 import Import
 import Handler.Commons
+import Database.Bloodhound
 
 getAdminR :: Handler Html
 getAdminR = do
@@ -29,4 +30,24 @@ getAdminR = do
         $(widgetFile "adminBase")
     Left (errorMsg, route) -> do
       setMessage errorMsg
+      redirect route
+
+getAdminSearchReloadR :: Handler Html
+getAdminSearchReloadR = do
+  adminCheck <- loginIsAdmin
+  case adminCheck of
+    Right _ -> do
+      _ <- runBH' $ deleteIndex $ IndexName "_all"
+      users    <- runDB $ selectList [] [Asc UserId]
+      albums   <- runDB $ selectList [] [Asc AlbumId]
+      media    <- runDB $ selectList [] [Asc MediumId]
+      comments <- runDB $ selectList [] [Asc CommentId]
+      mapM_ (\ u -> putIndexES $ ESUser (entityKey u) (entityVal u))    users
+      mapM_ (\ u -> putIndexES $ ESAlbum (entityKey u) (entityVal u))   albums
+      mapM_ (\ u -> putIndexES $ ESMedium (entityKey u) (entityVal u))  media
+      mapM_ (\ u -> putIndexES $ ESComment (entityKey u) (entityVal u)) comments
+      setMessage "search indices repopulated"
+      redirect AdminR
+    Left (msg, route) -> do
+      setMessage msg
       redirect route

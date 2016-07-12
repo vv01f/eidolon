@@ -57,6 +57,7 @@
 /admin/medium/#MediumId/delete	AdminMediumDeleteR	GET
 /admin/comment			AdminCommentR		GET
 /admin/comment/#CommentId	AdminCommentDeleteR	GET
+/admin/repop-search             AdminSearchReloadR      GET
 
 /tag/#Text			TagR			GET
 
