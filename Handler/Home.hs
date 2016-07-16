@@ -26,7 +26,7 @@ import Yesod.AtomFeed
 
 getHomeR :: Handler Html
 getHomeR = do
-  recentMedia <- runDB $ selectList [] [Desc MediumTime, LimitTo 30]
+  recentMedia <- runDB $ selectList [] [Desc MediumTime, LimitTo 15]
   nextMediaQuery <- runDB $ selectList [] [Desc MediumTime, LimitTo 1, OffsetBy 30]
   let nextMedia = not $ L.null nextMediaQuery
   defaultLayout $ do
@@ -37,8 +37,8 @@ getHomeR = do
 
 getPageR :: Int -> Handler Html
 getPageR page = do
-  pageMedia <- runDB $ selectList [] [Desc MediumTime, LimitTo 30, OffsetBy (page*30)]
-  nextMediaQuery <- runDB $ selectList [] [Desc MediumTime, LimitTo 1, OffsetBy ((page + 1) * 30)]
+  pageMedia <- runDB $ selectList [] [Desc MediumTime, LimitTo 15, OffsetBy (page*15)]
+  nextMediaQuery <- runDB $ selectList [] [Desc MediumTime, LimitTo 1, OffsetBy ((page + 1) * 15)]
   let nextMedia = not $ L.null nextMediaQuery
   defaultLayout $ do
     rssLink RootFeedRssR "Root Feed"
