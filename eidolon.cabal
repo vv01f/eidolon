@@ -124,7 +124,6 @@ library
                  -- for Migrations
                  , HDBC
                  , HDBC-postgresql
-                 , imagemagick                   >= 0.0.4
                  , text
                  , filepath
                  , system-filepath
