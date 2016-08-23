@@ -34,12 +34,13 @@ import Yesod
 import Numeric (readHex, showHex)
 import Network.Mail.Mime
 import Text.Blaze.Html.Renderer.Utf8
-import Graphics.ImageMagick.MagickWand
 import Filesystem.Path.CurrentOS
 import Database.Bloodhound
 import Network.HTTP.Client
 import Network.HTTP.Types.Status as S
 import Control.Monad (when)
+
+import Codec.Picture
 
 getUserIdFromText :: T.Text -> UserId
 getUserIdFromText tempUserId =
@@ -192,10 +193,19 @@ mediumStaticThumbRoute medium =
 getThumbWidth :: MonadIO m => Maybe String -> m Int
 getThumbWidth path
   | path == Nothing = pure 230
-  | otherwise       = liftIO $ withMagickWandGenesis $ do
-                        (_, w) <- magickWand
-                        readImage w (T.pack $ fromJust path)
-                        getImageWidth w
+  | otherwise       = liftIO $ do
+      eorig <- readImage $ fromJust path
+      case eorig of
+        Right orig -> do
+          let img = convertRGBA8 orig
+          return $ imageWidth img
+        Left e ->
+          error e
+--   | path == Nothing = pure 230
+--   | otherwise       = liftIO $ withMagickWandGenesis $ do
+--                         (_, w) <- magickWand
+--                         readImage w (T.pack $ fromJust path)
+--                         getImageWidth w
 
 multiFileField :: (Monad m, RenderMessage (HandlerSite m) FormMessage) => Field m [FileInfo]
 multiFileField = Field

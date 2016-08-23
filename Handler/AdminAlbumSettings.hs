@@ -94,7 +94,7 @@ postAdminAlbumSettingsR albumId = do
             adminAlbumSettingsForm album albumId users
           case res of
             FormSuccess temp -> do
-              width <- getThumbWidth $ Just $ L.tail $ fromMaybe "a" $ albumSamplePic temp
+              width <- getThumbWidth $ albumSamplePic temp
               _ <- runDB $ update albumId
                 [ AlbumTitle =. albumTitle temp
                 , AlbumShares =. albumShares temp

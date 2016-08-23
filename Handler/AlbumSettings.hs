@@ -108,7 +108,7 @@ postAlbumSettingsR albumId = do
                     else  do
                       return [()]
                       -- nothing to do here
-                  width <- getThumbWidth $ Just $ L.tail $ fromMaybe ['a'] $ albumSamplePic temp
+                  width <- getThumbWidth $ albumSamplePic temp
                   _ <- runDB $ update albumId 
                     [ AlbumTitle =. albumTitle temp
                     , AlbumShares =. newShares
