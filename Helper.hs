@@ -22,23 +22,18 @@ import Model
 import Data.Maybe
 import Data.List as L
 import qualified Data.ByteString as B
-import qualified Data.ByteString.Char8 as C
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.Text as T
+
 import Data.Time
 import Data.Char
+
 import Database.Persist
 import System.Random
--- import System.Locale
 import Yesod
 import Numeric (readHex, showHex)
 import Network.Mail.Mime
 import Text.Blaze.Html.Renderer.Utf8
-import Filesystem.Path.CurrentOS
-import Database.Bloodhound
-import Network.HTTP.Client
-import Network.HTTP.Types.Status as S
-import Control.Monad (when)
 
 import Codec.Picture
 
@@ -62,7 +57,7 @@ extractKey = extractKey' . keyToValues
 packKey :: PersistEntity record => T.Text -> Key record
 packKey = keyFromValues' . readText
   where
-    readText t = PersistInt64 $ (fromIntegral $ read $ T.unpack t)
+    readText t = PersistInt64 (fromIntegral $ read $ T.unpack t)
     keyFromValues' v = case keyFromValues [v] of
       Left err -> error $ T.unpack err
       Right k -> k
@@ -158,7 +153,8 @@ reverseLookup :: Eq b => b -> [(a, b)] -> Maybe a
 reverseLookup s ((x, y):zs)
   | s == y    = Just x
   | s /= y    = reverseLookup s zs
-  | otherwise = Nothing
+reverseLookup _ [] = Nothing
+reverseLookup _ _  = Nothing
 
 acceptedTypes :: [T.Text]
 acceptedTypes = ["image/jpeg", "image/jpg", "image/png", "image/x-ms-bmp", "image/x-bmp", "image/bmp", "image/tiff", "image/tiff-fx", "image/svg+xml", "image/gif"]
@@ -201,18 +197,13 @@ getThumbWidth path
           return $ imageWidth img
         Left e ->
           error e
---   | path == Nothing = pure 230
---   | otherwise       = liftIO $ withMagickWandGenesis $ do
---                         (_, w) <- magickWand
---                         readImage w (T.pack $ fromJust path)
---                         getImageWidth w
 
-multiFileField :: (Monad m, RenderMessage (HandlerSite m) FormMessage) => Field m [FileInfo]
+multiFileField :: (Monad m) => Field m [FileInfo]
 multiFileField = Field
     { fieldParse = \_ files -> return $
         case files of
             [] -> Right Nothing
-            file:_ -> Right $ Just files
+            _:_ -> Right $ Just files
     , fieldView = \id' name attrs _ isReq -> toWidget [hamlet|
             <input id=#{id'} name=#{name} *{attrs} type=file :isReq:required multiple="" enctype="multipart/form-data">
         |]
