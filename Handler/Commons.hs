@@ -172,7 +172,7 @@ checkResponseES resp =
     200 -> return ()
     code -> error $ (show code) ++ ": " ++ (C.unpack $ BL.toStrict $ responseBody resp)
 
-runBH' :: BH m a -> m a
+-- runBH' :: BH m (HandlerSite m) -> m a
 runBH' action = do
   master <- getYesod
   let s = appSearchHost $ appSettings master
