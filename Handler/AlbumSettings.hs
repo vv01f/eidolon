@@ -19,7 +19,6 @@ module Handler.AlbumSettings where
 import Import
 import Handler.Commons
 import qualified Data.Text as T
-import Data.Maybe
 import System.Directory
 import System.FilePath
 import qualified Data.List as L

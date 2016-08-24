@@ -24,7 +24,6 @@ import Network.HTTP.Client
 import Network.HTTP.Types.Status as S
 import qualified Data.ByteString.Char8 as C
 import qualified Data.ByteString.Lazy as BL
-import qualified Data.Text as T
 
 
 loginIsAdmin :: IsString t => Handler (Either (t, Route App)  ())
@@ -97,7 +96,7 @@ putIndexES input = do
     ESUser uId user -> do
       ex <- runBH' $ indexExists (IndexName "user")
       unless ex ((\ _ -> do
-        runBH' $ createIndex is (IndexName "user")
+        _ <- runBH' $ createIndex is (IndexName "user")
         return ()
         ) ex)
       _ <- runBH' $ openIndex (IndexName "user")
@@ -107,7 +106,7 @@ putIndexES input = do
     ESAlbum aId album -> do
       ex <- runBH' $ indexExists (IndexName "album")
       unless ex ((\ _ -> do
-        runBH' $ createIndex is (IndexName "album")
+        _ <- runBH' $ createIndex is (IndexName "album")
         return ()
         ) ex)
       _ <- runBH' $ openIndex (IndexName "album")
@@ -117,7 +116,7 @@ putIndexES input = do
     ESMedium mId medium -> do
       ex <- runBH' $ indexExists (IndexName "medium")
       unless ex ((\ _ -> do
-        runBH' $ createIndex is (IndexName "medium")
+        _ <- runBH' $ createIndex is (IndexName "medium")
         return ()
         ) ex)
       _ <- runBH' $ openIndex (IndexName "medium")
@@ -127,7 +126,7 @@ putIndexES input = do
     ESComment cId comment -> do
       ex <- runBH' $ indexExists (IndexName "comment")
       unless ex ((\ _ -> do
-        runBH' $ createIndex is (IndexName "comment")
+        _ <- runBH' $ createIndex is (IndexName "comment")
         return ()
         ) ex)
       _ <- runBH' $ openIndex (IndexName "comment")
@@ -173,7 +172,7 @@ checkResponseES resp =
     200 -> return ()
     code -> error $ (show code) ++ ": " ++ (C.unpack $ BL.toStrict $ responseBody resp)
 
--- runBH' :: BH m a -> Handler resp
+runBH' :: BH m a -> m b
 runBH' action = do
   master <- getYesod
   let s = appSearchHost $ appSettings master

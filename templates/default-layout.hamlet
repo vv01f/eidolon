@@ -5,7 +5,7 @@
         <li>
           <a href=@{HomeR}>
             Home
-        $maybe su <- msu
+        $maybe _ <- msu
           <li>
             <label for="cb1">
               <a>
@@ -24,7 +24,7 @@
               <li>
                 <a href=@{LogoutR}>
                   Logout
-              $maybe admin <- madmin
+              $maybe _ <- madmin
                 <li>
                   <a href=@{AdminR} .red>
                     Administration
