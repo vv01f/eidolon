@@ -183,7 +183,7 @@
 	#header
 	{
 		position: relative;
-		background: #d64760 url('images/overlay.png');
+		background: #d64760 url('../img/overlay.png');
 		color: #fff;
 		cursor: default;
 	}
@@ -246,7 +246,7 @@
 	{
 		border: 5px solid rgb(255, 255, 255);
 		padding: 2em 3em;
-		background: #d64760 url('/static/css/images/overlay.png');
+		background: #d64760 url('/static/img/overlay.png');
 	}
 
 	.center
@@ -261,18 +261,18 @@
 
 	.reply
 	{
-		background: #47d65f url('/static/css/images/overlay.png');
+		background: #47d65f url('/static/img/overlay.png');
 	}
 
 	.red
 	{
-		background: #ffeeee url('/static/css/images/overlay.png') !important;
+		background: #ffeeee url('/static/img/overlay.png') !important;
 	}
 
 	#message
 	{
 		padding: 20px;
-		background: lightyellow url('/static/css/images/overlay.png');
+		background: lightyellow url('/static/img/overlay.png');
 		color: #d64760;
 		font-size: 1.5em;
 	}
@@ -286,6 +286,6 @@
 
 	nav {
 		min-height: 0 !important;
-		background: #d64760 url('images/overlay.png');
+		background: #d64760 url('../img/overlay.png');
 		padding: 1em 2em;
 	}
