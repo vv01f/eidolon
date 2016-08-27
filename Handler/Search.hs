@@ -102,15 +102,23 @@ searchForm = renderDivs $ areq (searchField True) "Search" Nothing
 
 getResults :: Text -> Handler (Reply, Reply, Reply, Reply)
 getResults query = do
-  esQuery <- return $ QueryFuzzyLikeThisQuery $ FuzzyLikeThisQuery
-    { fuzzyLikeFields              = [FieldName "_all"]
-    , fuzzyLikeText                = query
-    , fuzzyLikeMaxQueryTerms       = MaxQueryTerms 25
-    , fuzzyLikeIgnoreTermFrequency = IgnoreTermFrequency False
-    , fuzzyLikeFuzziness           = Fuzziness 0.6
-    , fuzzyLikePrefixLength        = PrefixLength 0
-    , fuzzyLikeBoost               = Boost 1.0
-    , fuzzyLikeAnalyzer            = Nothing
+  -- esQuery <- return $ QueryFuzzyLikeThisQuery $ FuzzyLikeThisQuery
+  --   { fuzzyLikeFields              = [FieldName "_all"]
+  --   , fuzzyLikeText                = query
+  --   , fuzzyLikeMaxQueryTerms       = MaxQueryTerms 25
+  --   , fuzzyLikeIgnoreTermFrequency = IgnoreTermFrequency False
+  --   , fuzzyLikeFuzziness           = Fuzziness 0.6
+  --   , fuzzyLikePrefixLength        = PrefixLength 0
+  --   , fuzzyLikeBoost               = Boost 1.0
+  --   , fuzzyLikeAnalyzer            = Nothing
+  --   }
+  esQuery <- return $ QueryFuzzyQuery $ FuzzyQuery
+    { fuzzyQueryField         = FieldName "_all"
+    , fuzzyQueryValue         = query
+    , fuzzyQueryPrefixLength  = PrefixLength 0
+    , fuzzyQueryMaxExpansions = MaxExpansions 50
+    , fuzzyQueryFuzziness     = Fuzziness 0.6
+    , fuzzyQueryBoost         = Boost 1.0
     }
   su <- runBH' $ searchByIndex (IndexName "user") $ mkSearch (Just esQuery) Nothing
   sa <- runBH' $ searchByIndex (IndexName "album") $ mkSearch (Just esQuery) Nothing
