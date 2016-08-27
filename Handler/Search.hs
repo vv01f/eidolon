@@ -118,7 +118,7 @@ getResults query = do
     , fuzzyQueryPrefixLength  = PrefixLength 0
     , fuzzyQueryMaxExpansions = MaxExpansions 50
     , fuzzyQueryFuzziness     = Fuzziness 0.6
-    , fuzzyQueryBoost         = Boost 1.0
+    , fuzzyQueryBoost         = Just (Boost 1.0)
     }
   su <- runBH' $ searchByIndex (IndexName "user") $ mkSearch (Just esQuery) Nothing
   sa <- runBH' $ searchByIndex (IndexName "album") $ mkSearch (Just esQuery) Nothing
