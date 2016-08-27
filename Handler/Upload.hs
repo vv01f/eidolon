@@ -193,6 +193,12 @@ writeOnDrive fil userId albumId = do
   let filen = show $ length (albumContent album) + 1
   let ext = FP.takeExtension $ T.unpack $ fileName fil
   let path = "static" FP.</> "data" FP.</> T.unpack (extractKey userId) FP.</> T.unpack (extractKey albumId) FP.</> filen ++ ext
+  dde <- liftIO $ doesDirectoryExist $ FP.dropFileName path
+  if not dde
+    then
+      liftIO $ createDirectoryIfMissing True $ FP.dropFileName path
+    else
+      return ()
   liftIO $ fileMove fil path
   return path
 
