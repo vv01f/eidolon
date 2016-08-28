@@ -30,6 +30,7 @@
                     <li>
                       <a href=@{AdminR} .red>
                         Administration
+                $of Nothing
         $nothing
           <li>
             <a href=@{LoginR}>
