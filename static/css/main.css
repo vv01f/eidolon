@@ -108,6 +108,7 @@ a:hover, .item a:hover, .medium a:hover, a:hover figcaption {
 
 .image {
 	text-align: center;
+	padding: 5%;
 }
 
 .item a, .medium a {
