@@ -1,4 +1,5 @@
-<div id="header" class="item" data-width="400">
-  <form class="inner" method=post enctype=#{enctype}>
-    Upload multiple images
-    ^{uploadWidget}
+<div #reel .middle>
+  <div .medium>
+    <form class="inner" method=post enctype=#{enctype}>
+      Upload multiple images
+      ^{uploadWidget}

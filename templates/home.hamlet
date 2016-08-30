@@ -1,18 +1,17 @@
 $doctype 5
-<div id="header" class="item" data-width="400">
-  <div class="inner">
-    <h1>Eidolon
-    <p>
-      A simple gallery System in Haskell and Yesod
-$forall (Entity mediumId medium) <- recentMedia
-  <article class="item" data-width=#{mediumThumbWidth medium}>
-    <a href=@{MediumR mediumId}>
-      <figure>
-        <img src=@{StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumThumb medium) []} title=#{mediumTitle medium}>
-        <figcaption>#{mediumTitle medium}
+<div id="header">
+  <h1>Eidolon
+  <p>
+    A simple gallery System in Haskell and Yesod
+<div #reel>
+  $forall (Entity mediumId medium) <- recentMedia
+    <article class="item">
+      <a href=@{MediumR mediumId}>
+        <figure>
+          <img src=@{StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumThumb medium) []} title=#{mediumTitle medium}>
+          <figcaption>#{mediumTitle medium}
 $if nextMedia
-  <div id="header" class="item" data-width="400">
-    <div class="inner">
-      <p>
-        <a href=@{PageR 1}>
-         older
+  <div class="pagination">
+    <p>
+      <a href=@{PageR 1}>
+        older

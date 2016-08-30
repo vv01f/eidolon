@@ -1,6 +1,6 @@
 <nav>
   <div .row>
-    <div .col-md-9>
+    <div .col-md-9 .col-sm-6>
       <ul #user-nav>
         <li>
           <a href=@{HomeR}>
@@ -24,13 +24,11 @@
               <li>
                 <a href=@{LogoutR}>
                   Logout
-              $case madmin
-                $of Just admin
-                  $if admin
-                    <li>
-                      <a href=@{AdminR} .red>
-                        Administration
-                $of Nothing
+              $maybe admin <- madmin
+                $if admin
+                  <li>
+                    <a href=@{AdminR} .red>
+                      Administration
         $nothing
           <li>
             <a href=@{LoginR}>
@@ -39,7 +37,7 @@
             <li>
               <a href=@{SignupR}>
                 Signup
-    <div .col-md-3 #search>
+    <div .col-md-3 .col-sm-6 #search>
       ^{pageBody searchWidget}
 
 $maybe msg <- mmsg
@@ -47,39 +45,3 @@ $maybe msg <- mmsg
 
 <div id="main" role="main">
   ^{pageBody wc}
-<div id="footer">
-  <div class="left">
-    ^{pageBody copyrightWidget}
-  <div class="right">
-    $case route
-      $of Just HomeR
-        get a Feed from This:
-        <a href="@{RootFeedAtomR}">Atom
-        |
-        <a href="@{RootFeedRssR}">RSS
-      $of Just (PageR _)
-        get a Feed from This:
-        <a href="@{RootFeedAtomR}">Atom
-        |
-        <a href="@{RootFeedRssR}">RSS
-      $of Just (ProfileR uId)
-        get a Feed from This:
-        <a href="@{UserFeedAtomR uId}">Atom
-        |
-        <a href="@{UserFeedRssR uId}">RSS
-      $of Just (UserR name)
-        get a Feed from This:
-        <a href="@{NameFeedAtomR name}">Atom
-        |
-        <a href="@{NameFeedRssR name}">RSS
-      $of Just (AlbumR aId)
-        get a Feed from This:
-        <a href="@{AlbumFeedAtomR aId}">Atom
-        |
-        <a href="@{AlbumFeedRssR aId}">RSS
-      $of Just (MediumR mId)
-        get a Feed from This:
-        <a href="@{CommentFeedAtomR mId}">Atom
-        |
-        <a href="@{CommentFeedRssR mId}">RSS
-      $of _

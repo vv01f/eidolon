@@ -2,6 +2,7 @@
 	list-style: none;
 	font-weight: bold;
 	position: relative;
+	padding: 0;
 }
 
 #user-nav ul {
@@ -20,7 +21,15 @@
 #user-nav li a {
 	padding: 10px 20px 10px;
 	border-radius: 5px;
-	background-color: white;
+	background: white url('../img/overlay.png');
+}
+
+#user-nav li ul {
+	padding: 0;
+}
+
+#user-nav li ul li {
+	display: inline;
 }
 
 #user-nav input[type="checkbox"]:checked + ul {
@@ -50,4 +59,8 @@
 	/*position: absolute;
 	left: -9999px;*/
 	display: none;
+}
+
+.red {
+	background: rgba(255,0,0,0.2) url('../img/overlay.png') !important;
 }

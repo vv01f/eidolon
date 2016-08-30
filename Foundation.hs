@@ -29,7 +29,7 @@ import Text.Jasmine (minifym)
 import Text.Hamlet (hamletFile)
 import Yesod.Core.Types
 -- costom imports
-import Data.Text as T
+import qualified Data.Text as T
 import Data.Text.Encoding
 import Network.Wai
 import Helper
@@ -116,18 +116,19 @@ renderLayout widget = do
 
     pc <- widgetToPageContent $ do
         -- add parallelism js files
-        $(combineScripts 'StaticR
-            [ js_jquery_1_11_3_js
-            , js_jquery_poptrox_js
-            , js_skel_min_js
-            , js_init_js
-            , js_picturefill_js
-            ])
-        $(combineStylesheets 'StaticR
-            [ css_dropdown_css
-            , css_bootstrap_min_css
-            , css_style_global_css
-            ])
+        -- mapM_ addScript $ map StaticR
+        --     -- [ js_jquery_1_11_3_js
+        --     -- , js_jquery_poptrox_js
+        --     -- , js_skel_min_js
+        --     -- , js_init_js
+        --     [ js_picturefill_js
+        --     ]
+        mapM_ addStylesheet $ map StaticR
+            [ css_bootstrap_min_css
+            , css_dropdown_css
+            , css_main_css
+            -- , css_style_global_css
+            ]
         $(widgetFile "default-layout")
 
     withUrlRenderer $(hamletFile "templates/default-layout-wrapper.hamlet")
@@ -144,7 +145,7 @@ approotRequest master req =
     where
       prefix =
         if 
-          "https://" `isPrefixOf` appRoot (appSettings master)
+          "https://" `T.isPrefixOf` appRoot (appSettings master)
           then
             "https://"
           else
@@ -165,8 +166,9 @@ instance Yesod App where
         120    -- timeout in minutes
         "config/client_session_key.aes"
 
-    defaultLayout widget =
-      renderLayout $(widgetFile "default-widget")
+    -- defaultLayout widget =
+    --   renderLayout $(widgetFile "default-widget")
+    defaultLayout = renderLayout
 
     -- This is done to provide an optimization for serving static files from
     -- a separate domain. Please see the staticRoot setting in Settings.hs

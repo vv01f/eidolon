@@ -1,53 +1,48 @@
 $newline always
-<div id="header" class="item" data-width="400">
-  <div class="inner">
-    <h1>Profile of #{ownerSlug}
-    $if presence == True
-      <a href=@{ProfileSettingsR ownerId}>Change your profile settings
+<div #header>
+  <h1>Profile of #{ownerSlug}
+  $if presence == True
+    <a href=@{ProfileSettingsR ownerId}>Change your profile settings
 
-<div id="header" class="item" data-width="400">
-  <div class="inner">
+<div #reel>
+  <article .subheader .item>
     $if null userAlbs
       <p class="center">This user has no albums yet
     $else
       <h1>Albums
       <p>Albums of this user:
-  <ul>
-$forall (Entity albumId album) <- userAlbs
-  <article class="item" data-width=#{albumSampleWidth album}>
-    <a href=@{AlbumR albumId}>
-      <figure>
-        $if (albumSamplePic album) == Nothing
-          <img src=@{StaticR img_album_jpg} title=#{albumTitle album}>
-        $else
-          <img src=@{StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ fromJust $ albumSamplePic album) []} title=#{albumTitle album}>
-        <figcaption>#{albumTitle album}
-
-$if null sharedAlbs
-$else
-  <div id="header" class="item" data-width="400">
-    <div class="inner">
+  $if not (null userAlbs)
+    $forall (Entity albumId album) <- userAlbs
+      <article class="item">
+        <a href=@{AlbumR albumId}>
+          <figure>
+            $if (albumSamplePic album) == Nothing
+              <img src=@{StaticR img_album_jpg} title=#{albumTitle album}>
+            $else
+              <img src=@{StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ fromJust $ albumSamplePic album) []} title=#{albumTitle album}>
+            <figcaption>#{albumTitle album}
+  
+  $if not (null sharedAlbs)
+    <article .subheader .item>
       <h1>Shared Albums
       <p>Albums shared with this user:
-  $forall Just (Entity albumId album) <- sharedAlbs
-    <article class="shared item" data-width=#{albumSampleWidth album}>
-      <a href=@{AlbumR albumId}>
-        <figure>
-          $if (albumSamplePic album) == Nothing
-            <img src=@{StaticR img_album_jpg}>
-          $else
-            <img src=@{StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ fromJust $ albumSamplePic album) []} title=#{albumTitle album}>
-          <figcaption>#{albumTitle album}
-
-$if null recentMedia
-$else
-  <div id="header" class="item" data-width="400">
-    <div class="inner">
+    $forall Just (Entity albumId album) <- sharedAlbs
+      <article .item>
+        <a href=@{AlbumR albumId}>
+          <figure>
+            $if (albumSamplePic album) == Nothing
+              <img src=@{StaticR img_album_jpg}>
+            $else
+              <img src=@{StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ fromJust $ albumSamplePic album) []} title=#{albumTitle album}>
+            <figcaption>#{albumTitle album}
+  
+  $if not (null recentMedia)
+    <article .subheader .item>
       <h1>Newest images
       <p>recent uploads of #{ownerSlug}
-  $forall (Entity mediumId medium) <- take 10 recentMedia
-    <article class="recent item" data-width=#{mediumThumbWidth medium}>
-      <a href=@{MediumR mediumId}>
-        <figure>
-          <img src=@{StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumThumb medium) []} title=#{mediumTitle medium}>
-          <figcaption>#{mediumTitle medium}
+    $forall (Entity mediumId medium) <- take 10 recentMedia
+      <article .item>
+        <a href=@{MediumR mediumId}>
+          <figure>
+            <img src=@{StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumThumb medium) []} title=#{mediumTitle medium}>
+            <figcaption>#{mediumTitle medium}

@@ -45,7 +45,7 @@ getDirectUploadR albumId = do
             -- is the owner present or a user with whom the album is shared
             then do
               (dUploadWidget, enctype) <- generateFormPost $ renderBootstrap3 BootstrapBasicForm $ dUploadForm userId albumId
-              formLayout $ do
+              defaultLayout $ do
                 setTitle $ toHtml ("Eidolon :: Upload medium to " `T.append` albumTitle album)
                 $(widgetFile "dUpload")
             else do
@@ -239,7 +239,7 @@ getUploadR = do
           redirect NewAlbumR
         else do
           (uploadWidget, enctype) <- generateFormPost $ renderBootstrap3 BootstrapBasicForm $ bulkUploadForm userId
-          formLayout $ do
+          defaultLayout $ do
             setTitle "Eidolon :: Upload Medium"
             $(widgetFile "bulkUpload")
     Nothing -> do

@@ -34,7 +34,7 @@ data Credentials = Credentials
 
 getLoginR :: Handler Html
 getLoginR =
-  formLayout $ do
+  defaultLayout $ do
     setTitle "Eidolon :: Login"
     $(widgetFile "login")
 

@@ -24,9 +24,9 @@
 /signup				SignupR			GET POST
 /login				LoginR			GET POST
 /logout				LogoutR			GET
-/activate/#Text			ActivateR		GET POST
+/activate/#T.Text		ActivateR		GET POST
 /profile/#UserId		ProfileR		GET
-/user/#Text			UserR			GET
+/user/#T.Text			UserR			GET
 /upload				UploadR			GET POST
 /newalbum			NewAlbumR		GET POST
 /album/#AlbumId			AlbumR			GET
@@ -59,7 +59,7 @@
 /admin/comment/#CommentId	AdminCommentDeleteR	GET
 /admin/repop-search             AdminSearchReloadR      GET
 
-/tag/#Text			TagR			GET
+/tag/#T.Text			TagR			GET
 
 /feed/root/atom.xml		RootFeedAtomR		GET
 /feed/root/rss.xml		RootFeedRssR		GET
@@ -69,7 +69,7 @@
 /feed/medium/#MediumId/rss.xml	CommentFeedRssR		GET
 /feed/user/#UserId/atom.xml	UserFeedAtomR		GET
 /feed/user/#UserId/rss.xml	UserFeedRssR		GET
-!/feed/user/#Text/atom.xml	NameFeedAtomR		GET
-!/feed/user/#Text/rss.xml	NameFeedRssR		GET
+!/feed/user/#T.Text/atom.xml	NameFeedAtomR		GET
+!/feed/user/#T.Text/rss.xml	NameFeedRssR		GET
 
 /search				SearchR			GET

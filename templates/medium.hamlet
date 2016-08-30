@@ -1,70 +1,66 @@
-<div data-width="1000">
-  <div id="header" class="item" data-width="1000">
-    <div class="inner">
-      <h1>#{mediumTitle medium}
+<div .column>
+  <div class="medium">
+    <h1>#{mediumTitle medium}
+    <p>
+      by <a href=@{UserR ownerName}>#{ownerName}</a> from album <a href=@{AlbumR albumId}>#{albumTitle album}</a>
+  <div class="medium image">
+    <a href=@{ir}>
+      <picture>
+        <source srcset="@{pr}, @{ir} 2x" media="(min-width: 600px)">
+        <source srcset="@{tr}, @{pr} 2x">
+        <img src=@{pr} title=#{mediumTitle medium}>
+  
+  <div class="medium">
+    <p class="desc">
+      Uploaded on: #{formatTime defaultTimeLocale "%A %F %H:%M" (mediumTime medium)}<br>
+      $maybe d <- mediumDescription medium
+        Description:<br>
+        #{d}
+      $nothing
+        No description given
+  
+    <div class="tags">
       <p>
-        by <a href=@{UserR ownerName}>#{ownerName}</a> from album <a href=@{AlbumR albumId}>#{albumTitle album}</a>
-  <div id="header" class="item image" data-width=#{dataWidth}>
-    <div class="inner">
-      <a href=@{ir}>
-        <picture>
-          <source srcset="@{pr}, @{ir} 2x" media="(min-width: 600px)">
-          <source srcset="@{tr}, @{pr} 2x">
-          <img src=@{pr} title=#{mediumTitle medium}>
-
-  <div id="header" class="item" data-width="400">
-    <div class="inner">
-      <p class="desc">
-        Uploaded on: #{formatTime defaultTimeLocale "%A %F %H:%M" (mediumTime medium)}<br>
-        $maybe d <- mediumDescription medium
-          Description:<br>
-          #{d}
-        $nothing
-          No description given
-
-      <div class="tags">
-        <p>
-          Tags:
-          <ul>
-            $if null (mediumTags medium)
-              none
-            $else
-              $forall tag <- mediumTags medium
-                <li>
-                  <a href=@{TagR tag}>#{tag}
-      $if presence == True
-        <a href=@{MediumSettingsR mediumId}>Change medium settings
- 
+        Tags:
+        <ul>
+          $if null (mediumTags medium)
+            none
+          $else
+            $forall tag <- mediumTags medium
+              <li>
+                <a href=@{TagR tag}>#{tag}
+    $if presence == True
+      <a href=@{MediumSettingsR mediumId}>Change medium settings
+  
   $if null comments
-    <div id="header" class="item" data-width="300">
+    <div class="medium">
+      <p>There are no Comments yet
+  $else
+    $forall (Entity commentId comment) <- comments
+      <div .medium .comment data-width="300">
+        <a href=@{ProfileR $ commentAuthor comment}>#{commentAuthorSlug comment}</a> wrote on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime comment}:
+        <hr>
+        #{commentContent comment}
+        $if userId /= Nothing
+          <hr>
+          <a href=@{CommentReplyR commentId}>Reply to this comment
+          $if userId == (Just $ commentAuthor comment)
+            <a href=@{CommentDeleteR commentId}>Delete this comment
+      $forall (Entity replyId reply) <- replies
+        $if commentParent reply == Just commentId
+          <article .comment .reply .medium>
+            <a href=@{ProfileR $ commentAuthor reply}>#{commentAuthorSlug reply}</a> replied on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime reply}:
+            <hr>
+            #{commentContent reply}
+            <hr>
+            $if userId == (Just $ commentAuthor comment)
+              <a href=@{CommentDeleteR replyId}>Delete this comment
+    
+  $if userId /= Nothing
+    <div class="medium">
       <div class="inner">
-        <p>There are no Comments yet
-
-$forall (Entity commentId comment) <- comments
-  <article class="comment" data-width="300">
-    <a href=@{ProfileR $ commentAuthor comment}>#{commentAuthorSlug comment}</a> wrote on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime comment}:
-    <hr>
-    #{commentContent comment}
-    $if userId /= Nothing
-      <hr>
-      <a href=@{CommentReplyR commentId}>Reply to this comment
-      $if userId == (Just $ commentAuthor comment)
-        <a href=@{CommentDeleteR commentId}>Delete this comment
-  $forall (Entity replyId reply) <- replies
-    $if commentParent reply == Just commentId
-      <article class="comment reply">
-        <a href=@{ProfileR $ commentAuthor reply}>#{commentAuthorSlug reply}</a> replied on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime reply}:
-        <hr>
-        #{commentContent reply}
-        <hr>
-        $if userId == (Just $ commentAuthor comment)
-          <a href=@{CommentDeleteR replyId}>Delete this comment
-
-$if userId /= Nothing
-  <div id="header" class="item" data-width="1000">
-    <div class="inner">
-      <form method=post enctype=#{enctype}>
-        ^{commentWidget}
+        <form method=post enctype=#{enctype}>
+          ^{commentWidget}
 
 <style type="text/css">
   body{background-image: url('/static/css/images/overlay.png'),	-webkit-linear-gradient(top, rgba(0,0,0,0) 75%, rgba(0,0,0,0.65)), url('@{StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumPath medium) []}');background-attachment:fixed;background-image: url('/static/css/images/overlay.png'), -moz-linear-gradient(center top , transparent 75%, rgba(0, 0, 0, 0.65)), url('@{StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumPath medium) []}');}

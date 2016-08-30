@@ -65,7 +65,7 @@ getMediumR mediumId = do
       let tr = StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumThumb medium) []
       let pr = StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumPreview medium) []
       let ir = StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumPath medium) []
-      formLayout $ do
+      defaultLayout $ do
         setTitle $ toHtml ("Eidolon :: Medium " `T.append` (mediumTitle medium))
         rssLink (CommentFeedRssR mediumId) $ "Comment feed of medium " `T.append` mediumTitle medium
         atomLink (CommentFeedAtomR mediumId) $ "Comment feed of medium " `T.append` mediumTitle medium

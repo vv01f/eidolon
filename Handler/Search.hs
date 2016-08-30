@@ -26,16 +26,20 @@ import Database.Bloodhound
 import Network.HTTP.Client (responseBody)
 import System.FilePath.Posix
 
+import Debug.Trace
+
 getSearchR :: Handler Html
 getSearchR = do
   ((res, widget), _) <- runFormGet searchForm
   case res of
     FormSuccess query -> do
       (ru, ra, rm, rc) <- getResults query
+      liftIO $ traceIO $ show (ru, ra, rm, rc)
       let a = decode (responseBody ru) :: Maybe (SearchResult SearchUser)
       let b = decode (responseBody ra) :: Maybe (SearchResult SearchAlbum)
       let c = decode (responseBody rm) :: Maybe (SearchResult SearchMedium)
       let d = decode (responseBody rc) :: Maybe (SearchResult SearchComment)
+      liftIO $ traceIO $ show (a,b,c,d)
       let hitListA = case a of {
           Just as -> hits $ searchHits as;
           Nothing -> []}
@@ -84,6 +88,7 @@ getSearchR = do
           else
             Nothing
         ) hitListD
+      liftIO $ traceIO $ show (userIdList, albumIdList, mediumIdList, commentIdList)
       userList <- return . catMaybes =<< mapM (\i -> runDB $ selectFirst [UserId ==. i] []) userIdList
       albumList <- return . catMaybes =<< mapM (\i -> runDB $ selectFirst [AlbumId ==. i] []) albumIdList
       mediumList <- return . catMaybes =<< mapM (\i -> runDB $ selectFirst [MediumId ==. i] []) mediumIdList
@@ -129,7 +134,7 @@ getResults query = do
 data SearchUser = SearchUser
   { suName :: T.Text
   , suSlug :: T.Text
-  }
+  } deriving Show
 
 instance FromJSON SearchUser where
   parseJSON (Object o) = SearchUser
@@ -138,7 +143,7 @@ instance FromJSON SearchUser where
   parseJSON _ = mempty
 
 data SearchAlbum = SearchAlbum
-  { saName :: T.Text }
+  { saName :: T.Text } deriving Show
 
 instance FromJSON SearchAlbum where
   parseJSON (Object o) = SearchAlbum <$> o .: "name"
@@ -149,7 +154,7 @@ data SearchMedium = SearchMedium
   , smTime :: UTCTime
   , smDescription :: Textarea
   , smTags :: [T.Text]
-  }
+  } deriving Show
 
 instance FromJSON SearchMedium where
   parseJSON (Object o) = SearchMedium
@@ -163,7 +168,7 @@ data SearchComment = SearchComment
   { scAuthor :: Text
   , scTime :: UTCTime
   , scContent :: Text
-  }
+  } deriving Show
 
 instance FromJSON SearchComment where
   parseJSON (Object o) = SearchComment
