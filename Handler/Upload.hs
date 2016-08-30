@@ -156,9 +156,9 @@ generateThumbs path uId aId = do
           oHeight = fromIntegral $ fromJust $ PM.lookup Height meta :: Int
           tWidth = floor (fromIntegral oWidth / fromIntegral oHeight * fromIntegral tHeight :: Double)
           tHeight = 230 :: Int
-          pWidth = 1380 :: Int
-          pScale = (fromIntegral pWidth :: Double) / (fromIntegral oWidth :: Double)
-          pHeight = floor (fromIntegral oHeight * pScale)
+          pHeight = 600 :: Int
+          pScale = (fromIntegral pHeight :: Double) / (fromIntegral oHeight :: Double)
+          pWidth = floor (fromIntegral oWidth * pScale)
           tPix = scale (tWidth, tHeight) origPix
           pPix = scale (pWidth, pHeight) origPix
       liftIO $ saveJpgImage 95 tPath $ ImageRGBA8 tPix
