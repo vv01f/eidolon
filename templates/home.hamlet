@@ -1,17 +1,16 @@
 $doctype 5
-<div id="header">
+<div .subheader .item>
   <h1>Eidolon
   <p>
     A simple gallery System in Haskell and Yesod
-<div #reel>
-  $forall (Entity mediumId medium) <- recentMedia
-    <article class="item">
-      <a href=@{MediumR mediumId}>
-        <figure>
-          <img src=@{StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumThumb medium) []} title=#{mediumTitle medium}>
-          <figcaption>#{mediumTitle medium}
-  $if nextMedia
-    <div .item .pagination>
-      <p>
-        <a href=@{PageR 1}>
-          older
+$forall (Entity mediumId medium) <- recentMedia
+  <div class="item">
+    <a href=@{MediumR mediumId}>
+      <figure>
+        <img src=@{StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumThumb medium) []} title=#{mediumTitle medium}>
+        <figcaption>#{mediumTitle medium}
+$if nextMedia
+  <div .item .subheader .pagin>
+    <p>
+      <a href=@{PageR 1}>
+        older

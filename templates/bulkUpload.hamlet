@@ -1,5 +1,4 @@
-<div #reel .middle>
-  <div .medium>
-    <form class="inner" method=post enctype=#{enctype}>
-      Upload multiple images
-      ^{uploadWidget}
+<div .medium .middle>
+  <form class="inner" method=post enctype=#{enctype}>
+    Upload multiple images
+    ^{uploadWidget}

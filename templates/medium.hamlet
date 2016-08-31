@@ -1,17 +1,17 @@
 <div .column>
-  <div class="medium">
+  <div .medium>
     <h1>#{mediumTitle medium}
     <p>
       by <a href=@{UserR ownerName}>#{ownerName}</a> from album <a href=@{AlbumR albumId}>#{albumTitle album}</a>
-  <div class="medium image">
+  <div .medium .image>
     <a href=@{ir}>
       <picture>
         <source srcset="@{pr}, @{ir} 2x" media="(min-width: 600px)">
         <source srcset="@{tr}, @{pr} 2x">
         <img src=@{pr} title=#{mediumTitle medium}>
   
-  <div class="medium">
-    <p class="desc">
+  <div .medium>
+    <p>
       Uploaded on: #{formatTime defaultTimeLocale "%A %F %H:%M" (mediumTime medium)}<br>
       $maybe d <- mediumDescription medium
         Description:<br>
@@ -19,25 +19,25 @@
       $nothing
         No description given
   
-    <div class="tags">
-      <p>
-        Tags:
-        <ul>
-          $if null (mediumTags medium)
-            none
-          $else
-            $forall tag <- mediumTags medium
-              <li>
-                <a href=@{TagR tag}>#{tag}
-    $if presence == True
-      <a href=@{MediumSettingsR mediumId}>Change medium settings
+    <div .tags>
+        <p>
+          Tags:
+          <ul>
+            $if null (mediumTags medium)
+              none
+            $else
+              $forall tag <- mediumTags medium
+                <li>
+                  <a href=@{TagR tag}>#{tag}
+      $if presence == True
+        <a href=@{MediumSettingsR mediumId}>Change medium settings
   
   $if null comments
     <div class="medium">
       <p>There are no Comments yet
   $else
     $forall (Entity commentId comment) <- comments
-      <div .medium .comment data-width="300">
+      <div .medium .comment>
         <a href=@{ProfileR $ commentAuthor comment}>#{commentAuthorSlug comment}</a> wrote on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime comment}:
         <hr>
         #{commentContent comment}
@@ -48,7 +48,7 @@
             <a href=@{CommentDeleteR commentId}>Delete this comment
       $forall (Entity replyId reply) <- replies
         $if commentParent reply == Just commentId
-          <article .comment .reply .medium>
+          <div .comment .reply .medium>
             <a href=@{ProfileR $ commentAuthor reply}>#{commentAuthorSlug reply}</a> replied on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime reply}:
             <hr>
             #{commentContent reply}
@@ -57,10 +57,9 @@
               <a href=@{CommentDeleteR replyId}>Delete this comment
     
   $if userId /= Nothing
-    <div class="medium">
-      <div class="inner">
-        <form method=post enctype=#{enctype}>
-          ^{commentWidget}
+    <div .medium>
+      <form method=post enctype=#{enctype}>
+        ^{commentWidget}
 
 <style type="text/css">
   body{background-image: url('/static/css/images/overlay.png'),	-webkit-linear-gradient(top, rgba(0,0,0,0) 75%, rgba(0,0,0,0.65)), url('@{StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumPath medium) []}');background-attachment:fixed;background-image: url('/static/css/images/overlay.png'), -moz-linear-gradient(center top , transparent 75%, rgba(0, 0, 0, 0.65)), url('@{StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumPath medium) []}');}

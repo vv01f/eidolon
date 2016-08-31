@@ -1,19 +1,18 @@
 $newline always
-<div #reel>
-  <div .subheader .item>
-    <h1>#{albumTitle album} <small>by <a href=@{UserR ownerName}>#{ownerSlug}</a></small>
-    $if presence == True
-      <a href=@{DirectUploadR albumId}>Upload image to this album
-      <br>
-      <a href=@{AlbumSettingsR albumId}>Change settings of this album
-  
-  $if null media
+<div .subheader .item>
+  <h1>#{albumTitle album} <small>by <a href=@{UserR ownerName}>#{ownerSlug}</a></small>
+  $if presence == True
+    <a href=@{DirectUploadR albumId}>Upload image to this album
+    <br>
+    <a href=@{AlbumSettingsR albumId}>Change settings of this album
+
+$if null media
+  <div .item>
+    <p class="center">This album is empty
+$else
+  $forall (Entity mediumId medium) <- media
     <div .item>
-      <p class="center">This album is empty
-  $else
-    $forall (Entity mediumId medium) <- media
-      <div .item>
-        <a href=@{MediumR mediumId}>
-          <figure>
-            <img src=@{StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumThumb medium) []} title=#{mediumTitle medium}>
-            <figcaption>#{mediumTitle medium}
+      <a href=@{MediumR mediumId}>
+        <figure>
+          <img src=@{StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumThumb medium) []} title=#{mediumTitle medium}>
+          <figcaption>#{mediumTitle medium}

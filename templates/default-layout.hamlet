@@ -43,5 +43,5 @@
 $maybe msg <- mmsg
   <div #message>#{msg}
 
-<div id="main" role="main">
+<div .reel role="main">
   ^{pageBody wc}

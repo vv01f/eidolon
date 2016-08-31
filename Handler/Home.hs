@@ -27,7 +27,7 @@ import Yesod.AtomFeed
 getHomeR :: Handler Html
 getHomeR = do
   recentMedia <- runDB $ selectList [] [Desc MediumTime, LimitTo 15]
-  nextMediaQuery <- runDB $ selectList [] [Desc MediumTime, LimitTo 1, OffsetBy 30]
+  nextMediaQuery <- runDB $ selectList [] [Desc MediumTime, LimitTo 1, OffsetBy 15]
   let nextMedia = not $ L.null nextMediaQuery
   defaultLayout $ do
     rssLink RootFeedRssR "Root Feed"

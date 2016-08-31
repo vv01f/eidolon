@@ -9,11 +9,6 @@ $doctype 5
         <meta name="author" content="">
 
         <meta name="viewport" content="width=device-width,initial-scale=1">
-        <noscript>
-          <link rel="stylesheet" href=@{StaticR css_style_css} />
-          <link rel="stylesheet" href=@{StaticR css_style_global_css} />
-          <link rel="stylesheet" href=@{StaticR css_style_desktop_css} />
-          <link rel="stylesheet" href=@{StaticR css_style_noscript_css} />
 
         ^{pageHead pc}
         ^{pageHead wc}

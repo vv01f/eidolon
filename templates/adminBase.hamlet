@@ -1,32 +1,26 @@
 $newline always
-<div id="header" class="item" data-width="400">
-  <div class="inner">
-    <h1>Admin interface
-    <p>
-      Be careful with your actions here, every click will perform directly the advertised action.
+<div .subheader .item>
+  <h1>Admin interface
+  <p>
+    Be careful with your actions here, every click will perform directly the advertised action.
 
 
-<div id="header" class="item" data-width="400">
-  <div class="inner">
-    <p>
-      <a href=@{AdminProfilesR}>User profiles
+<div .item>
+  <p>
+    <a href=@{AdminProfilesR}>User profiles
 
-<div id="header" class="item" data-width="400">
-  <div class="inner">
-    <p>
-      <a href=@{AdminAlbumsR}>Albums
+<div .item>
+  <p>
+    <a href=@{AdminAlbumsR}>Albums
 
-<div id="header" class="item" data-width="400">
-  <div class="inner">
-    <p>
-      <a href=@{AdminMediaR}>Media
+<div .item>
+  <p>
+    <a href=@{AdminMediaR}>Media
 
-<div id="header" class="item" data-width="400">
-  <div class="inner">
-    <p>
-      <a href=@{AdminCommentR}>Comments
+<div .item>
+  <p>
+    <a href=@{AdminCommentR}>Comments
 
-<div id="header" class="item" data-width="400">
-  <div class="inner">
-    <p>
-      <a href=@{AdminSearchReloadR}>Repopulate search index
+<div .item>
+  <p>
+    <a href=@{AdminSearchReloadR}>Repopulate search index

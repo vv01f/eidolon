@@ -12,11 +12,6 @@ body {
 	color: rgba(255,255,255,0.7);
 }
 
-#main {
-	margin-top: 80px;
-	width: 100%;
-}
-
 a {
 	color: white;
 	text-decoration: none;
@@ -54,17 +49,12 @@ a:hover, .item a:hover, .medium a:hover, a:hover figcaption {
 	margin: 40px 80px 40px;
 }
 
-#reel {
+.reel {
 	list-style: none;
 	display: block;
-	margin: 0 80px;
+	margin: 80px 80px 0;
 	padding: 0;
 	text-align: center;
-}
-
-.middle {
-	position: relative;
-	top: 50px;
 }
 
 .item, .medium {
@@ -109,6 +99,10 @@ a:hover, .item a:hover, .medium a:hover, a:hover figcaption {
 	width: 100%;
 }
 
+.subheader > * {
+	padding: 20px;
+}
+
 .subheader a {
 	flex: 1;
 	display: inline;
@@ -122,6 +116,8 @@ a:hover, .item a:hover, .medium a:hover, a:hover figcaption {
 
 .subheader p {
 	font-size: 14pt;
+	display: block;
+	height: 150px;
 }
 
 .column {
@@ -193,6 +189,10 @@ footer {
 
 .right {
 	float: right;
+}
+
+.middle {
+	margin-top: 50px;
 }
 
 @media (max-width: 755px) {

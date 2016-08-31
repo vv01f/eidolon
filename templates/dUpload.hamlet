@@ -1,5 +1,4 @@
-<div #reel .middle>
-  <div .medium>
-    <form method=post enctype=#{enctype}>
-      Image upload to album #{albumTitle album}
-      ^{dUploadWidget}
+<div .medium .middle>
+  <form method=post enctype=#{enctype}>
+    Image upload to album #{albumTitle album}
+    ^{dUploadWidget}

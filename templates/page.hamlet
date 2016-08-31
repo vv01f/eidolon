@@ -1,24 +1,24 @@
 $doctype 5
 $if page == 1
-  <div id="header" class="item" data-width="400">
+  <div .item .subheader>
     <div class="inner">
       <p>
         <a href=@{HomeR}>
           newer
 $else
-  <div id="header" class="item" data-width="400">
+  <div .item .subheader>
     <div class="inner">
       <p>
         <a href=@{PageR (page - 1)}>
           newer
 $forall (Entity mediumId medium) <- pageMedia
-  <article class="item" data-width=#{mediumThumbWidth medium}>
+  <div .item>
     <a href=@{MediumR mediumId}>
       <figure>
         <img src=@{StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumThumb medium) []} title=#{mediumTitle medium}>
         <figcaption>#{mediumTitle medium}
 $if nextMedia
-  <div id="header" class="item" data-width="400">
+  <div .item .subheader>
     <div class="inner">
       <p>
         <a href=@{PageR (page + 1)}>

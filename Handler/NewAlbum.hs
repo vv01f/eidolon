@@ -31,7 +31,7 @@ getNewAlbumR = do
       (albumWidget, enctype) <- generateFormPost $
         renderBootstrap3 BootstrapBasicForm $
         albumForm userId
-      formLayout $ do
+      defaultLayout $ do
         setTitle "Eidolon :: Create new Album"
         $(widgetFile "newAlbum")
     Nothing -> do
