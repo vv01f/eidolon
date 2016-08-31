@@ -10,7 +10,7 @@ $newline always
       <p class="center">This user has no albums yet
     $else
       <h1>Albums
-      <p>Albums of this user:
+      <p>Albums of this user
   $if not (null userAlbs)
     $forall (Entity albumId album) <- userAlbs
       <article class="item">
@@ -25,7 +25,7 @@ $newline always
   $if not (null sharedAlbs)
     <article .subheader .item>
       <h1>Shared Albums
-      <p>Albums shared with this user:
+      <p>Albums others have shared with this user
     $forall Just (Entity albumId album) <- sharedAlbs
       <article .item>
         <a href=@{AlbumR albumId}>
@@ -39,7 +39,7 @@ $newline always
   $if not (null recentMedia)
     <article .subheader .item>
       <h1>Newest images
-      <p>recent uploads of #{ownerSlug}
+      <p>Recent uploads by #{ownerSlug}
     $forall (Entity mediumId medium) <- take 10 recentMedia
       <article .item>
         <a href=@{MediumR mediumId}>

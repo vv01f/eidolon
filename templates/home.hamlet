@@ -10,8 +10,8 @@ $doctype 5
         <figure>
           <img src=@{StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumThumb medium) []} title=#{mediumTitle medium}>
           <figcaption>#{mediumTitle medium}
-$if nextMedia
-  <div class="pagination">
-    <p>
-      <a href=@{PageR 1}>
-        older
+  $if nextMedia
+    <div .item .pagination>
+      <p>
+        <a href=@{PageR 1}>
+          older
