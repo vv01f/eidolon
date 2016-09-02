@@ -1,12 +1,12 @@
 $newline always
-<div id="header" class="item" data-width="400">
-  <form class="inner" method="post" enctype=#{enctype}>
+<div .medium>
+  <form method="post" enctype=#{enctype}>
     <h1>Profile Settings
     ^{adminProfileSetWidget}
 
   <a href=@{AdminProfileDeleteR userId}>Delete user
 
-<div id="header" class="item" data-width="200">
+<div .item>
   <div class="inner">
     <ul>
       <li>

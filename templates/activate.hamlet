@@ -1,7 +1,7 @@
 $newline always
-<div id="header" class="item" data-width="300">
+<div .item>
   <noscript>You need to have Javascript enabled
-  <form class="inner login">
+  <form .login>
     <h3>Activate your account
     <p>
       <label for="password1">Password:

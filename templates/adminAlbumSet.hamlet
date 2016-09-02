@@ -1,12 +1,12 @@
 $newline always
-<div id="header" class="item" data-width="400">
+<div .medium>
   <form class="inner" method="post" enctype=#{enctype}>
     <h1>Album settings
     ^{adminAlbumSettingsWidget}
 
   <a href=@{AdminAlbumDeleteR albumId}>Delete this album
 
-<div id="header" class="item" data-width="200">
+<div .item>
   <div class="inner">
     <p>
       <a href=@{AdminAlbumMediaR albumId}>Media in this album

@@ -1,12 +1,12 @@
 $newline always
-<div id="header" class="item" data-width="400">
-  <div class="inner">
-    <h1>Tag #{tag}
-    $if null media
+<div .subheader .item>
+  <h1>Tag #{tag}
+  $if null media
+    <p>
       There are no media tagged with #{tag}
 
 $forall Just (Entity mId m) <- media
-  <article class="item" data-width=#{mediumThumbWidth m}>
+  <div .item>
     <a href=@{MediumR mId}>
       <figure>
         <img src=@{StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumThumb m) []} title=#{mediumTitle m}>

@@ -1,12 +1,11 @@
 $newline always
-<div id="header" class="item" data-width="400">
-  <div class="inner">
-    <h1>Media from #{albumTitle album}
-    $if null media
-      <p>#{albumTitle album} has no media yet
+<div .subheader .item>
+  <h1>Media from #{albumTitle album}
+  $if null media
+    <p>#{albumTitle album} has no media yet
 
 $forall (Entity mId m) <- media
-  <article class="item" data-width=#{mediumThumbWidth m}>
+  <div .item>
     <a href=@{AdminMediumSettingsR mId}>
       <figure>
         <img src=@{StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumThumb m) []}>

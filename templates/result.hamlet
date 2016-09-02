@@ -1,31 +1,26 @@
-<div #header .item data-width="400">
-  <div .inner>
-    <h1>
-      Results for: #{query}
+<div .subheader .item>
+  <h1>
+    Results for: #{query}
 
 $if allEmpty
-  <div #header .item data-width="400">
-    <div .inner>
-      <h2>
-        Sorry, no results
+  <div .subheader .item>
+    <h2>
+      Sorry, no results
 $else
   $if not $ null userList
-    <div #header .item data-width="400">
-      <div .inner>
-        <h2>
-          Results in Users:
+    <div .subheader .item>
+      <h2>
+        Results in Users:
     $forall (Entity uId user) <- userList
-      <div #header .item data-width="400">
-        <div .inner>
-          <a href=@{ProfileR uId}>
-            #{userSlug user}
+      <div .item>
+        <a href=@{ProfileR uId}>
+          #{userSlug user}
   $if not $ null albumList
-    <div #header .item data-width="400">
-      <div .inner>
-        <h2>
-          Results in Albums:
+    <div .subheader .item>
+      <h2>
+        Results in Albums:
     $forall (Entity aId album) <- albumList
-      <article .item data-width="#{albumSampleWidth album}">
+      <div .item data-width="#{albumSampleWidth album}">
         <a href=@{AlbumR aId}>
           <figure>
             $if (albumSamplePic album) == Nothing
@@ -34,23 +29,20 @@ $else
               <img src=@{StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ fromJust $ albumSamplePic album) []} title=#{albumTitle album}>
             <figcaption>#{albumTitle album}
   $if not $ null mediumList
-    <article #header .item data-width="400">
-      <div .inner>
-        <h2>
-          Results in Media:
+    <article .subheader .item>
+      <h2>
+        Results in Media:
     $forall (Entity mId medium) <- mediumList
-      <article .item data-width="#{mediumThumbWidth medium}">
+      <div .item>
         <a href=@{MediumR mId}>
           <figure>
             <img src=@{StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumThumb medium) []} title=#{mediumTitle medium}>
             <figcaption>#{mediumTitle medium}
   $if not $ null commentList
-    <div #header .item data-width="400">
-      <div .inner>
-        <h2>
-          Results in Comments:
+    <div .subheader .item>
+      <h2>
+        Results in Comments:
     $forall (Entity _ comment) <- commentList
-      <div #header .item data-width="400">
-        <div .inner>
-          <a href=@{MediumR $ commentOrigin comment}>
-            #{commentContent comment}
+      <div .item>
+        <a href=@{MediumR $ commentOrigin comment}>
+          #{commentContent comment}

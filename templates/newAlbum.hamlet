@@ -1,4 +1,4 @@
-<div .medium .middle>
+<div .medium>
   <h3>Create new Album
   <form class="inner r" method=post enctype=#{enctype}>
     ^{albumWidget}

@@ -1,9 +1,8 @@
 $newline always
-<div id="header" class="item" data-width="400">
-  <div class="inner">
-    <h3>Reset Password
+<div .item>
+  <h3>Reset Password
 
-    <form method="post" enctype=#{enctype}>
-      ^{reactivateWidget}
-      <div>
-        <input type=submit value="Send">
+  <form method="post" enctype=#{enctype}>
+    ^{reactivateWidget}
+    <div>
+      <input type=submit value="Send">

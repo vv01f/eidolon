@@ -1,5 +1,5 @@
 $newline always
-<div id="header" class="item" data-width="300">
+<div .medium>
   <noscript>You need to have Javscript enabled
   <h3>Signup
   <form role="form" class="inner" method="POST" action=@{SignupR}>

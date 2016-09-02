@@ -1,10 +1,9 @@
 $newline always
-<div id="header" class="item" data-width="300">
-  <div class="inner">
-    <h3>Medium settings
+<div .item>
+  <h3>Medium settings
 
-    <form method="post" enctype=#{enctype}>
-      ^{mediumSettingsWidget}
+  <form method="post" enctype=#{enctype}>
+    ^{mediumSettingsWidget}
 
   <a href=@{MediumDeleteR mediumId}>Delete this image
 

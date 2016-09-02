@@ -19,6 +19,7 @@ module Handler.AlbumSettings where
 import Import
 import Handler.Commons
 import qualified Data.Text as T
+import Data.Maybe
 import System.Directory
 import System.FilePath
 import qualified Data.List as L
@@ -107,7 +108,9 @@ postAlbumSettingsR albumId = do
                     else  do
                       return [()]
                       -- nothing to do here
-                  width <- getThumbWidth $ albumSamplePic temp
+                  sample <- runDB $ selectFirst
+                    [MediumThumb ==. (fromMaybe "" $ albumSamplePic temp)] []
+                  let width = if isNothing sample then 230 else mediumThumbWidth $ entityVal $ fromJust sample
                   _ <- runDB $ update albumId 
                     [ AlbumTitle =. albumTitle temp
                     , AlbumShares =. newShares

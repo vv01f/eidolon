@@ -1,14 +1,13 @@
 $newline always
-<div id="header" class="item" data-width="400">
-  <div class="inner">
-    <h1>Albums of #{userSlug owner}
+<div .subheader .item>
+  <h1>Albums of #{userSlug owner}
+    $if null albums
       <p>
-        $if null albums
-          #{userSlug owner} has no albums yet
+        #{userSlug owner} has no albums yet
 
 $forall (Entity aId a) <- albums
-  <article class="item" data-width=#{albumSampleWidth a}>
-    <a href=@{AdminAlbumSettingsR aId}>#{albumTitle a}
+  <div .item>
+    <a href=@{AdminAlbumSettingsR aId}>
       <figure>
         $if (albumSamplePic a) == Nothing
           <img src="/static/img/album.jpg">

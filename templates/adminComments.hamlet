@@ -1,30 +1,28 @@
 $newline never
-<div id="header" class="item">
-  <div class="inner">
+<div .column>
+  <div .subheader .medium>
     <h1>Comments by medium
 
 
-$if null comments
-  <div id="header" class="item">
-    <div class="inner">
+  $if null comments
+    <div .subheader .medium>
       <p>There are no comments yet
-$else
-  $forall (Entity mediumId medium) <- media
-    <div id="header" class="item">
-      <div class="inner">
+  $else
+    $forall (Entity mediumId medium) <- media
+      <div .subheader .medium>
         <h3>#{mediumTitle medium}
-        $forall (Entity commentId comment) <- comments
-          $if commentOrigin comment == mediumId
-            <article class="comment">
-              #{commentAuthorSlug comment} wrote on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime comment}:
-              <hr>
-              #{commentContent comment}
-              <a href=@{AdminCommentDeleteR commentId}>Delete this comment
-          $forall (Entity replyId reply) <- replies
-            $if commentParent reply == Just commentId
-              $if commentOrigin reply == mediumId
-                <article class="comment reply">
-                  #{commentAuthorSlug comment} wrote on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime comment}:
-                  <hr>
-                  #{commentContent reply}
-                  <a href=@{AdminCommentDeleteR replyId}>Delete this comment
+      $forall (Entity commentId comment) <- comments
+        $if commentOrigin comment == mediumId
+          <div .medium .comment>
+            #{commentAuthorSlug comment} wrote on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime comment}:
+            <hr>
+            #{commentContent comment}
+            <a href=@{AdminCommentDeleteR commentId}>Delete this comment
+        $forall (Entity replyId reply) <- replies
+          $if commentParent reply == Just commentId
+            $if commentOrigin reply == mediumId
+              <div .medium .comment .reply>
+                #{commentAuthorSlug comment} wrote on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime comment}:
+                <hr>
+                #{commentContent reply}
+                <a href=@{AdminCommentDeleteR replyId}>Delete this comment

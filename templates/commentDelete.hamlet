@@ -1,12 +1,11 @@
 $newline always
-<div id="header" class="item" data-width="300">
-  <div class="inner">
-    <h3>Delete comment
+<div .item>
+  <h3>Delete comment
 
-    <p>
-      Do you wish to delete this comment?
+  <p>
+    Do you wish to delete this comment?
 
-    <form method="POST" action=@{CommentDeleteR commentId}>
-      <label for="confirm">Really delete this comment
-      <input type="checkbox" id="confirm" name="confirm" value="confirm" required>
-      <input id="delete" type="submit" value="Delete comment">
+  <form method="POST" action=@{CommentDeleteR commentId}>
+    <label for="confirm">Really delete this comment
+    <input type="checkbox" id="confirm" name="confirm" value="confirm" required>
+    <input id="delete" type="submit" value="Delete comment">
