@@ -145,7 +145,7 @@ a:hover, .item a:hover, .medium a:hover, a:hover figcaption {
 }
 
 .item img {
-	height: 230px;
+	max-height: 230px;
 }
 
 figure {
