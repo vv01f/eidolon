@@ -204,8 +204,18 @@ footer {
 }
 
 @media (max-width: 480px) {
-	#main, #reel {
-		margin-left: 0;
+	.reel {
+		margin: 80px 0 0;
+	}
+
+	.item, .medium {
+		border: 1px solid white;
+	}
+
+	.item {
+		margin-bottom: -1px;
 		margin-right: 0;
+		width: auto;
+		max-width: 400px;
 	}
 }
