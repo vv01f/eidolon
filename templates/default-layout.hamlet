@@ -37,8 +37,8 @@
             <li>
               <a href=@{SignupR}>
                 Signup
-    <div .col-md-3 .col-sm-6 #search>
-      ^{pageBody searchWidget}
+    <!--<div .col-md-3 .col-sm-6 #search>
+      ^{pageBody searchWidget}-->
 
 $maybe msg <- mmsg
   <div #message>#{msg}

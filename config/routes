@@ -57,7 +57,7 @@
 /admin/medium/#MediumId/delete	AdminMediumDeleteR	GET
 /admin/comment			AdminCommentR		GET
 /admin/comment/#CommentId	AdminCommentDeleteR	GET
-/admin/repop-search             AdminSearchReloadR      GET
+-- /admin/repop-search             AdminSearchReloadR      GET
 
 /tag/#T.Text			TagR			GET
 
@@ -72,4 +72,4 @@
 !/feed/user/#T.Text/atom.xml	NameFeedAtomR		GET
 !/feed/user/#T.Text/rss.xml	NameFeedRssR		GET
 
-/search				SearchR			GET
+-- /search				SearchR			GET

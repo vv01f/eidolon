@@ -101,16 +101,16 @@ renderLayout widget = do
     copyrightWidget <- widgetToPageContent $
         $(widgetFile "copyrightFooter")
 
-    searchWidget <- widgetToPageContent $ [whamlet|
-      <form action=@{SearchR} method=GET>
-        <input type="hidden" name="_hasdata">
-        <div .input-group .required>
-          <input #hident2 .form-control type="text" autofocus="" required="" name="f1" placeholder="Search for ...">
-          <span .input-group-btn>
-            <button .btn .btn-default type="submit">Go!
-        <script>
-          if (!('autofocus' in document.createElement('input'))) {document.getElementById('hident2').focus();}
-      |]
+    -- searchWidget <- widgetToPageContent $ [whamlet|
+    --   <form action=@{SearchR} method=GET>
+    --     <input type="hidden" name="_hasdata">
+    --     <div .input-group .required>
+    --       <input #hident2 .form-control type="text" autofocus="" required="" name="f1" placeholder="Search for ...">
+    --       <span .input-group-btn>
+    --         <button .btn .btn-default type="submit">Go!
+    --     <script>
+    --       if (!('autofocus' in document.createElement('input'))) {document.getElementById('hident2').focus();}
+    --   |]
 
     wc <- widgetToPageContent widget
 

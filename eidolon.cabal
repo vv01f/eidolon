@@ -50,7 +50,7 @@ library
                      Handler.Tag
                      Handler.RootFeed
                      Handler.Commons
-                     Handler.Search
+                     -- Handler.Search
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT

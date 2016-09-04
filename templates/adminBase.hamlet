@@ -21,6 +21,6 @@ $newline always
   <p>
     <a href=@{AdminCommentR}>Comments
 
-<div .item>
+<!--<div .item>
   <p>
-    <a href=@{AdminSearchReloadR}>Repopulate search index
+    <a href=@{AdminSearchReloadR}>Repopulate search index-->
