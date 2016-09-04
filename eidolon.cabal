@@ -118,7 +118,7 @@ library
                  , bloodhound                    >= 0.11.1
                  , http-types
                  , image-type
-                 , JuicyPixels                   >= 3.2.7
+                 , JuicyPixels                   >= 3.2.8
                  , JuicyPixels-scale-dct
                  , classy-prelude-yesod          >= 1.0
                  -- for Migrations
