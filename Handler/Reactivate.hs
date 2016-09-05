@@ -22,14 +22,14 @@ import Data.Text.Encoding
 
 getReactivateR :: Handler Html
 getReactivateR = do
-  (reactivateWidget, enctype) <- generateFormPost reactivateForm
+  (reactivateWidget, enctype) <- generateFormPost $ renderBootstrap3 BootstrapBasicForm $ reactivateForm
   formLayout $ do
     setTitle "Eidolon :: Reactivate account"
     $(widgetFile "reactivate")
 
 postReactivateR :: Handler Html
 postReactivateR = do
-  ((result, _), _) <- runFormPost reactivateForm
+  ((result, _), _) <- runFormPost $ renderBootstrap3 BootstrapBasicForm $ reactivateForm
   case result of
     FormSuccess temp -> do
       users <- runDB $ selectList [UserEmail ==. temp] []
@@ -66,6 +66,7 @@ postReactivateR = do
       setMessage "There is something wrong with your email"
       redirect $ ReactivateR
 
-reactivateForm :: Form Text
-reactivateForm = renderDivs $ (\a -> a)
-  <$> areq emailField "Email"  Nothing
+reactivateForm :: AForm Handler Text
+reactivateForm = id
+  <$> areq emailField (bfs ("Email" :: Text)) Nothing
+  <*  bootstrapSubmit ("Send" :: BootstrapSubmit Text)

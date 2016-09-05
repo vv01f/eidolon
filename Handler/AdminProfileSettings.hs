@@ -150,15 +150,15 @@ getAdminProfileDeleteR ownerId = do
       case tempOwner of
         Just owner -> do
           let albumList = userAlbums owner
-          _ <- mapM (\albumId -> do
+          mapM_ (\albumId -> do
             album <- runDB $ getJust albumId
             let mediaList = albumContent album
-            _ <- mapM (\med -> do
+            mapM_ (\med -> do
               -- delete comments
               commEnts <- runDB $ selectList [CommentOrigin ==. med] []
-              _ <- mapM (\ent -> do
+              mapM_ (\ent -> do
                 children <- runDB $ selectList [CommentParent ==. (Just $ entityKey ent)] []
-                _ <- mapM (\child -> do
+                mapM_ (\child -> do
                   -- delete comment children
                   runDB $ delete $ entityKey child
                   ) children
@@ -169,7 +169,6 @@ getAdminProfileDeleteR ownerId = do
               liftIO $ removeFile (normalise $ L.tail $ mediumThumb medium)
               liftIO $ removeFile (normalise $ L.tail $ mediumPreview medium)
               -- delete medium database entry and search
-              ium <- runDB $ getJust med
               runDB $ delete med
               ) mediaList
             runDB $ delete albumId

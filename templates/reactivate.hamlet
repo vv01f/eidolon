@@ -4,5 +4,3 @@ $newline always
 
   <form method="post" enctype=#{enctype}>
     ^{reactivateWidget}
-    <div>
-      <input type=submit value="Send">
