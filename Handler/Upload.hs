@@ -94,7 +94,6 @@ postDirectUploadR albumId = do
                               inALbum <- runDB $ getJust albumId
                               let newMediaList = mId : albumContent inALbum
                               runDB $ update albumId [AlbumContent =. newMediaList]
-                              putIndexES (ESMedium mId medium)
                               return Nothing
                           else do
                             liftIO $ removeFile (FP.normalise path)
@@ -306,7 +305,6 @@ postUploadR = do
                       inALbum <- runDB $ getJust inAlbumId
                       let newMediaList = mId : albumContent inALbum
                       runDB $ update inAlbumId [AlbumContent =. newMediaList]
-                      putIndexES (ESMedium mId medium)
                       return Nothing
                     else do
                       liftIO $ removeFile (FP.normalise path)

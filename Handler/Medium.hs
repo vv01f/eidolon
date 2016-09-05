@@ -91,7 +91,6 @@ postMediumR mediumId = do
           case res of
             FormSuccess temp -> do
               cId <- runDB $ insert temp
-              putIndexES (ESComment cId temp)
               --send mail to medium owner
               owner <- runDB $ getJust $ mediumOwner medium
               link <- ($ MediumR (commentOrigin temp)) <$> getUrlRender
@@ -170,7 +169,6 @@ postCommentReplyR commentId = do
           case res of
             FormSuccess temp -> do
               cId <- runDB $ insert temp
-              putIndexES (ESComment cId temp)
               --send mail to parent author
               parent <- runDB $ getJust $ fromJust $ commentParent temp
               parAuth <- runDB $ getJust $ commentAuthor parent
@@ -253,13 +251,10 @@ postCommentDeleteR commentId = do
                   -- delete comment children
                   childEnts <- runDB $ selectList [CommentParent ==. (Just commentId)] []
                   _ <- mapM (\ent -> do
-                    -- delete comment children from elasticsearch
-                    deleteIndexES (ESComment (entityKey ent) (entityVal ent))
+                    -- delete comment children
                     runDB $ delete $ entityKey ent) childEnts
                   -- delete comment itself
                   runDB $ delete commentId
-                  -- delete from elasticsearch
-                  deleteIndexES (ESComment commentId comment)
                   -- outro
                   setMessage "Your comment has been deleted"
                   redirect $ MediumR $ commentOrigin comment

@@ -16,7 +16,6 @@
 module Handler.Activate where
 
 import Import as I hiding (returnJson)
-import Handler.Commons
 import Data.Text
 import Data.Text.Encoding
 import Data.Maybe
@@ -74,8 +73,6 @@ postActivateR token = do
                   -- create user directory
                   liftIO $ createDirectoryIfMissing True $
                     "static" </> "data" </> unpack (extractKey uId)
-                  -- input user to elasticsearch
-                  putIndexES (ESUser uId $ activatorUser activ)
                   -- cleanup
                   runDB $ delete aId
                   runDB $ delete uTokenId

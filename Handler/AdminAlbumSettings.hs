@@ -101,7 +101,6 @@ postAdminAlbumSettingsR albumId = do
                 , AlbumSamplePic =. albumSamplePic temp
                 , AlbumSampleWidth =. width
                 ]
-              updateIndexES (ESAlbum albumId temp)
               setMessage "Album settings changed successfully"
               redirect AdminR
             _ -> do
@@ -152,22 +151,16 @@ getAdminAlbumDeleteR albumId = do
             -- delete comments
             commEnts <- runDB $ selectList [CommentOrigin ==. a] []
             _ <- mapM (\c -> do
-              -- delete comment from elasticsearch
+              -- delete comment
               children <- runDB $ selectList [CommentParent ==. (Just $ entityKey c)] []
               _ <- mapM (\child -> do
-                -- delete comment children from elasticsearch and db
-                deleteIndexES (ESComment (entityKey child) (entityVal child))
+                -- delete comment children from db
                 runDB $ delete $ entityKey child
                 ) children
-              deleteIndexES (ESComment (entityKey c) (entityVal c))
               runDB $ delete $ entityKey c) commEnts
-            -- delete album from elasticsearch
-            deleteIndexES (ESAlbum albumId album)
             -- delete album database entry
             runDB $ delete a
             ) (albumContent album)
-          -- delete from elasticsearch
-          deleteIndexES (ESAlbum albumId album)
           -- delete album
           runDB $ delete albumId
           -- delete files

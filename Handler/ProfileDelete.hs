@@ -55,23 +55,18 @@ postProfileDeleteR userId = do
                   children <- runDB $ selectList [CommentParent ==. (Just $ entityKey ent)] []
                   _ <- mapM (\child -> do
                     -- delete comment children
-                    deleteIndexES $ ESComment (entityKey child) (entityVal child)
                     runDB $ delete $ entityKey child
                     ) children
                   -- delete comment
-                  deleteIndexES $ ESComment (entityKey ent) (entityVal ent)
                   runDB $ delete $ entityKey ent) commEnts
                 medium <- runDB $ getJust med
                 liftIO $ removeFile (normalise $ L.tail $ mediumPath medium)
                 liftIO $ removeFile (normalise $ L.tail $ mediumThumb medium)
                 liftIO $ removeFile (normalise $ L.tail $ mediumPreview medium)
-                deleteIndexES (ESMedium med medium)
                 runDB $ delete med
                 ) mediaList
-              deleteIndexES $ ESAlbum albumId album
               runDB $ delete albumId
             ) albumList
-          deleteIndexES $ ESUser userId user
           runDB $ delete userId
           liftIO $ removeDirectoryRecursive $ "static" </> "data" </> T.unpack (extractKey userId)
           deleteSession "userId"

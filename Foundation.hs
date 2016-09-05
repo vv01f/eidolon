@@ -115,19 +115,13 @@ renderLayout widget = do
     wc <- widgetToPageContent widget
 
     pc <- widgetToPageContent $ do
-        -- add parallelism js files
-        -- mapM_ addScript $ map StaticR
-        --     -- [ js_jquery_1_11_3_js
-        --     -- , js_jquery_poptrox_js
-        --     -- , js_skel_min_js
-        --     -- , js_init_js
-        --     [ js_picturefill_js
-        --     ]
+        mapM_ addScript $ map StaticR
+            [ js_picturefill_js
+            ]
         mapM_ addStylesheet $ map StaticR
             [ css_bootstrap_min_css
             , css_dropdown_css
             , css_main_css
-            -- , css_style_global_css
             ]
         $(widgetFile "default-layout")
 
