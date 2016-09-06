@@ -97,11 +97,8 @@ adminMediumSetForm medium = Medium
   <*> pure (mediumOwner medium)
   <*> aopt textareaField (bfs ("Description" :: T.Text)) (Just $ mediumDescription medium)
   <*> areq tagField (bfs ("Tags" :: T.Text))  (Just $ mediumTags medium)
-  <*> pure (mediumWidth medium)
-  <*> pure (mediumThumbWidth medium)
   <*> pure (mediumAlbum medium)
   <*> pure (mediumPreview medium)
-  <*> pure (mediumPreviewWidth medium)
   <*  bootstrapSubmit ("Change settings" :: BootstrapSubmit Text)
 
 getAdminMediumDeleteR :: MediumId -> Handler Html

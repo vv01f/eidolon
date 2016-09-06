@@ -68,7 +68,7 @@ cabal sandbox init
 build the source with
 
 ```bash
-cabal install
+cabal build
 ```
 
 Everything should work automagically from there.
@@ -76,7 +76,7 @@ Everything should work automagically from there.
 ##Deploying
 
 After compiling you will find an executable called `eidolon` in
-`dist/dist-sandbox-XXXXXXXX/build/eidolon/eidolon`. Copy or link it anywhere you
+`dist/build/eidolon/eidolon`. Copy or link it anywhere you
 want. The executable needs to be accompanied by the folders `config` and
 `static` and their contents. It's best to copy them to your desired destination.
 

@@ -17,7 +17,6 @@
 module Handler.NewAlbum where
 
 import Import
-import Handler.Commons
 import Data.Text as T
 import System.Directory
 import System.FilePath
@@ -75,5 +74,4 @@ albumForm userId = Album
   <*> pure []
   <*> pure []
   <*> pure Nothing
-  <*> pure 230
   <*  bootstrapSubmit ("Create album" :: BootstrapSubmit Text)

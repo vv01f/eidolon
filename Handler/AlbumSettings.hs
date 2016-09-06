@@ -17,9 +17,7 @@
 module Handler.AlbumSettings where
 
 import Import
-import Handler.Commons
 import qualified Data.Text as T
-import Data.Maybe
 import System.Directory
 import System.FilePath
 import qualified Data.List as L
@@ -108,14 +106,10 @@ postAlbumSettingsR albumId = do
                     else  do
                       return [()]
                       -- nothing to do here
-                  sample <- runDB $ selectFirst
-                    [MediumThumb ==. (fromMaybe "" $ albumSamplePic temp)] []
-                  let width = if isNothing sample then 230 else mediumThumbWidth $ entityVal $ fromJust sample
                   _ <- runDB $ update albumId 
                     [ AlbumTitle =. albumTitle temp
                     , AlbumShares =. newShares
                     , AlbumSamplePic =. albumSamplePic temp
-                    , AlbumSampleWidth =. width
                     ]
                   setMessage "Album settings changed succesfully"
                   redirect $ AlbumR albumId
@@ -139,7 +133,6 @@ albumSettingsForm album albumId users = Album
   <*> areq (userField users) (bfs ("Share this album with" :: T.Text)) (Just $ albumShares album)
   <*> pure (albumContent album)
   <*> aopt (selectField media) (bfs ("Sample picture" :: T.Text)) (Just $ albumSamplePic album)
-  <*> pure 230
   <*  bootstrapSubmit ("Change settings" :: BootstrapSubmit Text)
   where
     media = do

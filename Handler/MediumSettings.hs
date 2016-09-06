@@ -72,11 +72,8 @@ mediumSettingsForm medium = Medium
   <*> pure (mediumOwner medium)
   <*> aopt textareaField (bfs ("Description" :: T.Text)) (Just $ mediumDescription medium)
   <*> areq tagField (bfs ("tags" :: T.Text)) (Just $ mediumTags medium)
-  <*> pure (mediumWidth medium)
-  <*> pure (mediumThumbWidth medium)
   <*> pure (mediumAlbum medium)
   <*> pure (mediumPreview medium)
-  <*> pure (mediumPreviewWidth medium)
   <*  bootstrapSubmit ("Change settings" :: BootstrapSubmit T.Text)
 
 getMediumDeleteR :: MediumId -> Handler Html

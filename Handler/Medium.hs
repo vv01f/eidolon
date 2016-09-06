@@ -17,11 +17,9 @@
 module Handler.Medium where
 
 import Import
-import Handler.Commons
 import Data.Time
 import Data.Maybe
 import qualified Data.Text as T
--- import System.Locale
 import System.FilePath
 import Yesod.Markdown
 import Yesod.RssFeed
@@ -61,7 +59,6 @@ getMediumR mediumId = do
         [ CommentOrigin ==. mediumId
         , CommentParent !=. Nothing ]
         [ Desc CommentTime ]
-      let dataWidth = if mediumWidth medium >= 850 then 850 else mediumWidth medium
       let tr = StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumThumb medium) []
       let pr = StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumPreview medium) []
       let ir = StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumPath medium) []
@@ -90,7 +87,7 @@ postMediumR mediumId = do
             commentForm userId userSl mediumId Nothing
           case res of
             FormSuccess temp -> do
-              cId <- runDB $ insert temp
+              runDB $ insert_ temp
               --send mail to medium owner
               owner <- runDB $ getJust $ mediumOwner medium
               link <- ($ MediumR (commentOrigin temp)) <$> getUrlRender
@@ -168,7 +165,7 @@ postCommentReplyR commentId = do
             commentForm userId userSl mediumId (Just commentId)
           case res of
             FormSuccess temp -> do
-              cId <- runDB $ insert temp
+              runDB $ insert_ temp
               --send mail to parent author
               parent <- runDB $ getJust $ fromJust $ commentParent temp
               parAuth <- runDB $ getJust $ commentAuthor parent

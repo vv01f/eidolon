@@ -43,7 +43,7 @@ getAdminCommentDeleteR commentId = do
     Right _ -> do
       tempComment <- runDB $ get commentId
       case tempComment of
-        Just comment -> do
+        Just _ -> do
           -- delete comment children
           children <- runDB $ selectList [CommentParent ==. Just commentId] []
           _ <- mapM (\child -> do

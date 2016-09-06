@@ -17,7 +17,6 @@
 module Handler.Upload where
 
 import Import as I
-import Handler.Commons
 import Data.Time
 import Data.Maybe
 import qualified Data.Text as T
@@ -89,7 +88,7 @@ postDirectUploadR albumId = do
                               tempName <- if length indFils == 1
                                 then return $ fileBulkPrefix temp
                                 else return (fileBulkPrefix temp `T.append` " " `T.append` T.pack (show (index :: Int)) `T.append` " of " `T.append` T.pack (show (length indFils)))
-                              let medium = Medium tempName ('/' : path) ('/' : metaThumbPath meta) mime (fileBulkTime temp) (fileBulkOwner temp) (fileBulkDesc temp) (fileBulkTags temp) (metaImageWidth meta) (metaThumbWidth meta) albumId ('/' : metaPreviewPath meta) (metaPreviewWidth meta)
+                              let medium = Medium tempName ('/' : path) ('/' : metaThumbPath meta) mime (fileBulkTime temp) (fileBulkOwner temp) (fileBulkDesc temp) (fileBulkTags temp) albumId ('/' : metaPreviewPath meta)
                               mId <- runDB $ I.insert medium
                               inALbum <- runDB $ getJust albumId
                               let newMediaList = mId : albumContent inALbum
@@ -129,9 +128,6 @@ postDirectUploadR albumId = do
 data ThumbsMeta = ThumbsMeta
   { metaThumbPath    :: FP.FilePath -- ^ Filepath of the new thumbnail image
   , metaPreviewPath  :: FP.FilePath -- ^ Filepath of the new preview image
-  , metaImageWidth   :: Int         -- ^ Width of the original image
-  , metaThumbWidth   :: Int         -- ^ Width of the generated thumbnail image
-  , metaPreviewWidth :: Int         -- ^ Width of the generated preview image
   }
 
 -- | generate thumbnail and preview images from uploaded image
@@ -165,9 +161,6 @@ generateThumbs path uId aId = do
       return $ ThumbsMeta
         { metaThumbPath    = tPath
         , metaPreviewPath  = pPath
-        , metaImageWidth   = oWidth
-        , metaThumbWidth   = tWidth
-        , metaPreviewWidth = pWidth
         }
 
 checkCVE_2016_3714 :: FP.FilePath -> Text -> IO Bool
@@ -300,7 +293,7 @@ postUploadR = do
                             T.pack (show (index :: Int)) `T.append`
                             " of " `T.append`
                             T.pack (show (length indFils)))
-                      let medium = Medium tempName ('/' : path) ('/' : metaThumbPath meta) mime (fileBulkTime temp) (fileBulkOwner temp) (fileBulkDesc temp) (fileBulkTags temp) (metaImageWidth meta) (metaThumbWidth meta) inAlbumId ('/' : metaPreviewPath meta) (metaPreviewWidth meta)
+                      let medium = Medium tempName ('/' : path) ('/' : metaThumbPath meta) mime (fileBulkTime temp) (fileBulkOwner temp) (fileBulkDesc temp) (fileBulkTags temp) inAlbumId ('/' : metaPreviewPath meta)
                       mId <- runDB $ I.insert medium
                       inALbum <- runDB $ getJust inAlbumId
                       let newMediaList = mId : albumContent inALbum
