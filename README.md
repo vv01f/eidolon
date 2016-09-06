@@ -12,25 +12,22 @@ Visit the test instance at [eidolon.nek0.eu][eidolon]
 
 ####Build dependencies
 
-A working Haskell capable environment. For that you will need `haskell-stack`
-and `cabal-install`, which you can install with:
+A working Haskell capable environment. For that you will need `cabal-install`,
+which you can install with:
 
 ```bash
-sudo apt-get install haskell-stack
+sudo apt-get install cabal-install
 ```
 
-Shouldn't stack be available through your package repositories you can get it
-[here][stack].
-
-Now you can set up your stack with `stack setup` and follow its instructions.
-This will install the latest GHC Haskell compiler on your system.
+Now you can set up your cabal with `cabal update` and follow its instructions.
+with this you will have also installed the latest GHC Haskell compiler on your
+system.
 
 Additionally to Haskell and its dependencies you will need the following
 software and libraries:
 
 * alex
 * happy
-* libmagick++-dev
 * libpq-dev
 * postgresql
 * libfftw3-dev
@@ -42,6 +39,8 @@ sudo apt-get install alex happy libmagick++-dev libpq-dev postgresql libmagickwa
 ```
 
 ####Elasticsearch dependencies
+
+**WARNING: THIS SECTION IS ONLY VALID FOR VERSIONS >= 0.0.5 and < 0.1.0.0**
 
 Since version 0.0.5 there is an Elasticsearch integration for Eidolon. To Be
 able to run eidolon , you need to install `elasticsearch` additionally with:
@@ -60,10 +59,16 @@ get the source with
 git clone https://github.com/nek0/eidolon.git
 ```
 
+build your sandbox with
+
+```bash
+cabal sandbox init
+```
+
 build the source with
 
 ```bash
-stack build
+cabal install
 ```
 
 Everything should work automagically from there.
@@ -71,11 +76,9 @@ Everything should work automagically from there.
 ##Deploying
 
 After compiling you will find an executable called `eidolon` in
-`.stack-work/dist/<arch>/Cabal-<version>/build/eidolon/`, where `<arch>` is
-your system architecture and `<version>` your current cabal version. Copy or
-link it anywhere you want. The executable needs to be accompanied by the
-folders `config` and `static` and their contents. It's best to copy them to your
-desired destination.
+`dist/dist-sandbox-XXXXXXXX/build/eidolon/eidolon`. Copy or link it anywhere you
+want. The executable needs to be accompanied by the folders `config` and
+`static` and their contents. It's best to copy them to your desired destination.
 
 Also check `config/settings.yml` and set the values there accrding to your
 configuration. Especially the settings for elasticsearch are vital.
@@ -86,7 +89,7 @@ recommend using [nginx](http://nginx.org/).
 ##Customizing
 
 Unfortunately the gallery is not highly customizable, but you can change most of
-its appearance by changing the files `static/css/style-*.css`. Especially the
+its appearance by changing the files `static/css/main.css`. Especially the
 default background image can be changed by replacing `static/css/img/bg.jpg`.
 
 ##Starting
@@ -122,6 +125,16 @@ all the images is located)
 		* Note: No space between the option `-package-db` and its argument
 	* without sandbox: `runghc /path/to/eidolon/Migrations/0.0.4-0.0.5/Migration.hs`
 * start or restart your eidolon service
+
+###0.0.7-0.1.0.0
+
+You have two options to accomplish the migration:
+1. Build the migration binary with `cabal exec -- ghc --make
+Migrations/0.0.7-0.1.0.0/Migration.hs` and run the executable in your run
+location.
+2. Link the `static/data/` folder from your link location in the same location
+in the project directory and run `cabal exec -- runghc
+Migrations/0.0.7-0.1.0.0/Migration.hs`
 
 ##Acknowledgements:
 
