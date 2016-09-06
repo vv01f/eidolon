@@ -115,7 +115,7 @@ library
                  , wai                           >= 3.0
                  , yesod-newsfeed                >= 1.6
                  , unix                          >= 2.7
-                 , bloodhound                    >= 0.11.1
+                 -- , bloodhound                    >= 0.11.1
                  , http-types
                  , image-type
                  , JuicyPixels                   >= 3.2.8
