@@ -41,7 +41,7 @@ getAlbumSettingsR albumId = do
               (albumSettingsWidget, enctype) <- generateFormPost $
                 renderBootstrap3 BootstrapBasicForm $
                 albumSettingsForm album albumId users
-              formLayout $ do
+              defaultLayout $ do
                 setTitle "Eidolon :: Album Settings"
                 $(widgetFile "albumSettings")
             False -> do
@@ -152,7 +152,7 @@ getAlbumDeleteR albumId = do
           if
             userId == ownerId
             then do
-              formLayout $ do
+              defaultLayout $ do
                 setTitle $ toHtml ("Eidolon :: Delete album" `T.append` (albumTitle album))
                 $(widgetFile "albumDelete")
             else do

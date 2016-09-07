@@ -29,7 +29,7 @@ getAdminCommentR = do
       media <- runDB $ selectList [] [Desc MediumTime]
       comments <- runDB $ selectList [CommentParent ==. Nothing] [Desc CommentTime]
       replies <- runDB $ selectList [CommentParent !=. Nothing] [Desc CommentTime]
-      formLayout $ do
+      defaultLayout $ do
         setTitle "Administration: Comments"
         $(widgetFile "adminComments")
     Left (errorMsg, route) -> do

@@ -31,7 +31,7 @@ getMediumSettingsR mediumId = do
       (mediumSettingsWidget, enctype) <- generateFormPost $
         renderBootstrap3 BootstrapBasicForm $
         mediumSettingsForm medium
-      formLayout $ do
+      defaultLayout $ do
         setTitle "Eidolon :: Medium Settings"
         $(widgetFile "mediumSettings")
     Left (errorMsg, route) -> do
@@ -81,7 +81,7 @@ getMediumDeleteR mediumId = do
   checkRes <- mediumCheck mediumId
   case checkRes of
     Right medium ->
-      formLayout $ do
+      defaultLayout $ do
         setTitle "Eidolon :: Delete Medium"
         $(widgetFile "mediumDelete")
     Left (errorMsg, route) -> do

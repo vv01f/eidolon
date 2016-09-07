@@ -138,7 +138,7 @@ getCommentReplyR commentId = do
           (replyWidget, enctype) <- generateFormPost $
             renderBootstrap3 BootstrapBasicForm $
             commentForm userId userSl mediumId (Just commentId)
-          formLayout $ do
+          defaultLayout $ do
             setTitle "Eidolon :: Reply to comment"
             $(widgetFile "commentReply")
         Nothing -> do
@@ -217,7 +217,7 @@ getCommentDeleteR commentId = do
           if
             Just userId == Just (commentAuthor comment)
             then do
-              formLayout $ do
+              defaultLayout $ do
                 setTitle "Eidolon :: Delete comment"
                 $(widgetFile "commentDelete")
             else do

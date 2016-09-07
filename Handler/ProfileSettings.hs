@@ -27,7 +27,7 @@ getProfileSettingsR userId = do
     Right user -> do
       (profileSettingsWidget, enctype) <- generateFormPost $
         renderBootstrap3 BootstrapBasicForm $ profileSettingsForm user
-      formLayout $ do
+      defaultLayout $ do
         setTitle "Eidolon :: Profile settings"
         $(widgetFile "profileSettings")
     Left (errorMsg, route) -> do

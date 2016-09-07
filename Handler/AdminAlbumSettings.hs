@@ -69,7 +69,7 @@ getAdminAlbumSettingsR albumId = do
           (adminAlbumSettingsWidget, enctype) <- generateFormPost $
             renderBootstrap3 BootstrapBasicForm $
             adminAlbumSettingsForm album albumId users
-          formLayout $ do
+          defaultLayout $ do
             setTitle "Administration: Album settings"
             $(widgetFile "adminAlbumSet")
         Nothing -> do

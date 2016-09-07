@@ -88,7 +88,7 @@ getAdminProfileSettingsR ownerId = do
           (adminProfileSetWidget, enctype) <- generateFormPost $
             renderBootstrap3 BootstrapBasicForm $
             adminProfileForm owner
-          formLayout $ do
+          defaultLayout $ do
             setTitle "Administration: Profile settings"
             $(widgetFile "adminProfileSettings")
         Nothing -> do

@@ -29,7 +29,7 @@ getProfileDeleteR userId = do
   checkRes <- profileCheck userId
   case checkRes of
     Right user ->
-      formLayout $ do
+      defaultLayout $ do
         setTitle "Eidolon :: Delete user profile"
         $(widgetFile "profileDelete")
     Left (errorMsg, route) -> do

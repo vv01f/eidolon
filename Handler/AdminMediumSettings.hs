@@ -47,7 +47,7 @@ getAdminMediumSettingsR mediumId = do
           (adminMediumSetWidget, enctype) <- generateFormPost $
             renderBootstrap3 BootstrapBasicForm $
             adminMediumSetForm medium
-          formLayout $ do
+          defaultLayout $ do
             setTitle "Administration: Medium Settings"
             $(widgetFile "adminMediumSet")
         Nothing -> do

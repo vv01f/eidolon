@@ -127,10 +127,6 @@ renderLayout widget = do
 
     withUrlRenderer $(hamletFile "templates/default-layout-wrapper.hamlet")
 
-formLayout :: Widget -> Handler Html
-formLayout widget =
-    renderLayout $(widgetFile "form-widget")
-
 approotRequest :: App -> Request -> T.Text
 approotRequest master req =
     case requestHeaderHost req of

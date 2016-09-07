@@ -23,7 +23,7 @@ import Data.Text.Encoding
 getReactivateR :: Handler Html
 getReactivateR = do
   (reactivateWidget, enctype) <- generateFormPost $ renderBootstrap3 BootstrapBasicForm $ reactivateForm
-  formLayout $ do
+  defaultLayout $ do
     setTitle "Eidolon :: Reactivate account"
     $(widgetFile "reactivate")
 
