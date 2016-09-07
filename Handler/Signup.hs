@@ -28,7 +28,7 @@ getSignupR = do
   let block = appSignupBlocked $ appSettings master
   case block of
     False -> do
-      formLayout $ do
+      defaultLayout $ do
         setTitle "Eidolon :: Signup"
         $(widgetFile "signup")
     True -> do
