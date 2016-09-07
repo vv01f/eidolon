@@ -22,6 +22,7 @@
 /				HomeR			GET
 /page/#Int			PageR			GET
 /signup				SignupR			GET POST
+/threat				ThreatR			GET
 /login				LoginR			GET POST
 /logout				LogoutR			GET
 /activate/#T.Text		ActivateR		GET POST

@@ -1,0 +1,39 @@
+$newline always
+<div .medium>
+  <h1>
+    Data and threat analysis
+  <h2>
+    Eidolon stores the following data:
+  <ul>
+    <li>Usernames
+    <li>Email addresses
+    <li>Salted password hashes (SHA1) and the respective salt
+    <li>Images
+    <li>Upload time of images
+    <li>Image titles
+    <li>Image descriptions
+    <li>Image tags
+    <li>EXIF data of images are preserved
+    <li>Comment texts
+    <li>Time when comment was posted
+    <li>Comment author
+    <li>Album titles
+    <li>Album owner
+    <li>With whom the album is shared
+  <h2>
+    Database exposure
+  <p>
+    If an attacker were to gain access to the eidolon database they would have
+    access to the above information.
+  <p>
+    An attacker that gained access to the eidolon database could delete or
+    otherwise corrupt user data, potentially disrupting the service.
+  <h3>
+    Mitigation
+  <p>
+    Any discovery of a user's real identity can be mitigated by using an
+    anonymous email account.
+  <p>
+    Passwords are stored salted and hashed in the database rendering them
+    useless to an attacker. Additionally the authentication mechanism does not
+    need the password to be transmitted in clear text to the server.
