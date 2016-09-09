@@ -20,6 +20,7 @@ Flag library-only
     Default:       False
 
 library
+    other-modules:   Paths_eidolon
     exposed-modules: Application
                      Foundation
                      Helper
@@ -51,6 +52,7 @@ library
                      Handler.RootFeed
                      Handler.Commons
                      -- Handler.Search
+                     Handler.About
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT

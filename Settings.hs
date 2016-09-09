@@ -97,14 +97,14 @@ instance FromJSON AppSettings where
         appMutableStatic          <- o .:? "mutable-static"   .!= defaultDev
         appSkipCombining          <- o .:? "skip-combining"   .!= defaultDev
 
-        appAfferoLink             <- o .: "copyrightLink"
+        appAfferoLink             <- o .: "afferoLink"
         appAnalytics              <- o .:? "analytics"
 
         appSignupBlocked          <- o .: "signupBlocked"
         appTos1                   <- o .: "tos1"
         appTos2                   <- o .: "tos2"
 
-        appContact                <- o .:? "contactEmail"
+        appContactEmail           <- o .:? "contactEmail"
 
         return AppSettings {..}
 

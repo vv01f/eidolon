@@ -51,5 +51,8 @@ infixr 5 <>
 (<>) = mappend
 #endif
 
-version :: Text
-version = ""
+import Data.Version
+import qualified Paths_eidolon as P
+
+version :: String
+version = showVersion $ P.version

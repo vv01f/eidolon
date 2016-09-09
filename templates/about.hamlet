@@ -7,17 +7,14 @@ $newline always
     This software is licenced under the
     <a href="http://www.gnu.org/licenses/agpl-3.0">
       GNU Affero General Public License 3.0
-    .
   <p>
-    The source code for this instance canbe found at
-    <a href="#{appAfferoLink $ appSettings master} target=_blank>
+    The source code for this instance can be found at
+    <a href="#{appAfferoLink $ appSettings master}" target=_blank>
       #{appAfferoLink $ appSettings master}
-    .
   $maybe contact <- appContactEmail $ appSettings master
     <p>
       if you wish to contact the maintaner of this Eidolon, you can do it by
-      <a href="mailto:#{appContactEmail $ appSettings master}">
+      <a href="mailto:#{contact}">
         email
-      .
   <a href=@{ThreatR}>
     Data and threat analysis

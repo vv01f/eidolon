@@ -35,5 +35,5 @@ $newline always
     anonymous email account.
   <p>
     Passwords are stored salted and hashed in the database rendering them
-    useless to an attacker. Additionally the authentication mechanism does not
+    useless to an attacker.<br>Additionally the authentication mechanism does not
     need the password to be transmitted in clear text to the server.

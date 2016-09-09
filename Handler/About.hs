@@ -14,10 +14,13 @@
 --  You should have received a copy of the GNU Affero General Public License
 --  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+module Handler.About where
+
 import Import
 
 getAboutR :: Handler Html
-getAboutR =
+getAboutR = do
+  master <- getYesod
   defaultLayout $
     $(widgetFile "about")
 
