@@ -98,9 +98,6 @@ renderLayout widget = do
     -- value passed to hamletToRepHtml cannot be a widget, this allows
     -- you to use normal widget features in default-layout.
 
-    copyrightWidget <- widgetToPageContent $
-        $(widgetFile "copyrightFooter")
-
     -- searchWidget <- widgetToPageContent $ [whamlet|
     --   <form action=@{SearchR} method=GET>
     --     <input type="hidden" name="_hasdata">
