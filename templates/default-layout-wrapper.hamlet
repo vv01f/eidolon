@@ -18,7 +18,8 @@ $doctype 5
         ^{pageBody pc}
       <footer>
         <div class="left">
-          ^{pageBody copyrightWidget}
+          <a href=@{AboutR} target="_blank">
+            About Eidolon
         <div class="right">
           $case route
             $of Just HomeR

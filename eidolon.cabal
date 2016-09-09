@@ -1,5 +1,5 @@
 name:                eidolon
-version:             0.1.1.1
+version:             0.1.2.0
 synopsis:            Image gallery in Yesod
 homepage:            https://eidolon.nek0.eu
 license:             AGPL-3
@@ -20,6 +20,7 @@ Flag library-only
     Default:       False
 
 library
+    other-modules:   Paths_eidolon
     exposed-modules: Application
                      Foundation
                      Helper
@@ -51,6 +52,7 @@ library
                      Handler.RootFeed
                      Handler.Commons
                      -- Handler.Search
+                     Handler.About
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT

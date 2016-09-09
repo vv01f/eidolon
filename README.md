@@ -81,7 +81,9 @@ want. The executable needs to be accompanied by the folders `config` and
 `static` and their contents. It's best to copy them to your desired destination.
 
 Also check `config/settings.yml` and set the values there accrding to your
-configuration. Especially the settings for elasticsearch are vital.
+configuration. The field `contactEmail` is optional, you can comment it out, but
+be aware. In certain jurisdictions you are required to give some contact
+information.
 
 It may also be necessery to create a reverse proxy to your gallery. I would
 recommend using [nginx](http://nginx.org/).

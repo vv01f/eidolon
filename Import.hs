@@ -50,3 +50,9 @@ infixr 5 <>
 (<>) :: Monoid m => m -> m -> m
 (<>) = mappend
 #endif
+
+import Data.Version
+import qualified Paths_eidolon as P
+
+version :: String
+version = showVersion $ P.version

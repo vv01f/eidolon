@@ -64,10 +64,8 @@ data AppSettings = AppSettings
     -- ^ Perform no stylesheet/script combining
 
     -- Example app-specific configuration values.
-    , appCopyright              :: Text
-    -- ^ Copyright text to appear in the footer of the page
-    , appCopyrightLink          :: Text
-    -- ^ Link to Copyright
+    , appAfferoLink             :: Text
+    -- ^ Link to source code
     , appAnalytics              :: Maybe Text
     -- ^ Google Analytics code
     , appSignupBlocked          :: Bool
@@ -75,10 +73,7 @@ data AppSettings = AppSettings
     , appTos1                   :: Text
     , appTos2                   :: Text
     -- ^ Terms of Service
-    , appSearchHost             :: Text
-    , appShards                 :: Int
-    , appReplicas               :: Int
-    -- ^ Settings for Elasticsearch
+    , appContactEmail           :: Maybe Text
     }
 
 instance FromJSON AppSettings where
@@ -102,17 +97,14 @@ instance FromJSON AppSettings where
         appMutableStatic          <- o .:? "mutable-static"   .!= defaultDev
         appSkipCombining          <- o .:? "skip-combining"   .!= defaultDev
 
-        appCopyright              <- o .: "copyright"
-        appCopyrightLink          <- o .: "copyrightLink"
+        appAfferoLink             <- o .: "afferoLink"
         appAnalytics              <- o .:? "analytics"
 
         appSignupBlocked          <- o .: "signupBlocked"
         appTos1                   <- o .: "tos1"
         appTos2                   <- o .: "tos2"
 
-        appSearchHost             <- o .: "searchhost"
-        appShards                 <- o .: "shards"
-        appReplicas               <- o .: "replicas"
+        appContactEmail           <- o .:? "contactEmail"
 
         return AppSettings {..}
 

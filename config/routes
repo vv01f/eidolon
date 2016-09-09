@@ -73,3 +73,6 @@
 !/feed/user/#T.Text/rss.xml	NameFeedRssR		GET
 
 -- /search				SearchR			GET
+
+/about				AboutR			GET
+/about/threat			ThreatR			GET

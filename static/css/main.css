@@ -193,6 +193,10 @@ footer {
 	float: right;
 }
 
+ul, ol {
+	text-align: left;
+}
+
 @media (max-width: 755px) {
 	#main {
 		margin-top: 120px;
