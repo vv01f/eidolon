@@ -52,8 +52,3 @@ signupBlocked:  "_env:SIGNUP_BLOCK:false"
 # Terms of Service
 tos1: "Terms of Service 1"
 tos2: "Terms of Service 2"
-
-# Elasticsearcha settings
-searchhost: "http://localhost:9200"
-shards: 2
-replicas: 1
