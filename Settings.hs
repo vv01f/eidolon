@@ -97,8 +97,7 @@ instance FromJSON AppSettings where
         appMutableStatic          <- o .:? "mutable-static"   .!= defaultDev
         appSkipCombining          <- o .:? "skip-combining"   .!= defaultDev
 
-        appCopyright              <- o .: "copyright"
-        appCopyrightLink          <- o .: "copyrightLink"
+        appAfferoLink             <- o .: "copyrightLink"
         appAnalytics              <- o .:? "analytics"
 
         appSignupBlocked          <- o .: "signupBlocked"
