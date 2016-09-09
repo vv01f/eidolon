@@ -41,9 +41,10 @@ database:
   database: "_env:PGDATABASE:eidolon"
   poolsize: "_env:PGPOOLSIZE:10"
 
-copyright: Powered by Eidolon
-copyrightLink: https://github.com/nek0/eidolon
+afferoLink: https://github.com/nek0/eidolon
 #analytics: UA-YOURCODE
+
+contactEmail: your@email.here
 
 # block signup process
 signupBlocked:  "_env:SIGNUP_BLOCK:false"

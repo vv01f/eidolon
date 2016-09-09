@@ -84,8 +84,3 @@ postSignupR = do
 validateLen :: Text -> Bool
 validateLen a =
   (T.length a) > 2
-
-getThreatR :: Handler Html
-getThreatR =
-  defaultLayout $
-    $(widgetFile "threat")
