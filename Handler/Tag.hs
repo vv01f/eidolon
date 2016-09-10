@@ -22,7 +22,7 @@ import System.FilePath
 
 getTagR :: Text -> Handler Html
 getTagR tag = do
-  tempMedia <- runDB $ selectList [] [Desc MediumTitle]
+  tempMedia <- runDB $ selectList [] [Asc MediumTitle]
   almostMedia <- mapM (\a ->
     if tag `elem` mediumTags (entityVal a)
       then return (Just a)
