@@ -221,5 +221,6 @@ ul, ol {
 		margin-right: 0;
 		width: auto;
 		max-width: 400px;
+		min-width: 100%;
 	}
 }
