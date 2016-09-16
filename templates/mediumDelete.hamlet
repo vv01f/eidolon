@@ -1,5 +1,5 @@
 $newline always
-<div .item>
+<div .medium>
   <h3>Delete Medium #{mediumTitle medium}
 
   <p>
