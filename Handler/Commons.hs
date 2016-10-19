@@ -17,7 +17,11 @@
 module Handler.Commons where
 
 import Import
+import qualified Data.Text as T
 import Data.String
+import qualified Data.List as L
+import System.FilePath as FP
+import System.Directory
 
 loginIsAdmin :: IsString t => Handler (Either (t, Route App)  ())
 loginIsAdmin = do
@@ -78,3 +82,58 @@ mediumCheck mediumId = do
           return $ Left ("You must be logged in to change settings", LoginR)
     Nothing ->
       return $ Left ("This medium does not exist", HomeR)
+
+insertMedium :: Medium -> AlbumId -> Handler ()
+insertMedium medium aId = do
+  mId <- runDB $ insert medium
+  inAlbum <- runDB $ getJust aId
+  let newMediaList = mId : albumContent inAlbum
+  runDB $ update aId [AlbumContent =. newMediaList]
+
+deleteMedium :: MediumId -> Medium -> Handler ()
+deleteMedium mId medium = do
+  commEnts <- runDB $ selectList [CommentOrigin ==. mId] []
+  -- delete comments first
+  mapM_ (runDB . delete . entityKey) commEnts
+  -- remove reference
+  removeReference mId $ mediumAlbum medium
+  -- delete Files
+  mapM_ (liftIO . removeFile . normalise . L.tail)
+    [ mediumPath medium
+    , mediumThumb medium
+    , mediumPreview medium
+    ]
+  -- delete database entry
+  runDB $ delete mId
+
+moveMedium :: Medium -> MediumId -> AlbumId -> Handler ()
+moveMedium med mId destId = do
+  dest <- runDB $ getJust destId
+  -- remove reference
+  removeReference mId $ mediumAlbum med
+  -- move physical Files
+  let filen = show $ length (albumContent dest) + 1
+      ext   = takeExtension $ mediumPath med
+      nPath = "static" </> "data" </> T.unpack (extractKey $ albumOwner dest) </> T.unpack (extractKey destId) </> filen ++ ext
+      nThumb = takeBaseName nPath ++ "_thumb.jpg"
+      nPrev = takeBaseName nPath ++ "_preview.jpg"
+  liftIO $ renameFile (mediumPath med) nPath
+  liftIO $ renameFile (mediumThumb med) nThumb
+  liftIO $ renameFile (mediumPreview med) nPrev
+  -- chenge filenames in database
+  runDB $ update mId
+    [ MediumPath =. '/' : nPath
+    , MediumThumb =. '/' : nThumb
+    , MediumPreview =. '/' : nPrev
+    ]
+  -- create new references
+  let newMediaList = mId : albumContent dest
+  runDB $ update destId [AlbumContent =. newMediaList]
+
+removeReference :: MediumId -> AlbumId -> Handler ()
+removeReference mId aId = do
+  -- delete references next
+  album <- runDB $ getJust aId
+  let newMediaList = removeItem mId $ albumContent album
+  -- update reference list
+  runDB $ update aId [AlbumContent =. newMediaList]

@@ -17,6 +17,7 @@
 module Handler.Upload where
 
 import Import as I
+import Handler.Commons
 import Data.Time
 import Data.Maybe
 import qualified Data.Text as T
@@ -89,10 +90,11 @@ postDirectUploadR albumId = do
                                 then return $ fileBulkPrefix temp
                                 else return (fileBulkPrefix temp `T.append` " " `T.append` T.pack (show (index :: Int)) `T.append` " of " `T.append` T.pack (show (length indFils)))
                               let medium = Medium tempName ('/' : path) ('/' : metaThumbPath meta) mime (fileBulkTime temp) (fileBulkOwner temp) (fileBulkDesc temp) (fileBulkTags temp) albumId ('/' : metaPreviewPath meta)
-                              mId <- runDB $ I.insert medium
-                              inALbum <- runDB $ getJust albumId
-                              let newMediaList = mId : albumContent inALbum
-                              runDB $ update albumId [AlbumContent =. newMediaList]
+                              -- mId <- runDB $ I.insert medium
+                              -- inALbum <- runDB $ getJust albumId
+                              -- let newMediaList = mId : albumContent inALbum
+                              -- runDB $ update albumId [AlbumContent =. newMediaList]
+                              insertMedium medium albumId
                               return Nothing
                           else do
                             liftIO $ removeFile (FP.normalise path)
@@ -251,7 +253,7 @@ bulkUploadForm userId = (\a b c d e f g -> FileBulk b c d e f g a)
   where
     albums = do
       allEnts <- runDB $ selectList [] [Desc AlbumTitle]
-      let entities = map fromJust $ removeItem Nothing $ map (\ent ->
+      let entities = catMaybes $ map (\ent ->
             if
               userId == albumOwner (entityVal ent) || userId `elem` albumShares (entityVal ent)
               then Just ent
@@ -294,10 +296,11 @@ postUploadR = do
                             " of " `T.append`
                             T.pack (show (length indFils)))
                       let medium = Medium tempName ('/' : path) ('/' : metaThumbPath meta) mime (fileBulkTime temp) (fileBulkOwner temp) (fileBulkDesc temp) (fileBulkTags temp) inAlbumId ('/' : metaPreviewPath meta)
-                      mId <- runDB $ I.insert medium
-                      inALbum <- runDB $ getJust inAlbumId
-                      let newMediaList = mId : albumContent inALbum
-                      runDB $ update inAlbumId [AlbumContent =. newMediaList]
+                      -- mId <- runDB $ I.insert medium
+                      -- inALbum <- runDB $ getJust inAlbumId
+                      -- let newMediaList = mId : albumContent inALbum
+                      -- runDB $ update inAlbumId [AlbumContent =. newMediaList]
+                      insertMedium medium inAlbumId
                       return Nothing
                     else do
                       liftIO $ removeFile (FP.normalise path)

@@ -96,20 +96,21 @@ postMediumDeleteR mediumId = do
       confirm <- lookupPostParam "confirm"
       case confirm of
         Just "confirm" -> do
-          -- delete comments
-          commEnts <- runDB $ selectList [CommentOrigin ==. mediumId] []
-          _ <- mapM (runDB . delete . entityKey) commEnts
-          -- delete references first
-          let albumId = mediumAlbum medium
-          album <- runDB $ getJust albumId
-          let mediaList = albumContent album
-          let newMediaList = removeItem mediumId mediaList
-          -- update reference List
-          runDB $ update albumId [AlbumContent =. newMediaList]
-          liftIO $ removeFile (normalise $ tail $ mediumPath medium)
-          liftIO $ removeFile (normalise $ tail $ mediumThumb medium)
-          liftIO $ removeFile (normalise $ tail $ mediumPreview medium)
-          runDB $ delete mediumId
+          -- -- delete comments
+          -- commEnts <- runDB $ selectList [CommentOrigin ==. mediumId] []
+          -- _ <- mapM (runDB . delete . entityKey) commEnts
+          -- -- delete references first
+          -- let albumId = mediumAlbum medium
+          -- album <- runDB $ getJust albumId
+          -- let mediaList = albumContent album
+          -- let newMediaList = removeItem mediumId mediaList
+          -- -- update reference List
+          -- runDB $ update albumId [AlbumContent =. newMediaList]
+          -- liftIO $ removeFile (normalise $ tail $ mediumPath medium)
+          -- liftIO $ removeFile (normalise $ tail $ mediumThumb medium)
+          -- liftIO $ removeFile (normalise $ tail $ mediumPreview medium)
+          -- runDB $ delete mediumId
+          deleteMedium mediumId medium
           setMessage "Medium succesfully deleted"
           redirect HomeR
         _ -> do
@@ -118,3 +119,42 @@ postMediumDeleteR mediumId = do
     Left (errorMsg, route) -> do
       setMessage errorMsg
       redirect route
+
+getMediumMoveR :: MediumId -> Handler Html
+getMediumMoveR mId = do
+  checkRes <- mediumCheck mId
+  case checkRes of
+    Right medium ->
+      (mediumSettingsWidget, enctype) <- generateFormPost $
+        renderBootstrap3 BootstrapBasicForm $
+        mediumMoveForm medium
+    Left (err, route) -> do
+      setMessage err
+      redirect route
+
+postMediumMoveR :: MediumOd -> Handler Html
+postMediumMoveR mId = do
+  checkRes <- mediumCheck mId
+  case checkres of
+    Right medium -> do
+      ((res, _), _) <- runFormPost $
+        renderBootstrap3 BootstrapBasicForm $
+        mediumMoveForm medium
+      case res of
+        FormSuccess aId ->
+          moveMedium medium mId aId
+
+mediumMoveForm :: Medium -> AForm Handler AlbumId
+mediumMoveForm medium = id
+  <$> areq (selectField albums) (bfs ("Destination album" :: T.Text)) (mediumAlbum medium)
+  <*  bootstrapSubmit ("Move medium" :: BootstrapSubmit Text)
+  where
+    albums = do
+      allEnts <- runDB $ selectList [] [Asc AlbumTitle]
+      let ents = catMaybes $ map (\ent ->
+        if uId == albumOwner (entityVal ent) || uId `elem` albumShares (entityVal nt)
+          then Just ent
+          else Nothing
+        ) allEnts
+      optionsPairs $ map (\alb -> ((albumTitle $ entityVal alb), entityKey alb) ents
+    uId = mediumOwner medium

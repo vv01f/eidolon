@@ -109,28 +109,29 @@ getAdminMediumDeleteR mediumId = do
       tempMedium <- runDB $ get mediumId
       case tempMedium of
         Just medium -> do
-          -- remove reference from album
-          let albumId = mediumAlbum medium
-          album <- runDB $ getJust albumId
-          let mediaList = albumContent album
-          let newMediaList = removeItem mediumId mediaList
-          runDB $ update albumId [AlbumContent =. newMediaList]
-          -- delete comments
-          commEnts <- runDB $ selectList [CommentOrigin ==. mediumId] []
-          _ <- mapM (\ent -> do
-            children <- runDB $ selectList [CommentParent ==. (Just $ entityKey ent)] []
-            _ <- mapM (\child -> do
-              -- delete comment children
-              runDB $ delete $ entityKey child
-              ) children
-            runDB $ delete $ entityKey ent) commEnts
-          -- delete medium
-          runDB $ delete mediumId
-          -- delete files
-          liftIO $ removeFile (normalise $ tail $ mediumPath medium)
-          liftIO $ removeFile (normalise $ tail $ mediumThumb medium)
-          liftIO $ removeFile (normalise $ tail $ mediumPreview medium)
+          -- -- remove reference from album
+          -- let albumId = mediumAlbum medium
+          -- album <- runDB $ getJust albumId
+          -- let mediaList = albumContent album
+          -- let newMediaList = removeItem mediumId mediaList
+          -- runDB $ update albumId [AlbumContent =. newMediaList]
+          -- -- delete comments
+          -- commEnts <- runDB $ selectList [CommentOrigin ==. mediumId] []
+          -- _ <- mapM (\ent -> do
+          --   children <- runDB $ selectList [CommentParent ==. (Just $ entityKey ent)] []
+          --   _ <- mapM (\child -> do
+          --     -- delete comment children
+          --     runDB $ delete $ entityKey child
+          --     ) children
+          --   runDB $ delete $ entityKey ent) commEnts
+          -- -- delete medium
+          -- runDB $ delete mediumId
+          -- -- delete files
+          -- liftIO $ removeFile (normalise $ tail $ mediumPath medium)
+          -- liftIO $ removeFile (normalise $ tail $ mediumThumb medium)
+          -- liftIO $ removeFile (normalise $ tail $ mediumPreview medium)
           -- outro
+          deleteMedium mediumId medium
           setMessage "Medium deleted successfully"
           redirect AdminR
         Nothing -> do
