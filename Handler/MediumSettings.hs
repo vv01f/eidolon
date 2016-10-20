@@ -18,10 +18,9 @@ module Handler.MediumSettings where
 
 import Import
 import Handler.Commons
-import System.Directory
 import System.FilePath
 import qualified Data.Text as T
-import Data.List (tail)
+import Data.Maybe (catMaybes)
 
 getMediumSettingsR :: MediumId -> Handler Html
 getMediumSettingsR mediumId = do
@@ -124,37 +123,42 @@ getMediumMoveR :: MediumId -> Handler Html
 getMediumMoveR mId = do
   checkRes <- mediumCheck mId
   case checkRes of
-    Right medium ->
-      (mediumSettingsWidget, enctype) <- generateFormPost $
+    Right medium -> do
+      (mediumMoveWidget, enctype) <- generateFormPost $
         renderBootstrap3 BootstrapBasicForm $
         mediumMoveForm medium
+      defaultLayout $ do
+        setTitle "Eidolon :: Move Medium"
+        $(widgetFile "mediumMove")
     Left (err, route) -> do
       setMessage err
       redirect route
 
-postMediumMoveR :: MediumOd -> Handler Html
+postMediumMoveR :: MediumId -> Handler Html
 postMediumMoveR mId = do
   checkRes <- mediumCheck mId
-  case checkres of
+  case checkRes of
     Right medium -> do
       ((res, _), _) <- runFormPost $
         renderBootstrap3 BootstrapBasicForm $
         mediumMoveForm medium
       case res of
-        FormSuccess aId ->
+        FormSuccess aId -> do
           moveMedium medium mId aId
+          setMessage "Medium successfully moved"
+          redirect $ MediumR mId
 
 mediumMoveForm :: Medium -> AForm Handler AlbumId
 mediumMoveForm medium = id
-  <$> areq (selectField albums) (bfs ("Destination album" :: T.Text)) (mediumAlbum medium)
+  <$> areq (selectField albums) (bfs ("Destination album" :: T.Text)) (Just $ mediumAlbum medium)
   <*  bootstrapSubmit ("Move medium" :: BootstrapSubmit Text)
   where
     albums = do
       allEnts <- runDB $ selectList [] [Asc AlbumTitle]
-      let ents = catMaybes $ map (\ent ->
-        if uId == albumOwner (entityVal ent) || uId `elem` albumShares (entityVal nt)
+      ents <- return $ catMaybes $ map (\ent ->
+        if uId == albumOwner (entityVal ent) || uId `elem` albumShares (entityVal ent)
           then Just ent
           else Nothing
         ) allEnts
-      optionsPairs $ map (\alb -> ((albumTitle $ entityVal alb), entityKey alb) ents
+      optionsPairs $ map (\alb -> ((albumTitle $ entityVal alb), entityKey alb)) ents
     uId = mediumOwner medium
