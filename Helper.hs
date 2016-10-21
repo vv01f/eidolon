@@ -157,7 +157,29 @@ reverseLookup _ [] = Nothing
 reverseLookup _ _  = Nothing
 
 acceptedTypes :: [T.Text]
-acceptedTypes = ["image/jpeg", "image/jpg", "image/png", "image/x-ms-bmp", "image/x-bmp", "image/bmp", "image/tiff", "image/tiff-fx", "image/svg+xml", "image/gif"]
+acceptedTypes =
+    -- PNG
+  [ "image/png"
+    -- BMP
+  , "image/x-ms-bmp"
+  , "image/x-bmp"
+  , "image/bmp"
+    -- JPG
+  , "image/jpeg"
+  , "image/jpg"
+    -- GIF
+  , "image/gif"
+    -- Radiance
+  , "image/vnd.radiance"
+    -- Targa
+  , "image/x-targa"
+  , "image/x-tga"
+    -- Tiff
+  , "image/tiff"
+  , "image/tiff-fx"
+    -- SVG
+  , "image/svg+xml"
+  ]
 
 iso8601 :: FormatTime t => t -> String
 iso8601 time =
