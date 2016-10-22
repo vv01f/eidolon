@@ -108,23 +108,35 @@ deleteMedium mId medium = do
 
 moveMedium :: Medium -> MediumId -> AlbumId -> Handler ()
 moveMedium med mId destId = do
+  $(logError) "getting destination"
   dest <- runDB $ getJust destId
   -- remove reference
+  $(logError) "removing reference"
   removeReference mId $ mediumAlbum med
   -- move physical Files
   let filen = show $ length (albumContent dest) + 1
       ext   = takeExtension $ mediumPath med
-      nPath = "static" </> "data" </> T.unpack (extractKey $ albumOwner dest) </> T.unpack (extractKey destId) </> filen ++ ext
-      nThumb = takeBaseName nPath ++ "_thumb.jpg"
-      nPrev = takeBaseName nPath ++ "_preview.jpg"
-  liftIO $ renameFile (mediumPath med) nPath
-  liftIO $ renameFile (mediumThumb med) nThumb
-  liftIO $ renameFile (mediumPreview med) nPrev
+      prefix = "static" </> "data" </> T.unpack (extractKey $ albumOwner dest) </> T.unpack (extractKey destId)
+      nPath = prefix </> filen ++ ext
+      nThumb = prefix </> takeBaseName nPath ++ "_thumb.jpg"
+      nPrev = prefix </> takeBaseName nPath ++ "_preview.jpg"
+  $(logError) $ T.pack $ "copyFile" ++ nPath
+  liftIO $ copyFile (L.tail $ mediumPath med) nPath
+  liftIO $ copyFile (L.tail $ mediumThumb med) nThumb
+  liftIO $ copyFile (L.tail $ mediumPreview med) nPrev
+  -- remove physical files
+  $(logError) "removeFile"
+  mapM_ (liftIO . removeFile . normalise . L.tail)
+    [ mediumPath med
+    , mediumThumb med
+    , mediumPreview med
+    ]
   -- chenge filenames in database
   runDB $ update mId
     [ MediumPath =. '/' : nPath
     , MediumThumb =. '/' : nThumb
     , MediumPreview =. '/' : nPrev
+    , MediumAlbum =. destId
     ]
   -- create new references
   let newMediaList = mId : albumContent dest

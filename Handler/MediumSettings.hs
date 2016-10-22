@@ -147,6 +147,9 @@ postMediumMoveR mId = do
           moveMedium medium mId aId
           setMessage "Medium successfully moved"
           redirect $ MediumR mId
+    Left (err, route) -> do
+      setMessage err
+      redirect route
 
 mediumMoveForm :: Medium -> AForm Handler AlbumId
 mediumMoveForm medium = id

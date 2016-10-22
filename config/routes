@@ -36,6 +36,7 @@
 /album/#AlbumId/delete		AlbumDeleteR		GET POST
 /medium/#MediumId/settings	MediumSettingsR		GET POST
 /medium/#MediumId/delete	MediumDeleteR		GET POST
+/medium/#MediumId/move          MediumMoveR             GET POST
 /comment/#CommentId/reply	CommentReplyR		GET POST
 /comment/#CommentId/delcom	CommentDeleteR		GET POST
 /reactivate			ReactivateR		GET POST
