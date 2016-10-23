@@ -38,7 +38,7 @@
   $else
     $forall (Entity commentId comment) <- comments
       <div .medium .comment>
-        <a href=@{ProfileR $ commentAuthor comment}>#{commentAuthorSlug comment}</a> wrote on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime comment}:
+        <a href=@{ProfileR $ commentAuthor comment}>#{fromMaybe "" $ lookup (commentAuthor comment) authors}</a> wrote on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime comment}:
         <hr>
         #{commentContent comment}
         $if userId /= Nothing
@@ -49,7 +49,7 @@
       $forall (Entity replyId reply) <- replies
         $if commentParent reply == Just commentId
           <div .comment .reply .medium>
-            <a href=@{ProfileR $ commentAuthor reply}>#{commentAuthorSlug reply}</a> replied on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime reply}:
+            <a href=@{ProfileR $ commentAuthor reply}>#{fromMaybe "" $ lookup (commentAuthor comment) authors}</a> replied on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime reply}:
             <hr>
             #{commentContent reply}
             <hr>

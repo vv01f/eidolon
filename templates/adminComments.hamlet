@@ -14,7 +14,7 @@ $newline never
       $forall (Entity commentId comment) <- comments
         $if commentOrigin comment == mediumId
           <div .medium .comment>
-            #{commentAuthorSlug comment} wrote on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime comment}:
+            #{fromMaybe "" $ lookup (commentAuthor comment) authors} wrote on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime comment}:
             <hr>
             #{commentContent comment}
             <a href=@{AdminCommentDeleteR commentId}>Delete this comment
@@ -22,7 +22,7 @@ $newline never
           $if commentParent reply == Just commentId
             $if commentOrigin reply == mediumId
               <div .medium .comment .reply>
-                #{commentAuthorSlug comment} wrote on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime comment}:
+                #{fromMaybe "" $ lookup (commentAuthor comment) authors} wrote on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime comment}:
                 <hr>
                 #{commentContent reply}
                 <a href=@{AdminCommentDeleteR replyId}>Delete this comment

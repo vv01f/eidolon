@@ -19,6 +19,7 @@ module Handler.AdminComments where
 import Import
 import Handler.Commons
 import Data.Time
+import Data.Maybe (fromMaybe)
 -- import System.Locale
 
 getAdminCommentR :: Handler Html
@@ -26,6 +27,8 @@ getAdminCommentR = do
   adminCheck <- loginIsAdmin
   case adminCheck of
     Right _ -> do
+      userEnts <- runDB $ selectList [] [Asc UserId]
+      let authors = map (\ent -> (entityKey ent, userSlug (entityVal ent))) userEnts
       media <- runDB $ selectList [] [Desc MediumTime]
       comments <- runDB $ selectList [CommentParent ==. Nothing] [Desc CommentTime]
       replies <- runDB $ selectList [CommentParent !=. Nothing] [Desc CommentTime]

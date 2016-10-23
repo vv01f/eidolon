@@ -138,6 +138,12 @@ location.
 in the project directory and run `cabal exec -- runghc
 Migrations/0.0.7-0.1.0.0/Migration.hs`
 
+###0.1.2.4-0.1.3.0
+* Stop Eidolon
+* Log into your database and issue this command:
+`ALTER TABLE "comment" DROP COLUMN "author_slug";`
+* Start Eidolon
+
 ##Acknowledgements:
 
 * This software uses the web Framework "Yesod" by Michael Snoyman. See more at:

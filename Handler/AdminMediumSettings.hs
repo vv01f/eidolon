@@ -19,8 +19,6 @@ module Handler.AdminMediumSettings where
 import Import
 import Handler.Commons
 import System.FilePath
-import System.Directory
-import Data.List (tail)
 import qualified Data.Text as T
 
 getAdminMediaR :: Handler Html

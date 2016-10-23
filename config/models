@@ -58,7 +58,7 @@ Medium
     deriving Eq Show
 Comment
     author UserId
-    authorSlug Text
+--    authorSlug Text
     origin MediumId
     parent CommentId Maybe
     time UTCTime

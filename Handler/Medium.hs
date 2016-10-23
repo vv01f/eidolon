@@ -41,16 +41,12 @@ getMediumR mediumId = do
           return $ Just $ getUserIdFromText tempUserId
         Nothing ->
           return Nothing
-      userSl <- case userId of
-        Just uId -> do
-          u <- runDB $ getJust uId
-          return $ Just $ userSlug u
-        Nothing ->
-          return Nothing
       let presence = userId == (Just ownerId) || userId == Just (albumOwner album)
       (commentWidget, enctype) <- generateFormPost $
         renderBootstrap3 BootstrapBasicForm $
-        commentForm (fromJust userId) (fromJust userSl) mediumId Nothing
+        commentForm (fromJust userId) mediumId Nothing
+      userEnts <- runDB $ selectList [] [Asc UserId]
+      let authors = map (\ent -> (entityKey ent, (userSlug $ entityVal ent))) userEnts
       comments <- runDB $ selectList
         [ CommentOrigin ==. mediumId
         , CommentParent ==. Nothing ]
@@ -84,17 +80,17 @@ postMediumR mediumId = do
           let userSl = userSlug u
           ((res, _), _) <- runFormPost $
             renderBootstrap3 BootstrapBasicForm $
-            commentForm userId userSl mediumId Nothing
+            commentForm userId mediumId Nothing
           case res of
             FormSuccess temp -> do
               runDB $ insert_ temp
               --send mail to medium owner
               owner <- runDB $ getJust $ mediumOwner medium
               link <- ($ MediumR (commentOrigin temp)) <$> getUrlRender
-              sendMail (userEmail owner) ((commentAuthorSlug temp) `T.append` " commented on your medium")
+              sendMail (userEmail owner) (userSl `T.append` " commented on your medium")
                 [shamlet|
                   <h1>Hello #{userSlug owner}
-                  <p>#{commentAuthorSlug temp} commented on your medium:
+                  <p>#{userSl} commented on your medium:
                   <p>#{commentContent temp}
                   <p>To follow the comment thread follow
                     <a href=#{link}>
@@ -113,10 +109,9 @@ postMediumR mediumId = do
       setMessage "This image does not exist"
       redirect HomeR
 
-commentForm :: UserId -> Text -> MediumId -> Maybe CommentId -> AForm Handler Comment
-commentForm authorId authorSlug originId parentId = Comment
+commentForm :: UserId -> MediumId -> Maybe CommentId -> AForm Handler Comment
+commentForm authorId originId parentId = Comment
   <$> pure authorId
-  <*> pure authorSlug
   <*> pure originId
   <*> pure parentId
   <*> lift (liftIO getCurrentTime)
@@ -132,12 +127,12 @@ getCommentReplyR commentId = do
       case msu of
         Just tempUserId -> do
           let userId = getUserIdFromText tempUserId
-          u <- runDB $ getJust userId
-          let userSl = userSlug u
           let mediumId = commentOrigin comment
+          parAuth <- runDB $ get $ commentAuthor comment
+          let parSlug = fromMaybe "" $ userSlug <$> parAuth
           (replyWidget, enctype) <- generateFormPost $
             renderBootstrap3 BootstrapBasicForm $
-            commentForm userId userSl mediumId (Just commentId)
+            commentForm userId mediumId (Just commentId)
           defaultLayout $ do
             setTitle "Eidolon :: Reply to comment"
             $(widgetFile "commentReply")
@@ -162,7 +157,7 @@ postCommentReplyR commentId = do
           let mediumId = commentOrigin comment
           ((res, _), _) <- runFormPost $
             renderBootstrap3 BootstrapBasicForm $
-            commentForm userId userSl mediumId (Just commentId)
+            commentForm userId mediumId (Just commentId)
           case res of
             FormSuccess temp -> do
               runDB $ insert_ temp
@@ -170,10 +165,10 @@ postCommentReplyR commentId = do
               parent <- runDB $ getJust $ fromJust $ commentParent temp
               parAuth <- runDB $ getJust $ commentAuthor parent
               link <- ($ MediumR (commentOrigin temp)) <$> getUrlRender
-              sendMail (userEmail parAuth) ((commentAuthorSlug temp) `T.append` " replied to your comment")
+              sendMail (userEmail parAuth) (userSl `T.append` " replied to your comment")
                 [shamlet|
                   <h1>Hello #{userSlug parAuth}
-                  <p>#{commentAuthorSlug temp} replied to your comment:
+                  <p>#{userSl} replied to your comment:
                   #{commentContent temp}
                   <p>To see the comment thread follow
                     <a href=#{link}>
@@ -183,10 +178,10 @@ postCommentReplyR commentId = do
               --send mail to medium owner
               medium <- runDB $ getJust mediumId
               owner <- runDB $ getJust $ mediumOwner medium
-              sendMail (userEmail owner) ((commentAuthorSlug temp) `T.append` " commented on your medium")
+              sendMail (userEmail owner) (userSl `T.append` " commented on your medium")
                 [shamlet|
                   <h1>Hello #{userSlug owner}
-                  <p>#{commentAuthorSlug temp} commented your medium with:
+                  <p>#{userSl} commented your medium with:
                   #{commentContent temp}
                   <p>To see the comment thread follow
                     <a href=#{link}>

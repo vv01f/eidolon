@@ -63,12 +63,14 @@ commentFeedBuilder mId = do
     , feedEntries = es
     }
 
-commentToEntry :: Monad m => Entity Comment -> m (FeedEntry (Route App))
-commentToEntry c =
+commentToEntry :: Entity Comment -> Handler (FeedEntry (Route App))
+commentToEntry c = do
+  author <- runDB $ get $ commentAuthor $ entityVal c
+  let slug = fromMaybe "" $ userSlug <$> author
   return FeedEntry
     { feedEntryLink = MediumR (commentOrigin $ entityVal c)
     , feedEntryUpdated = (commentTime $ entityVal c)
-    , feedEntryTitle = LT.toStrict $ [stext|#{commentAuthorSlug $ entityVal c} wrote:|]
+    , feedEntryTitle = LT.toStrict $ [stext|#{slug} wrote:|]
     , feedEntryContent = [shamlet|#{commentContent $ entityVal c}|]
     , feedEntryEnclosure = Nothing
     }

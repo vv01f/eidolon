@@ -149,7 +149,7 @@ postMediumMoveR mId = do
           redirect $ MediumR mId
         _ -> do
           setMessage "Error moving image"
-          redirect $ mediumR mId
+          redirect $ MediumR mId
     Left (err, route) -> do
       setMessage err
       redirect route

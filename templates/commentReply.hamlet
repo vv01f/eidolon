@@ -1,6 +1,6 @@
 <div .item>
   <h4>Reply to comment
-  <strong>#{commentAuthorSlug comment}</strong> posted on #{formatTime defaultTimeLocale "%A %F %H:%M" (commentTime comment)}:
+  <strong>#{parSlug}</strong> posted on #{formatTime defaultTimeLocale "%A %F %H:%M" (commentTime comment)}:
   <hr>
     <p>#{commentContent comment}
   <hr>
