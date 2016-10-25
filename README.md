@@ -35,7 +35,7 @@ software and libraries:
 which can be installed through
 
 ```bash
-sudo apt-get install alex happy libmagick++-dev libpq-dev postgresql libmagickwand-dev
+sudo apt-get install alex happy libpq-dev postgresql
 ```
 
 ####Elasticsearch dependencies
