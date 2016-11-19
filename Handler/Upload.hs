@@ -191,7 +191,7 @@ writeOnDrive :: FileInfo -> UserId -> AlbumId -> Handler FP.FilePath
 writeOnDrive fil userId albumId = do
   --filen <- return $ fileName fil
   album <- runDB $ getJust albumId
-  let [PersistInt64 int] = keyToValues $ maximum $ albumContent album
+  let [PersistInt64 int] = if albumContent album == [] then [PersistInt64 1] else keyToValues $ maximum $ albumContent album
   let filen = show $ fromIntegral int + 1
   let ext = FP.takeExtension $ T.unpack $ fileName fil
   let path = "static" FP.</> "data" FP.</> T.unpack (extractKey userId) FP.</> T.unpack (extractKey albumId) FP.</> filen ++ ext
