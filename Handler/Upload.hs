@@ -184,7 +184,7 @@ writeOnDrive :: FileInfo -> UserId -> AlbumId -> Handler FP.FilePath
 writeOnDrive fil userId albumId = do
   --filen <- return $ fileName fil
   album <- runDB $ getJust albumId
-  let filen = show $ length (albumContent album) + 1
+  let filen = show $ (read $ show $ maximum $ albumContent album :: Int) + 1
   let ext = FP.takeExtension $ T.unpack $ fileName fil
   let path = "static" FP.</> "data" FP.</> T.unpack (extractKey userId) FP.</> T.unpack (extractKey albumId) FP.</> filen ++ ext
   dde <- liftIO $ doesDirectoryExist $ FP.dropFileName path
