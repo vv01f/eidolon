@@ -123,6 +123,10 @@ library
                  , JuicyPixels                   >= 3.2.8
                  , JuicyPixels-scale-dct
                  , classy-prelude-yesod          >= 1.0
+                 -- svg stuff
+                 , rasterific-svg
+                 , svg-tree
+                 , FontyFruity
                  -- for Migrations
                  , HDBC
                  , HDBC-postgresql

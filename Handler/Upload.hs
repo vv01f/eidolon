@@ -26,9 +26,12 @@ import qualified System.FilePath as FP
 import System.Directory
 import Text.Blaze.Internal
 import Codec.ImageType
-import Codec.Picture
+import Codec.Picture as P
 import Codec.Picture.Metadata as PM
 import Codec.Picture.ScaleDCT
+import Graphics.Rasterific.Svg as SVG
+import Graphics.Svg
+import Graphics.Text.TrueType
 
 getDirectUploadR :: AlbumId -> Handler Html
 getDirectUploadR albumId = do
@@ -110,7 +113,7 @@ postDirectUploadR albumId = do
                       redirect HomeR
                     else do
                       let justErrNames = map fromJust onlyErrNames
-                      let msg = Content $ Text $ "File type not supported of: " `T.append` T.intercalate ", " justErrNames
+                      let msg = Content $ Text.Blaze.Internal.Text $ "File type not supported of: " `T.append` T.intercalate ", " justErrNames
                       setMessage msg
                       redirect HomeR
                 _ -> do
@@ -140,32 +143,36 @@ generateThumbs
   -> Handler ThumbsMeta -- ^ Resulting metadata to store
 generateThumbs path uId aId = do
   eimg <- liftIO $ readImageWithMetadata path
-  case eimg of
-    Left e -> error e
-    Right (orig, meta) -> do
-      let thumbName = FP.takeBaseName path ++ "_thumb.jpg"
-          prevName = FP.takeBaseName path ++ "_preview.jpg"
-          pathPrefix = "static" FP.</> "data" FP.</> T.unpack (extractKey uId) FP.</> T.unpack (extractKey aId)
-          tPath = pathPrefix FP.</> thumbName
-          pPath = pathPrefix FP.</> prevName
-          origPix = convertRGBA8 orig
-          oWidth = fromIntegral $ fromJust $ PM.lookup Width meta :: Int
-          oHeight = fromIntegral $ fromJust $ PM.lookup Height meta :: Int
-          tWidth = floor (fromIntegral oWidth / fromIntegral oHeight * fromIntegral tHeight :: Double)
-          tHeight = 230 :: Int
-          pHeight = 600 :: Int
-          pScale = (fromIntegral pHeight :: Double) / (fromIntegral oHeight :: Double)
-          pWidth = floor (fromIntegral oWidth * pScale)
-          tPix = scale (tWidth, tHeight) origPix
-          pPix = scale (pWidth, pHeight) origPix
-      liftIO $ saveJpgImage 95 tPath $ ImageRGBA8 tPix
-      liftIO $ saveJpgImage 95 pPath $ ImageRGBA8 pPix
-      return $ ThumbsMeta
-        { metaThumbPath    = tPath
-        , metaPreviewPath  = pPath
-        }
+  orig <- case eimg of
+    Left _ -> do
+      svg <- liftIO $ loadSvgFile path
+      (img, _) <- liftIO $ renderSvgDocument emptyFontCache Nothing 100 $ fromJust svg
+      return img
+    Right (img, _) -> do
+      return $ convertRGBA8 img
+  let thumbName = FP.takeBaseName path ++ "_thumb.jpg"
+      prevName = FP.takeBaseName path ++ "_preview.jpg"
+      pathPrefix = "static" FP.</> "data" FP.</> T.unpack (extractKey uId) FP.</> T.unpack (extractKey aId)
+      tPath = pathPrefix FP.</> thumbName
+      pPath = pathPrefix FP.</> prevName
+      -- origPix = convertRGBA8 orig
+      oWidth = P.imageWidth orig :: Int
+      oHeight = P.imageHeight orig :: Int
+      tWidth = floor (fromIntegral oWidth / fromIntegral oHeight * fromIntegral tHeight :: Double)
+      tHeight = 230 :: Int
+      pHeight = 600 :: Int
+      pScale = (fromIntegral pHeight :: Double) / (fromIntegral oHeight :: Double)
+      pWidth = floor (fromIntegral oWidth * pScale)
+      tPix = scale (tWidth, tHeight) orig
+      pPix = scale (pWidth, pHeight) orig
+  liftIO $ saveJpgImage 95 tPath $ ImageRGBA8 tPix
+  liftIO $ saveJpgImage 95 pPath $ ImageRGBA8 pPix
+  return $ ThumbsMeta
+    { metaThumbPath    = tPath
+    , metaPreviewPath  = pPath
+    }
 
-checkCVE_2016_3714 :: FP.FilePath -> Text -> IO Bool
+checkCVE_2016_3714 :: FP.FilePath -> T.Text -> IO Bool
 checkCVE_2016_3714 p m =
   case m of
     "image/jpeg"     -> isJpeg p
@@ -184,7 +191,8 @@ writeOnDrive :: FileInfo -> UserId -> AlbumId -> Handler FP.FilePath
 writeOnDrive fil userId albumId = do
   --filen <- return $ fileName fil
   album <- runDB $ getJust albumId
-  let filen = show $ (read $ show $ maximum $ albumContent album :: Int) + 1
+  let [PersistInt64 int] = keyToValues $ maximum $ albumContent album
+  let filen = show $ fromIntegral int + 1
   let ext = FP.takeExtension $ T.unpack $ fileName fil
   let path = "static" FP.</> "data" FP.</> T.unpack (extractKey userId) FP.</> T.unpack (extractKey albumId) FP.</> filen ++ ext
   dde <- liftIO $ doesDirectoryExist $ FP.dropFileName path
@@ -205,16 +213,16 @@ dUploadForm userId albumId = FileBulk
   <*> aopt textareaField (bfs ("Description" :: T.Text)) Nothing
   <*> areq tagField (bfs ("Enter tags" :: T.Text)) Nothing
   <*> pure albumId
-  <*  bootstrapSubmit ("Upload" :: BootstrapSubmit Text)
+  <*  bootstrapSubmit ("Upload" :: BootstrapSubmit T.Text)
       
 
 data FileBulk = FileBulk
-  { fileBulkPrefix :: Text
+  { fileBulkPrefix :: T.Text
   , fileBulkFiles :: [FileInfo]
   , fileBulkTime :: UTCTime
   , fileBulkOwner :: UserId
   , fileBulkDesc :: Maybe Textarea
-  , fileBulkTags :: [Text]
+  , fileBulkTags :: [T.Text]
   , fileBulkAlbum :: AlbumId
   }
 
@@ -249,7 +257,7 @@ bulkUploadForm userId = (\a b c d e f g -> FileBulk b c d e f g a)
   <*> pure userId
   <*> aopt textareaField (bfs ("Description" :: T.Text)) Nothing
   <*> areq tagField (bfs ("Enter tags" :: T.Text)) Nothing
-  <*  bootstrapSubmit ("Upload" :: BootstrapSubmit Text)
+  <*  bootstrapSubmit ("Upload" :: BootstrapSubmit T.Text)
   where
     albums = do
       allEnts <- runDB $ selectList [] [Desc AlbumTitle]
@@ -316,7 +324,7 @@ postUploadR = do
               redirect HomeR
             else do
               let justErrNames = map fromJust onlyErrNames
-              let msg = Content $ Text $ "File type not supported of: " `T.append` T.intercalate ", " justErrNames
+              let msg = Content $ Text.Blaze.Internal.Text $ "File type not supported of: " `T.append` T.intercalate ", " justErrNames
               setMessage msg
               redirect HomeR
         _ -> do
