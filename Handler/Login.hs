@@ -18,8 +18,15 @@ module Handler.Login where
 
 import Import hiding (returnJson)
 import qualified Data.Text as T
-import Crypto.HMAC
+
+-- old hmac
+import Crypto.HMAC as Old
 import Crypto.Hash.CryptoAPI (SHA1)
+
+-- new hmac
+import Crypto.MAC.HMAC as New
+import Crypto.Hash.Algorithms (SHA3_512)
+
 import Data.Text.Encoding (encodeUtf8)
 import Data.Serialize (encode)
 import Data.Maybe
@@ -111,3 +118,6 @@ hmacSHA1 keyData msgData =
       sha1 :: SHA1
       sha1 = hmac' key msgData
   in encode sha1
+
+hmacSHA3 :: B.ByteString -> B.ByteString -> B.ByteString
+hmacSHA3 key msg = B.pack $ show $ hmacGetDigest (hmac key msg :: HMAC SHA3_512)
