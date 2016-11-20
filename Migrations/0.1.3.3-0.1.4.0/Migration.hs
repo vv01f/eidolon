@@ -57,6 +57,7 @@ main = do
                 return img
               _ -> error err
           Right img -> do -- This branch contains "classical" image formats like bmp or png
+            putStrLn path
             return $ convertRGBA8 img
         let thumbName = FP.takeBaseName path ++ "_thumb.png"
             prevName = FP.takeBaseName path ++ "_preview.png"
