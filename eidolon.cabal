@@ -124,7 +124,7 @@ library
                  , JuicyPixels-scale-dct
                  , classy-prelude-yesod          >= 1.0
                  -- svg stuff
-                 , rasterific-svg
+                 , rasterific-svg                >= 0.3.2.1
                  , svg-tree
                  , FontyFruity
                  -- for Migrations
