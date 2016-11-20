@@ -195,7 +195,7 @@ mediumToEntry ent = do
     , feedEntryEnclosure = Just $ EntryEnclosure
         (StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumPreview $ entityVal ent) [])
         size
-        "image/jpeg"
+        "image/png"
     }
 
 getSize :: FilePath -> IO Int

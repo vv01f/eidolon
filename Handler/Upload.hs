@@ -150,8 +150,8 @@ generateThumbs path uId aId mime = do
         _ -> error err
     Right img -> do -- This branch contains "classical" image formats like bmp or png
       return $ convertRGBA8 img
-  let thumbName = FP.takeBaseName path ++ "_thumb.jpg"
-      prevName = FP.takeBaseName path ++ "_preview.jpg"
+  let thumbName = FP.takeBaseName path ++ "_thumb.png"
+      prevName = FP.takeBaseName path ++ "_preview.png"
       pathPrefix = "static" FP.</> "data" FP.</> T.unpack (extractKey uId) FP.</> T.unpack (extractKey aId)
       tPath = pathPrefix FP.</> thumbName
       pPath = pathPrefix FP.</> prevName
@@ -165,8 +165,8 @@ generateThumbs path uId aId mime = do
       pWidth = floor (fromIntegral oWidth * pScale)
       tPix = scale (tWidth, tHeight) orig
       pPix = scale (pWidth, pHeight) orig
-  liftIO $ saveJpgImage 95 tPath $ ImageRGBA8 tPix
-  liftIO $ saveJpgImage 95 pPath $ ImageRGBA8 pPix
+  liftIO $ savePngImage tPath $ ImageRGBA8 tPix
+  liftIO $ savePngImage pPath $ ImageRGBA8 pPix
   return $ ThumbsMeta
     { metaThumbPath    = tPath
     , metaPreviewPath  = pPath
