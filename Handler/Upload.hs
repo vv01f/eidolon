@@ -88,15 +88,11 @@ postDirectUploadR albumId = do
                           isOk <- liftIO $ checkCVE_2016_3714 path mime
                           if isOk
                             then do
-                              meta <- generateThumbs path ownerId albumId
+                              meta <- generateThumbs path ownerId albumId mime
                               tempName <- if length indFils == 1
                                 then return $ fileBulkPrefix temp
                                 else return (fileBulkPrefix temp `T.append` " " `T.append` T.pack (show (index :: Int)) `T.append` " of " `T.append` T.pack (show (length indFils)))
                               let medium = Medium tempName ('/' : path) ('/' : metaThumbPath meta) mime (fileBulkTime temp) (fileBulkOwner temp) (fileBulkDesc temp) (fileBulkTags temp) albumId ('/' : metaPreviewPath meta)
-                              -- mId <- runDB $ I.insert medium
-                              -- inALbum <- runDB $ getJust albumId
-                              -- let newMediaList = mId : albumContent inALbum
-                              -- runDB $ update albumId [AlbumContent =. newMediaList]
                               insertMedium medium albumId
                               return Nothing
                           else do
@@ -140,15 +136,19 @@ generateThumbs
   :: FP.FilePath        -- ^ Path to original image
   -> UserId             -- ^ Uploading user
   -> AlbumId            -- ^ Destination album
+  -> T.Text             -- ^ MIME-Type (used for svg et al.)
   -> Handler ThumbsMeta -- ^ Resulting metadata to store
-generateThumbs path uId aId = do
-  eimg <- liftIO $ readImageWithMetadata path
+generateThumbs path uId aId mime = do
+  eimg <- liftIO $ readImage path
   orig <- case eimg of
-    Left _ -> do
-      svg <- liftIO $ loadSvgFile path
-      (img, _) <- liftIO $ renderSvgDocument emptyFontCache Nothing 100 $ fromJust svg
-      return img
-    Right (img, _) -> do
+    Left err -> -- This branch contains svg and other data formats. to be extended for pdf et al.
+      case mime of
+        "image/svg+xml" -> do
+          svg <- liftIO $ loadSvgFile path
+          (img, _) <- liftIO $ renderSvgDocument emptyFontCache Nothing 100 $ fromJust svg
+          return img
+        _ -> error err
+    Right img -> do -- This branch contains "classical" image formats like bmp or png
       return $ convertRGBA8 img
   let thumbName = FP.takeBaseName path ++ "_thumb.jpg"
       prevName = FP.takeBaseName path ++ "_preview.jpg"
@@ -191,10 +191,11 @@ writeOnDrive :: FileInfo -> UserId -> AlbumId -> Handler FP.FilePath
 writeOnDrive fil userId albumId = do
   --filen <- return $ fileName fil
   album <- runDB $ getJust albumId
-  let [PersistInt64 int] = if albumContent album == [] then [PersistInt64 1] else keyToValues $ maximum $ albumContent album
-  let filen = show $ fromIntegral int + 1
-  let ext = FP.takeExtension $ T.unpack $ fileName fil
-  let path = "static" FP.</> "data" FP.</> T.unpack (extractKey userId) FP.</> T.unpack (extractKey albumId) FP.</> filen ++ ext
+  let ac = albumContent album
+      [PersistInt64 int] = if L.null ac then [PersistInt64 1] else keyToValues $ maximum $ ac
+      filen = show $ fromIntegral int + 1
+      ext = FP.takeExtension $ T.unpack $ fileName fil
+      path = "static" FP.</> "data" FP.</> T.unpack (extractKey userId) FP.</> T.unpack (extractKey albumId) FP.</> filen ++ ext
   dde <- liftIO $ doesDirectoryExist $ FP.dropFileName path
   if not dde
     then
@@ -292,7 +293,7 @@ postUploadR = do
                   isOk <- liftIO $ checkCVE_2016_3714 path mime
                   if isOk
                     then do
-                      meta <- generateThumbs path ownerId inAlbumId
+                      meta <- generateThumbs path ownerId inAlbumId mime
                       tempName <- if
                         length indFils == 1
                         then return $ fileBulkPrefix temp
