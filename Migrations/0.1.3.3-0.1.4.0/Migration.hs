@@ -3,6 +3,7 @@ import Database.HDBC.PostgreSQL
 import System.IO
 import System.Directory
 import Control.Exception
+import Control.Monad (when)
 import Data.Maybe (fromJust)
 import qualified Data.Text as T
 import qualified Data.ByteString.Char8 as B
@@ -78,7 +79,10 @@ main = do
             pPix = scale (pWidth, pHeight) orig
         savePngImage tPath $ ImageRGBA8 tPix
         savePngImage pPath $ ImageRGBA8 pPix
-        mapM (removeFile . (FP.</>) pathPrefix) [oldThumbName, oldPrevName]
+        mapM (\x -> do
+          let fullpath = pathPrefix FP.</> x
+          dfe <- doesFileExist fullpath
+          when dfe (removeFile fullpath)) [oldThumbName, oldPrevName]
         return [SqlByteString (B.pack $ '/':tPath), SqlByteString (B.pack $ '/':pPath), theId]
       _ ->
         error "malformed entry"
