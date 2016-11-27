@@ -1,0 +1,24 @@
+{
+  "name": "eidolon",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "output"
+  ],
+  "dependencies": {
+    "purescript-prelude": "^2.1.0",
+    "purescript-console": "^2.0.0",
+    "purescript-functions": "^2.0.0",
+    "purescript-jquery": "^3.0.0",
+    "purescript-affjax": "^3.0.1",
+    "purescript-form-urlencoded": "^2.0.0",
+    "purescript-argonaut": "^2.0.0",
+    "purescript-react": "^2.0.0",
+    "purescript-react-dom": "^2.0.0",
+    "purescript-dom": "^3.2.0"
+  },
+  "devDependencies": {
+    "purescript-psci-support": "^2.0.0"
+  }
+}
