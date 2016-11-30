@@ -5,14 +5,14 @@ $newline always
   <form>
     <div .form-group .required>
       <label for="password1">Password:
-      <input id="password1" type="password" required>
+      <input #password1 type="password" required>
     <div .form-group .required>
       <label for="password2">Confirm your password:
-      <input id="password2" type="password" required>
-    <p id="progress">
-    <div .form-group .optional>
-      <input id="activate" type="submit" value="Activate" data-token="#{token}" data-salt="#{hexSalt}">
+      <input #password2 type="password" required>
+    <p #progress>
+  <div .form-group .optional>
+    <button #activate data-token="#{token}" data-salt="#{hexSalt}">Activate
 
   <script src="/static/js/jquery.min.js" type="text/javascript">
   <script src="/static/js/jsSHA.js" type="text/javascript">
-  <script src="/static/js/activate.js" type="text/javascript">
+  <script src="/static/js/purs_activate.js" type="text/javascript">

@@ -31,6 +31,7 @@ import Data.Text.Encoding (encodeUtf8)
 import Data.Serialize (encode)
 import Data.Maybe
 import qualified Data.ByteString as B
+import qualified Data.ByteString.Char8 as BC
 import Data.Aeson.Types
 
 data Credentials = Credentials
@@ -72,7 +73,7 @@ postLoginR = do
             queriedUser <- runDB $ getJust (fromJust savedUserId)
             let salted = userSalted queriedUser
             let hexSalted = toHex salted
-            let expected = hmacSHA1 (tokenToken token) (encodeUtf8 hexSalted)
+            let expected = hmacSHA3 (tokenToken token) (encodeUtf8 hexSalted)
             if
               fromHex' (T.unpack hexResponse) == expected
               then do
@@ -120,4 +121,4 @@ hmacSHA1 keyData msgData =
   in encode sha1
 
 hmacSHA3 :: B.ByteString -> B.ByteString -> B.ByteString
-hmacSHA3 key msg = B.pack $ show $ hmacGetDigest (hmac key msg :: HMAC SHA3_512)
+hmacSHA3 key msg = BC.pack $ show $ hmacGetDigest (New.hmac key msg :: HMAC SHA3_512)

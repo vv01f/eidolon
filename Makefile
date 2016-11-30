@@ -1,3 +1,5 @@
+all:	hsbuild pursbuild
+
 clean:
 	cabal clean
 	rm -r bower_components
@@ -18,7 +20,6 @@ cryptojs:
 	npm install react
 	npm install react-dom
 
-pursbuild:	purdeps
-	pulp browserify -O > ./static/js/purs.js
-
-all:	hsbuild pursbuild
+pursbuild:	pursdeps
+	pulp browserify -m Login -O -t ./static/js/purs_login.js
+	pulp browserify -m Activate -O -t ./static/js/purs_activate.js
