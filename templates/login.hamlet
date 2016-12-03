@@ -1,6 +1,6 @@
 $newline always
 <div .medium>
-  <div .noscript .btn .btn-danger>Please enable Javascript to log in
+  <div .noscript .btn .btn-danger>Please enable Javascript to log in<br/>
   <form .js-hidden>
     <h3>Login
     <div .form-group .required>

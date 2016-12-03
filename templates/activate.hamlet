@@ -1,6 +1,6 @@
 $newline always
 <div .medium>
-  <div .noscript .btn .btn-danger>You need to have Javascript enabled
+  <div .noscript .btn .btn-danger>You need to have Javascript enabled<br/>
   <form .js-hidden>
     <h3>Activate your account
     <div .form-group .required>
