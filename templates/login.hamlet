@@ -9,9 +9,9 @@ $newline always
     <div .form-group .required>
       <label for="password">Password:
       <input .form-control #password type="password" required>
-  <div .form-group .optional>
-    <button .btn .btn-default #login>Login
-  <div #progress>
+    <div .form-group .optional>
+      <button .btn .btn-default type="submit" #login>Login
+    <div #progress>
 
   <a href=@{ReactivateR}>Forgot your Password?
 

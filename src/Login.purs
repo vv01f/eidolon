@@ -1,37 +1,28 @@
 module Login where
 
-import Prelude
-import Control.Monad.Aff
+import Prelude (Unit, bind, not, pure, show, unit, ($), (&&), (<$>), (<>), (=<<))
+import Control.Monad.Aff (runAff)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE, log)
-import Control.Monad.Eff.JQuery
-import Control.Monad.Except
+import Control.Monad.Eff.JQuery (JQuery, JQueryEvent, getValue, hide, on, preventDefault, ready, select, setProp)
 
 import DOM (DOM)
 
-import Data.Function.Uncurried (Fn2, runFn2)
-import Data.Maybe
-import Data.Either
+import Data.Function.Uncurried (runFn2)
+import Data.Maybe (Maybe(..), fromJust, isNothing)
+import Data.Either (Either(..))
 import Data.Tuple (Tuple(..))
-import Data.Unit
 
 import Data.Argonaut as A
-import Data.Argonaut.Decode
+import Data.Argonaut.Decode (decodeJson)
 
-import React as R
-import React.DOM as R
-import React.DOM.Props as RP
-import ReactDOM as RDOM
-
-import DOM.Node.Element
-
-import Network.HTTP.Affjax
+import Network.HTTP.Affjax (AJAX, post)
 
 import Data.FormURLEncoded as UE
 
-import Partial.Unsafe
+import Partial.Unsafe (unsafePartial)
 
-import Common
+import Common (Challenge(..), Elem(..), fail, fromForeign, fromHex, fromUtf8, hmacSha3, progress, welcome)
 
 -- main :: forall e. Eff (console :: CONSOLE | e) Unit
 -- main = do
@@ -69,10 +60,10 @@ onLoginClick login ev x = unsafePartial $ do
   if not (isNothing username && isNothing password)
     then do
       progress "Obtaining Challenge..."
-      let data1 = UE.encode (UE.fromArray $ [ Tuple "username" username ]) :: String
+      let data1 = UE.fromArray $ [ Tuple "username" username ]
       _ <- runAff
           (\e -> fail Login $ show e)
-          (\x -> resp1Success (fromJust password) x.response)
+          (\y -> resp1Success (fromJust password) y.response)
           $ post "/login" data1
       log "success so far"
     else
@@ -93,11 +84,13 @@ resp1Success pass j = do
       fail Login e
     Right (Challenge challenge) -> do
       progress "HMAC 1"
-      let salted = runFn2 hmacSha3 pass challenge.salt
+      let salted = runFn2 hmacSha3 (fromUtf8 pass) (fromHex challenge.salt)
+      log $ "salted: " <> salted
       progress "HMAC 2"
-      let response = runFn2 hmacSha3 salted challenge.token
+      let response = runFn2 hmacSha3 (fromUtf8 salted) (fromUtf8 challenge.token)
+      log $ "resp: " <> response
       progress "sending response"
-      let data2 = UE.encode (UE.fromArray $ [ Tuple "token" (Just challenge.token), Tuple "response" (Just response) ]) :: String
+      let data2 = UE.fromArray $ [ Tuple "token" (Just challenge.token), Tuple "response" (Just response) ]
       _ <- runAff
           (\e -> fail Login $ show e)
           (\x -> welcome x.response Login)

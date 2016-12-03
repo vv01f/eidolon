@@ -25,9 +25,9 @@ import Crypto.Hash.CryptoAPI (SHA1)
 
 -- new hmac
 import Crypto.MAC.HMAC as New
-import Crypto.Hash.Algorithms (SHA3_512)
+import Crypto.Hash.Algorithms (Keccak_512)
 
-import Data.Text.Encoding (encodeUtf8)
+import Data.Text.Encoding (encodeUtf8, decodeUtf8)
 import Data.Serialize (encode)
 import Data.Maybe
 import qualified Data.ByteString as B
@@ -73,9 +73,8 @@ postLoginR = do
             queriedUser <- runDB $ getJust (fromJust savedUserId)
             let salted = userSalted queriedUser
             let hexSalted = toHex salted
-            let expected = hmacSHA3 (tokenToken token) (encodeUtf8 hexSalted)
-            if
-              fromHex' (T.unpack hexResponse) == expected
+            let expected = hmacKeccak (encodeUtf8 $ toHex $ tokenToken token) (encodeUtf8 hexSalted)
+            if encodeUtf8 hexResponse == expected
               then do
                 -- Success!!
                 runDB $ delete tokenId
@@ -120,5 +119,5 @@ hmacSHA1 keyData msgData =
       sha1 = hmac' key msgData
   in encode sha1
 
-hmacSHA3 :: B.ByteString -> B.ByteString -> B.ByteString
-hmacSHA3 key msg = BC.pack $ show $ hmacGetDigest (New.hmac key msg :: HMAC SHA3_512)
+hmacKeccak :: B.ByteString -> B.ByteString -> B.ByteString
+hmacKeccak key msg = BC.pack $ show $ hmacGetDigest (New.hmac key msg :: HMAC Keccak_512)

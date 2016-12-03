@@ -10,8 +10,8 @@ $newline always
       <label for="password2">Confirm your password:
       <input #password2 type="password" required>
     <p #progress>
-  <div .form-group .optional>
-    <button #activate data-token="#{token}" data-salt="#{hexSalt}">Activate
+    <div .form-group .optional>
+      <button #activate type="submit" data-token="#{token}" data-salt="#{hexSalt}">Activate
 
   <script src="/static/js/jquery.min.js" type="text/javascript">
   <script src="/static/js/jsSHA.js" type="text/javascript">

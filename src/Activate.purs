@@ -1,37 +1,24 @@
 module Activate where
 
-import Prelude
-import Control.Monad.Aff
+import Prelude (Unit, bind, not, pure, show, unit, ($), (&&), (<>), (=<<), (==))
+import Control.Monad.Aff (runAff)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE, log)
-import Control.Monad.Eff.JQuery
-import Control.Monad.Except
+import Control.Monad.Eff.JQuery (JQuery, JQueryEvent, getValue, on, preventDefault, ready, select)
 
 import DOM (DOM)
 
-import Data.Function.Uncurried (Fn2, runFn2)
-import Data.Maybe
-import Data.Either
+import Data.Function.Uncurried (runFn2)
+import Data.Maybe (Maybe(..), fromJust, isNothing)
 import Data.Tuple (Tuple(..))
-import Data.Unit
 
-import Data.Argonaut as A
-import Data.Argonaut.Decode
-
-import React as R
-import React.DOM as R
-import React.DOM.Props as RP
-import ReactDOM as RDOM
-
-import DOM.Node.Element
-
-import Network.HTTP.Affjax
+import Network.HTTP.Affjax (AJAX, post)
 
 import Data.FormURLEncoded as UE
 
-import Partial.Unsafe
+import Partial.Unsafe (unsafePartial)
 
-import Common
+import Common (Elem(..), fail, fromForeign, fromHex, fromUtf8, getAttr, hmacSha3, progress, welcome)
 
 -- main :: forall e. Eff (console :: CONSOLE | e) Unit
 -- main = do
@@ -44,6 +31,7 @@ main :: forall eff. Eff ( ajax :: AJAX
                         ) Unit
 main =
   ready $ do
+    log "activating"
     activate <- select "#activate"
     on "click" (onActivateClick activate) activate
 
@@ -59,7 +47,9 @@ onActivateClick
 onActivateClick activate ev _ = unsafePartial $ do
   preventDefault ev
   token <- getAttr "data-token" activate
+  log $ "token: " <> token
   salt <- getAttr "data-salt" activate
+  log $ "salt: " <> salt
   fpassword1 <- getValue =<< select "#password1"
   fpassword2 <- getValue =<< select "#password2"
   let password1 = fromForeign fpassword1
@@ -69,9 +59,11 @@ onActivateClick activate ev _ = unsafePartial $ do
       if password1 == password2
         then do
           progress "Salting password"
-          let salted = runFn2 hmacSha3 (fromJust password1) salt
+          log $ fromJust password1 <> " " <> salt
+          let salted = runFn2 hmacSha3 (fromUtf8 $ fromJust password1) (fromHex salt)
+          log salted
           progress "Requesting account activation..."
-          let dat = UE.encode (UE.fromArray [ Tuple "salted" (Just salted) ]) :: String
+          let dat = UE.fromArray [ Tuple "salted" (Just salted) ]
           _ <- runAff
               (\e -> fail Activate $ show e)
               (\x -> welcome x.response Activate)

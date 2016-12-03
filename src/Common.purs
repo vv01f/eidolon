@@ -1,32 +1,16 @@
 module Common where
 
-import Prelude
-import Control.Monad.Aff
+import Prelude (Unit, bind, pure, ($), (<$>), (=<<))
 import Control.Monad.Eff (Eff)
-import Control.Monad.Eff.Console (CONSOLE, log)
-import Control.Monad.Eff.JQuery
-import Control.Monad.Except
-
+import Control.Monad.Eff.JQuery (JQuery, display, select, setProp, setText)
+import Control.Monad.Except (runExcept)
 import DOM (DOM)
-import Data.Function.Uncurried (Fn2, runFn2)
-import Data.Maybe
-import Data.Either
-import Data.Tuple (Tuple(..))
+import Data.Function.Uncurried (Fn2)
+import Data.Maybe (Maybe(..))
+import Data.Either (Either(..), either)
 import Data.Foreign as F
-import Data.Unit
-import Data.Argonaut as A
+import Data.Argonaut (class DecodeJson, decodeJson, (.?), Json) as A
 import Data.Argonaut.Decode
-import React as R
-import React.DOM as R
-import React.DOM.Props as RP
-import ReactDOM as RDOM
-import DOM.Node.Element
-
-import Network.HTTP.Affjax
-
-import Data.FormURLEncoded as UE
-
-import Partial.Unsafe
 
 data Elem
   = Login
@@ -36,8 +20,9 @@ welcome :: forall eff. A.Json -> Elem -> Eff (dom :: DOM | eff) Unit
 welcome j elem = do
   let eitherWelcome = decodeJson j
   case eitherWelcome of
-    Left e ->
-      fail elem e
+    Left _ -> do
+      let eitherErr = decodeJson j
+      either (fail elem) (\(Err e) -> fail elem e.err) eitherErr
     Right (Welcome welc) -> do
       progress "welcome to Eidolon"
       setLocation welc.link
@@ -78,17 +63,35 @@ instance decodeJsonWelcome :: DecodeJson Welcome where
     link <- obj .? "welcome"
     pure $ Welcome { link }
 
+data Err = Err
+  { err :: String
+  }
+
+instance decodeJsonErr :: DecodeJson Err where
+  decodeJson j = do
+    obj <- decodeJson j
+    error <- obj .? "error"
+    pure $ Err { err: error }
+
 fromForeign :: F.Foreign -> Maybe String
 fromForeign f = case runExcept (F.readString f) of
   Left e -> Nothing
   Right s -> Just s
 
-foreign import hmacSha3 :: Fn2 String String String
+foreign import hmacSha3 :: Fn2 WordArray WordArray String
 
 foreign import setLocation :: forall eff. String -> Eff (dom :: DOM | eff) Unit
 
 foreign import getAttr
-  :: forall eff a
+  :: forall eff
    . String
   -> JQuery
   -> Eff (dom :: DOM | eff) String
+
+foreign import toHex :: String -> String
+
+foreign import fromHex :: String -> WordArray
+
+foreign import fromUtf8 :: String -> WordArray
+
+foreign import data WordArray :: *
