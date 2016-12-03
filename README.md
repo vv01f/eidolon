@@ -12,11 +12,11 @@ Visit the test instance at [eidolon.nek0.eu][eidolon]
 
 ####Build dependencies
 
-A working Haskell capable environment. For that you will need `cabal-install`,
-which you can install with:
+A working Haskell capable environment. For that you will need `ghc` and
+`cabal-install`, which you can install with:
 
 ```bash
-sudo apt-get install cabal-install
+sudo apt-get install ghc cabal-install
 ```
 
 Now you can set up your cabal with `cabal update` and follow its instructions.
