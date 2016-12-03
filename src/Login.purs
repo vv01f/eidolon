@@ -80,7 +80,7 @@ resp1Success pass j = do
   log $ show j
   let eitherChallenge = decodeJson j
   case eitherChallenge of
-    Left _ ->
+    Left _ -> do
       let eitherErr = decodeJson j
       either (fail Login) (\(Err e) -> fail Login e.err) eitherErr
     Right (Challenge challenge) -> do
