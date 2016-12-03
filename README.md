@@ -155,6 +155,13 @@ Migrations/0.0.7-0.1.0.0/Migration.hs`
 * Follow the prompts of the script
 * Start eidolon
 
+###0.1.4.0-0.1.5.0
+* Stop eidolon
+* Compile migration script with `cabal exec -- ghc --make Migrations/0.1.4.0-0.1.5.0/Migration.hs`
+* Copy or move compiled script to run location and execute
+* Follow the prompts of the script
+* Start eidolon
+
 ##Acknowledgements:
 
 * This software uses the web Framework "Yesod" by Michael Snoyman. See more at:
