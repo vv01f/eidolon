@@ -22,7 +22,7 @@ import Data.FormURLEncoded as UE
 
 import Partial.Unsafe (unsafePartial)
 
-import Common (Challenge(..), Elem(..), fail, fromForeign, fromHex, fromUtf8, hmacSha3, progress, welcome)
+import Common (Challenge(..), Elem(..), Err(..), fail, fromForeign, fromHex, fromUtf8, hmacSha3, progress, welcome)
 
 -- main :: forall e. Eff (console :: CONSOLE | e) Unit
 -- main = do
