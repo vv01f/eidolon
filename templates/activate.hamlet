@@ -1,8 +1,8 @@
 $newline always
 <div .medium>
+  <h3>Activate your account
   <div .noscript .redbox>You need to have Javascript enabled<br/>
   <form .js-hidden>
-    <h3>Activate your account
     <div .form-group .required>
       <label for="password1">Password:
       <input #password1 type="password" required>
