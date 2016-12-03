@@ -80,8 +80,9 @@ resp1Success pass j = do
   log $ show j
   let eitherChallenge = decodeJson j
   case eitherChallenge of
-    Left e ->
-      fail Login e
+    Left _ ->
+      let eitherErr = decodeJson j
+      either (fail Login) (\(Err e) -> fail Login e.err) eitherErr
     Right (Challenge challenge) -> do
       progress "HMAC 1"
       let salted = runFn2 hmacSha3 (fromUtf8 pass) (fromHex challenge.salt)
