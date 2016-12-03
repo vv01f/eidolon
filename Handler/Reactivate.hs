@@ -33,8 +33,7 @@ postReactivateR = do
   case result of
     FormSuccess temp -> do
       users <- runDB $ selectList [UserEmail ==. temp] []
-      if
-        null users
+      if not $ null users
         then do
           userTokens <- foldM (\userTokens (Entity userId user) -> do
             token <- liftIO $ generateString
