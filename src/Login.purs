@@ -10,7 +10,7 @@ import DOM (DOM)
 
 import Data.Function.Uncurried (runFn2)
 import Data.Maybe (Maybe(..), fromJust, isNothing)
-import Data.Either (Either(..))
+import Data.Either (Either(..), either)
 import Data.Tuple (Tuple(..))
 
 import Data.Argonaut as A
