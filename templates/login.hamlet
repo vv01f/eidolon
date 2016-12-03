@@ -1,8 +1,8 @@
 $newline always
 <div .medium>
-  <noscript>Please enable Javascript
-  <h3>Login
-  <form>
+  <div .noscript .btn .btn-danger>Please enable Javascript to log in
+  <form .js-hidden>
+    <h3>Login
     <div .form-group .required>
       <label for="username">User:
       <input .form-control #username type="text" required>

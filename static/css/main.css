@@ -197,6 +197,10 @@ ul, ol {
 	text-align: left;
 }
 
+.js-hidden {
+	display: none;
+}
+
 @media (max-width: 755px) {
 	#main {
 		margin-top: 120px;

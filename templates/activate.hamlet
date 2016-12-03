@@ -1,18 +1,18 @@
 $newline always
 <div .medium>
-  <noscript>You need to have Javascript enabled
+  <div .noscript .btn .btn-danger>You need to have Javascript enabled
+  <form .js-hidden>
     <h3>Activate your account
-  <form>
     <div .form-group .required>
       <label for="password1">Password:
       <input #password1 type="password" required>
     <div .form-group .required>
       <label for="password2">Confirm your password:
       <input #password2 type="password" required>
-    <p #progress>
     <div .form-group .optional>
       <button #activate type="submit" data-token="#{token}" data-salt="#{hexSalt}">Activate
+    <div #progress>
 
   <script src="/static/js/jquery.min.js" type="text/javascript">
-  <script src="/static/js/jsSHA.js" type="text/javascript">
+  <!--<script src="/static/js/jsSHA.js" type="text/javascript">-->
   <script src="/static/js/purs_activate.js" type="text/javascript">

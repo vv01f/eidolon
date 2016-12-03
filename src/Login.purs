@@ -4,7 +4,7 @@ import Prelude (Unit, bind, not, pure, show, unit, ($), (&&), (<$>), (<>), (=<<)
 import Control.Monad.Aff (runAff)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE, log)
-import Control.Monad.Eff.JQuery (JQuery, JQueryEvent, getValue, hide, on, preventDefault, ready, select, setProp)
+import Control.Monad.Eff.JQuery (JQuery, JQueryEvent, display, getValue, hide, on, preventDefault, ready, select, setProp)
 
 import DOM (DOM)
 
@@ -36,6 +36,8 @@ main :: forall eff. Eff ( ajax :: AJAX
 main =
   ready $ do
     log "logging in"
+    display =<< select ".js-hidden"
+    hide =<< select ".noscript"
     login <- select "#login"
     on "click" (onLoginClick login) login
 

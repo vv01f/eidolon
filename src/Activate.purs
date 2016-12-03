@@ -4,7 +4,7 @@ import Prelude (Unit, bind, not, pure, show, unit, ($), (&&), (<>), (=<<), (==))
 import Control.Monad.Aff (runAff)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE, log)
-import Control.Monad.Eff.JQuery (JQuery, JQueryEvent, getValue, on, preventDefault, ready, select)
+import Control.Monad.Eff.JQuery (JQuery, JQueryEvent, display, hide, getValue, on, preventDefault, ready, select)
 
 import DOM (DOM)
 
@@ -32,6 +32,8 @@ main :: forall eff. Eff ( ajax :: AJAX
 main =
   ready $ do
     log "activating"
+    display =<< select ".js-hidden"
+    hide =<< select ".noscript"
     activate <- select "#activate"
     on "click" (onActivateClick activate) activate
 
