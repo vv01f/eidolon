@@ -18,12 +18,20 @@ module Handler.Login where
 
 import Import hiding (returnJson)
 import qualified Data.Text as T
-import Crypto.HMAC
+
+-- old hmac
+import Crypto.HMAC as Old
 import Crypto.Hash.CryptoAPI (SHA1)
-import Data.Text.Encoding (encodeUtf8)
+
+-- new hmac
+import Crypto.MAC.HMAC as New
+import Crypto.Hash.Algorithms (Keccak_512)
+
+import Data.Text.Encoding (encodeUtf8, decodeUtf8)
 import Data.Serialize (encode)
 import Data.Maybe
 import qualified Data.ByteString as B
+import qualified Data.ByteString.Char8 as BC
 import Data.Aeson.Types
 
 data Credentials = Credentials
@@ -65,9 +73,8 @@ postLoginR = do
             queriedUser <- runDB $ getJust (fromJust savedUserId)
             let salted = userSalted queriedUser
             let hexSalted = toHex salted
-            let expected = hmacSHA1 (tokenToken token) (encodeUtf8 hexSalted)
-            if
-              fromHex' (T.unpack hexResponse) == expected
+            let expected = hmacKeccak (encodeUtf8 $ toHex $ tokenToken token) (encodeUtf8 hexSalted)
+            if encodeUtf8 hexResponse == expected
               then do
                 -- Success!!
                 runDB $ delete tokenId
@@ -111,3 +118,6 @@ hmacSHA1 keyData msgData =
       sha1 :: SHA1
       sha1 = hmac' key msgData
   in encode sha1
+
+hmacKeccak :: B.ByteString -> B.ByteString -> B.ByteString
+hmacKeccak key msg = BC.pack $ show $ hmacGetDigest (New.hmac key msg :: HMAC Keccak_512)

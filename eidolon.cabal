@@ -111,6 +111,7 @@ library
                  , cereal                        >= 0.4
                  , cryptohash-cryptoapi          >= 0.1
                  , crypto-api                    >= 0.13
+                 , cryptonite
                  -- , imagemagick
                  , yesod-markdown                >= 0.10
                  , blaze-markup                  >= 0.7
