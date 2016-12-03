@@ -7,7 +7,7 @@ $newline always
   <ul>
     <li>Usernames
     <li>Email addresses
-    <li>Salted password hashes (SHA1) and the respective salt
+    <li>Keyed password hashes (HMAC-Keccak) and the respective key
     <li>Images
     <li>Upload time of images
     <li>Image titles
