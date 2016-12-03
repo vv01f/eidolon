@@ -32,17 +32,20 @@ software and libraries:
 * postgresql
 * libfftw3-dev
 * npm
+* nodejs-legacy
 
 which can be installed through
 
 ```bash
-sudo apt-get install alex happy libpq-dev postgresql npm
+sudo apt-get install alex happy libpq-dev postgresql npm nodejs-legacy
 ```
 
-Additionally you need bower:
+Additionally you need bower, purescript and pulp:
 
 ```bash
 npm install -g bower
+npm install -g purescript
+npm install -g pulp
 ```
 
 for migrations also install:
