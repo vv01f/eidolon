@@ -31,11 +31,18 @@ software and libraries:
 * libpq-dev
 * postgresql
 * libfftw3-dev
+* npm
 
 which can be installed through
 
 ```bash
-sudo apt-get install alex happy libpq-dev postgresql
+sudo apt-get install alex happy libpq-dev postgresql npm
+```
+
+Additionally you need bower:
+
+```bash
+npm install -g bower
 ```
 
 for migrations also install:
@@ -72,7 +79,7 @@ cabal sandbox init
 build the source with
 
 ```bash
-cabal build
+make all
 ```
 
 Everything should work automagically from there.
@@ -151,6 +158,13 @@ Migrations/0.0.7-0.1.0.0/Migration.hs`
 ###0.1.3.3-0.1.4.0
 * Stop eidolon
 * Compile migration script with `cabal exec -- ghc --make Migrations/0.1.3.3-0.1.4.0/Migration.hs`
+* Copy or move compiled script to run location and execute
+* Follow the prompts of the script
+* Start eidolon
+
+###0.1.4.0-0.1.5.0
+* Stop eidolon
+* Compile migration script with `cabal exec -- ghc --make Migrations/0.1.4.0-0.1.5.0/Migration.hs`
 * Copy or move compiled script to run location and execute
 * Follow the prompts of the script
 * Start eidolon
