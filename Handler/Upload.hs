@@ -106,7 +106,7 @@ postDirectUploadR albumId = do
                     L.null onlyErrNames
                     then do
                       setMessage "All images succesfully uploaded"
-                      redirect HomeR
+                      redirect $ AlbumR albumId
                     else do
                       let justErrNames = map fromJust onlyErrNames
                       let msg = Content $ Text.Blaze.Internal.Text $ "File type not supported of: " `T.append` T.intercalate ", " justErrNames
@@ -322,14 +322,14 @@ postUploadR = do
             L.null onlyErrNames
             then do
               setMessage "All images succesfully uploaded"
-              redirect HomeR
+              redirect $ AlbumR $ fileBulkAlbum temp
             else do
               let justErrNames = map fromJust onlyErrNames
               let msg = Content $ Text.Blaze.Internal.Text $ "File type not supported of: " `T.append` T.intercalate ", " justErrNames
               setMessage msg
-              redirect HomeR
+              redirect $ AlbumR $ fileBulkAlbum temp
         _ -> do
-          setMessage "There was an error uploading the file"
+          setMessage "There was an error uploading the file(s)"
           redirect UploadR
     Nothing -> do
       setMessage "You need to be logged in"
