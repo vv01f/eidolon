@@ -1,7 +1,7 @@
 $newline always
 <div .medium>
   <h3>Signup
-  <div .noscript .redbox>You need to have Javscript enabled
+  <div .noscript .redbox>You need to have Javascript enabled
   <form .js-hidden role="form" method="POST" action=@{SignupR}>
     <div .form-group .required>
       <label for="username">Username:
