@@ -70,10 +70,13 @@ mediumSettingsForm medium = Medium
   <*> pure (mediumTime medium)
   <*> pure (mediumOwner medium)
   <*> aopt textareaField (bfs ("Description" :: T.Text)) (Just $ mediumDescription medium)
-  <*> areq tagField (bfs ("tags" :: T.Text)) (Just $ mediumTags medium)
+  <*> areq tagField (bfs ("Tags" :: T.Text)) (Just $ mediumTags medium)
   <*> pure (mediumAlbum medium)
   <*> pure (mediumPreview medium)
+  <*> areq (selectField licences) (bfs ("Licence" :: T.Text)) (Just $ mediumLicence medium)
   <*  bootstrapSubmit ("Change settings" :: BootstrapSubmit T.Text)
+  where
+    licences = optionsPairs $ map (\a -> (T.pack (show (toEnum a :: Licence)), a)) [-2..6]
 
 getMediumDeleteR :: MediumId -> Handler Html
 getMediumDeleteR mediumId = do

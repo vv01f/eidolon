@@ -47,7 +47,8 @@ getDirectUploadR albumId = do
             userId == ownerId || userId `elem` albumShares album
             -- is the owner present or a user with whom the album is shared
             then do
-              (dUploadWidget, enctype) <- generateFormPost $ renderBootstrap3 BootstrapBasicForm $ dUploadForm userId albumId
+              user <- runDB $ getJust userId
+              (dUploadWidget, enctype) <- generateFormPost $ renderBootstrap3 BootstrapBasicForm $ dUploadForm userId user albumId
               defaultLayout $ do
                 setTitle $ toHtml ("Eidolon :: Upload medium to " `T.append` albumTitle album)
                 $(widgetFile "dUpload")
@@ -74,7 +75,8 @@ postDirectUploadR albumId = do
           if userId == ownerId || userId `elem` albumShares album
             -- is the logged in user the owner or is the album shared with him
             then do
-              ((result, _), _) <- runFormPost $ renderBootstrap3 BootstrapBasicForm $ dUploadForm userId albumId
+              user <- runDB $ getJust userId
+              ((result, _), _) <- runFormPost $ renderBootstrap3 BootstrapBasicForm $ dUploadForm userId user albumId
               case result of
                 FormSuccess temp -> do
                   let fils = fileBulkFiles temp
@@ -92,7 +94,7 @@ postDirectUploadR albumId = do
                               tempName <- if length indFils == 1
                                 then return $ fileBulkPrefix temp
                                 else return (fileBulkPrefix temp `T.append` " " `T.append` T.pack (show (index :: Int)) `T.append` " of " `T.append` T.pack (show (length indFils)))
-                              let medium = Medium tempName ('/' : path) ('/' : metaThumbPath meta) mime (fileBulkTime temp) (fileBulkOwner temp) (fileBulkDesc temp) (fileBulkTags temp) albumId ('/' : metaPreviewPath meta)
+                              let medium = Medium tempName ('/' : path) ('/' : metaThumbPath meta) mime (fileBulkTime temp) (fileBulkOwner temp) (fileBulkDesc temp) (fileBulkTags temp) albumId ('/' : metaPreviewPath meta) (fileBulkLicence temp)
                               insertMedium medium albumId
                               return Nothing
                           else do
@@ -205,8 +207,8 @@ writeOnDrive fil userId albumId = do
   liftIO $ fileMove fil path
   return path
 
-dUploadForm :: UserId -> AlbumId -> AForm Handler FileBulk
-dUploadForm userId albumId = FileBulk
+dUploadForm :: UserId -> User -> AlbumId -> AForm Handler FileBulk
+dUploadForm userId user albumId = FileBulk
   <$> areq textField (bfs ("Title" :: T.Text)) Nothing
   <*> areq multiFileField "Select file(s)" Nothing
   <*> lift (liftIO getCurrentTime)
@@ -217,10 +219,8 @@ dUploadForm userId albumId = FileBulk
   <*> areq (selectField licences) (bfs ("Licence" :: T.Text)) (defLicence)
   <*  bootstrapSubmit ("Upload" :: BootstrapSubmit T.Text)
   where
-    licenses = optionsPairs $ I.map (\a -> (T.pack (show (toEnum a :: Licence)), a)) [-2..6]
-    defLicence = do
-      user <- runDB $ selectJust userId
-      return $ Just $ userDefaultLicence user
+    licences = optionsPairs $ I.map (\a -> (T.pack (show (toEnum a :: Licence)), a)) [-2..6]
+    defLicence = Just $ userDefaultLicence user
       
 
 data FileBulk = FileBulk
@@ -248,7 +248,7 @@ getUploadR = do
           setMessage "Please create an album first"
           redirect NewAlbumR
         else do
-          (uploadWidget, enctype) <- generateFormPost $ renderBootstrap3 BootstrapBasicForm $ bulkUploadForm userId
+          (uploadWidget, enctype) <- generateFormPost $ renderBootstrap3 BootstrapBasicForm $ bulkUploadForm userId user
           defaultLayout $ do
             setTitle "Eidolon :: Upload Medium"
             $(widgetFile "bulkUpload")
@@ -257,7 +257,7 @@ getUploadR = do
       redirect LoginR
 
 bulkUploadForm :: UserId -> User -> AForm Handler FileBulk
-bulkUploadForm userId = (\a b c d e f g h -> FileBulk b c d e f g a h)
+bulkUploadForm userId user = (\a b c d e f g h -> FileBulk b c d e f g a h)
   <$> areq (selectField albums) (bfs ("Album" :: T.Text)) Nothing
   <*> areq textField (bfs ("Title" :: T.Text)) Nothing
   <*> areq multiFileField "Select file(s)" Nothing
@@ -277,10 +277,8 @@ bulkUploadForm userId = (\a b c d e f g h -> FileBulk b c d e f g a h)
               else Nothing
             ) allEnts
       optionsPairs $ I.map (\alb -> (albumTitle $ entityVal alb, entityKey alb)) entities
-    licenses = optionsPairs $ I.map (\a -> (T.pack (show (toEnum a :: Licence)), a)) [-2..6]
-    defLicence = do
-      user <- runDB $ selectJust userId
-      return $ Just $ userDefaultLicence user
+    licences = optionsPairs $ I.map (\a -> (T.pack (show (toEnum a :: Licence)), a)) [-2..6]
+    defLicence = Just $ userDefaultLicence user
 
 postUploadR :: Handler Html
 postUploadR = do
@@ -288,7 +286,8 @@ postUploadR = do
   case msu of
     Just tempUserId -> do
       let userId = getUserIdFromText tempUserId
-      ((result, _), _) <- runFormPost $ renderBootstrap3 BootstrapBasicForm $ bulkUploadForm userId
+      user <- runDB $ getJust userId
+      ((result, _), _) <- runFormPost $ renderBootstrap3 BootstrapBasicForm $ bulkUploadForm userId user
       case result of
         FormSuccess temp -> do
           let fils = fileBulkFiles temp
@@ -316,7 +315,7 @@ postUploadR = do
                             T.pack (show (index :: Int)) `T.append`
                             " of " `T.append`
                             T.pack (show (length indFils)))
-                      let medium = Medium tempName ('/' : path) ('/' : metaThumbPath meta) mime (fileBulkTime temp) (fileBulkOwner temp) (fileBulkDesc temp) (fileBulkTags temp) inAlbumId ('/' : metaPreviewPath meta)
+                      let medium = Medium tempName ('/' : path) ('/' : metaThumbPath meta) mime (fileBulkTime temp) (fileBulkOwner temp) (fileBulkDesc temp) (fileBulkTags temp) inAlbumId ('/' : metaPreviewPath meta) (fileBulkLicence temp)
                       -- mId <- runDB $ I.insert medium
                       -- inALbum <- runDB $ getJust inAlbumId
                       -- let newMediaList = mId : albumContent inALbum

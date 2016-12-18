@@ -71,4 +71,4 @@ profileSettingsForm user = User
     (Just $ userDefaultLicence user)
   <*  bootstrapSubmit ("Change settings" :: BootstrapSubmit Text)
   where
-    licenses = optionsPairs $ map (\a -> (T.pack (show (toEnum a :: Licence)), a)) [-2..6]
+    licences = optionsPairs $ map (\a -> (T.pack (show (toEnum a :: Licence)), a)) [-2..6]
