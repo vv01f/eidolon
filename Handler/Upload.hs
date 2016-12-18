@@ -225,6 +225,7 @@ data FileBulk = FileBulk
   , fileBulkDesc :: Maybe Textarea
   , fileBulkTags :: [T.Text]
   , fileBulkAlbum :: AlbumId
+  , fileBulkLicence :: Int
   }
 
 getUploadR :: Handler Html
@@ -241,7 +242,7 @@ getUploadR = do
           setMessage "Please create an album first"
           redirect NewAlbumR
         else do
-          (uploadWidget, enctype) <- generateFormPost $ renderBootstrap3 BootstrapBasicForm $ bulkUploadForm userId
+          (uploadWidget, enctype) <- generateFormPost $ renderBootstrap3 BootstrapBasicForm $ bulkUploadForm userId user
           defaultLayout $ do
             setTitle "Eidolon :: Upload Medium"
             $(widgetFile "bulkUpload")
@@ -249,8 +250,8 @@ getUploadR = do
       setMessage "You need to be logged in"
       redirect LoginR
 
-bulkUploadForm :: UserId -> AForm Handler FileBulk
-bulkUploadForm userId = (\a b c d e f g -> FileBulk b c d e f g a)
+bulkUploadForm :: UserId -> User -> AForm Handler FileBulk
+bulkUploadForm userId user = (\a b c d e f g -> FileBulk b c d e f g a)
   <$> areq (selectField albums) (bfs ("Album" :: T.Text)) Nothing
   <*> areq textField (bfs ("Title" :: T.Text)) Nothing
   <*> areq multiFileField "Select file(s)" Nothing
@@ -258,6 +259,7 @@ bulkUploadForm userId = (\a b c d e f g -> FileBulk b c d e f g a)
   <*> pure userId
   <*> aopt textareaField (bfs ("Description" :: T.Text)) Nothing
   <*> areq tagField (bfs ("Enter tags" :: T.Text)) Nothing
+  <*> areq (selectField licences) (bfs ("Licences" :: T.Text)) (Just $ userDefaultLicence user)
   <*  bootstrapSubmit ("Upload" :: BootstrapSubmit T.Text)
   where
     albums = do
@@ -269,6 +271,7 @@ bulkUploadForm userId = (\a b c d e f g -> FileBulk b c d e f g a)
               else Nothing
             ) allEnts
       optionsPairs $ I.map (\alb -> (albumTitle $ entityVal alb, entityKey alb)) entities
+    licenses = optionsPairs $ I.map (\a -> (T.pack (show (toEnum a :: Licence)), a)) [-2..6]
 
 postUploadR :: Handler Html
 postUploadR = do
@@ -276,7 +279,8 @@ postUploadR = do
   case msu of
     Just tempUserId -> do
       let userId = getUserIdFromText tempUserId
-      ((result, _), _) <- runFormPost $ renderBootstrap3 BootstrapBasicForm $ bulkUploadForm userId
+      user <- runDB $ getJust userId
+      ((result, _), _) <- runFormPost $ renderBootstrap3 BootstrapBasicForm $ bulkUploadForm userId user
       case result of
         FormSuccess temp -> do
           let fils = fileBulkFiles temp
