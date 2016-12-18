@@ -97,7 +97,10 @@ adminMediumSetForm medium = Medium
   <*> areq tagField (bfs ("Tags" :: T.Text))  (Just $ mediumTags medium)
   <*> pure (mediumAlbum medium)
   <*> pure (mediumPreview medium)
+  <*> areq (selectField licenses) (bfs ("Licence" :: T.Text)) (Just $ mediumLicence medium)
   <*  bootstrapSubmit ("Change settings" :: BootstrapSubmit Text)
+  where
+    licenses = optionsPairs $ map (\a -> (T.pack (show (toEnum a :: Licence)), a)) [-2..6]
 
 getAdminMediumDeleteR :: MediumId -> Handler Html
 getAdminMediumDeleteR mediumId = do

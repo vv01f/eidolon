@@ -61,7 +61,7 @@ postSignupR = do
       case namesakes of
         [] -> do
           salt <- liftIO generateSalt
-          let newUser = User newUserName newUserName (fromJust mEmail) salt "" [] False
+          let newUser = User newUserName newUserName (fromJust mEmail) salt "" [] False (fromEnum AllRightsReserved)
           activatorText <- liftIO generateString
           _ <- runDB $ insert $ Activator activatorText newUser
           _ <- runDB $ insert $ Token (encodeUtf8 activatorText) "activate" Nothing

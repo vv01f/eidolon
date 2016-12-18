@@ -22,6 +22,7 @@ User
     salted ByteString
     albums [AlbumId]
     admin Bool
+    defaultLicence Int		default=-1
     UniqueUser name
     deriving Typeable Eq Show
 Activator
@@ -39,7 +40,6 @@ Album
     shares [UserId]
     content [MediumId]
     samplePic FP.FilePath Maybe
---    sampleWidth Int
     deriving Eq Show
 Medium
     title Text
@@ -50,15 +50,12 @@ Medium
     owner UserId
     description Textarea Maybe
     tags Texts
---    width Int
---    thumbWidth Int
     album AlbumId
     preview FP.FilePath
---    previewWidth Int
+    licence Int			default=-1
     deriving Eq Show
 Comment
     author UserId
---    authorSlug Text
     origin MediumId
     parent CommentId Maybe
     time UTCTime
