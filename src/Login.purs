@@ -88,10 +88,10 @@ resp1Success pass j = do
     Right (Challenge challenge) -> do
       progress "HMAC 1"
       let salted = runFn2 hmacSha3 (fromUtf8 pass) (fromHex challenge.salt)
-      log $ "salted: " <> salted
+      -- log $ "salted: " <> salted
       progress "HMAC 2"
       let response = runFn2 hmacSha3 (fromUtf8 salted) (fromUtf8 challenge.token)
-      log $ "resp: " <> response
+      -- log $ "resp: " <> response
       progress "sending response"
       let data2 = UE.fromArray $ [ Tuple "token" (Just challenge.token), Tuple "response" (Just response) ]
       _ <- runAff

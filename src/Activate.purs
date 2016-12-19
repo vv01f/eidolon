@@ -49,9 +49,9 @@ onActivateClick
 onActivateClick activate ev _ = unsafePartial $ do
   preventDefault ev
   token <- getAttr "data-token" activate
-  log $ "token: " <> token
+  -- log $ "token: " <> token
   salt <- getAttr "data-salt" activate
-  log $ "salt: " <> salt
+  -- log $ "salt: " <> salt
   fpassword1 <- getValue =<< select "#password1"
   fpassword2 <- getValue =<< select "#password2"
   let password1 = fromForeign fpassword1
@@ -61,9 +61,9 @@ onActivateClick activate ev _ = unsafePartial $ do
       if password1 == password2
         then do
           progress "Salting password"
-          log $ fromJust password1 <> " " <> salt
+          -- log $ fromJust password1 <> " " <> salt
           let salted = runFn2 hmacSha3 (fromUtf8 $ fromJust password1) (fromHex salt)
-          log salted
+          -- log salted
           progress "Requesting account activation..."
           let dat = UE.fromArray [ Tuple "salted" (Just salted) ]
           _ <- runAff
