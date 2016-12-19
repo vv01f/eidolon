@@ -51,6 +51,7 @@ postMediumSettingsR mediumId = do
             [ MediumTitle =. mediumTitle temp
             , MediumDescription =. mediumDescription temp
             , MediumTags =. mediumTags temp
+            , MediumLicence =. mediumLicence temp
             ]
           setMessage "Medium settings changed succesfully"
           redirect $ MediumR mediumId

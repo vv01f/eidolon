@@ -12,6 +12,13 @@
   
   <div .medium>
     <p>
+      Licence:
+      <p>
+        $maybe thing <- link
+          <a href=#{thing}>#{lic}
+        $nothing
+          #{lic}
+    <p>
       Uploaded on: #{formatTime defaultTimeLocale "%A %F %H:%M" (mediumTime medium)}<br>
       $maybe d <- mediumDescription medium
         Description:<br>

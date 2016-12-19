@@ -56,8 +56,10 @@ getMediumR mediumId = do
         , CommentParent !=. Nothing ]
         [ Desc CommentTime ]
       let tr = StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumThumb medium) []
-      let pr = StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumPreview medium) []
-      let ir = StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumPath medium) []
+          pr = StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumPreview medium) []
+          ir = StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumPath medium) []
+          lic = T.pack $ show (toEnum (mediumLicence medium) :: Licence)
+          link = url (toEnum (mediumLicence medium) :: Licence)
       defaultLayout $ do
         setTitle $ toHtml ("Eidolon :: Medium " `T.append` (mediumTitle medium))
         rssLink (CommentFeedRssR mediumId) $ "Comment feed of medium " `T.append` mediumTitle medium

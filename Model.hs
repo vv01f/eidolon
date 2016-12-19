@@ -28,6 +28,9 @@ import qualified System.FilePath as FP
 share [mkPersist sqlSettings, mkMigrate "migrateAll"]
     $(persistFileWith lowerCaseSettings "config/models")
 
+class ShowUrl a where
+  url :: a -> Maybe String
+
 data Licence
   = AllRightsReserved
   | CC0
@@ -39,7 +42,19 @@ data Licence
   | CCByNcNd4
   | PublicDomain
 
+instance ShowUrl Licence where
+  url PublicDomain      = Nothing
+  url AllRightsReserved = Nothing
+  url CC0               = Just "https://creativecommons.org/publicdomain/zero/1.0/"
+  url CCBy4             = Just "https://creativecommons.org/licenses/by/4.0"
+  url CCBySa4           = Just "https://creativecommons.org/licenses/by-sa/4.0"
+  url CCByNd4           = Just "https://creativecommons.org/licenses/by-nd/4.0"
+  url CCByNc4           = Just "https://creativecommons.org/licenses/by-nc/4.0"
+  url CCByNcSa4         = Just "https://creativecommons.org/licenses/by-nc-sa/4.0"
+  url CCByNcNd4         = Just "https://creativecommons.org/licenses/by-nc-nd/4.0"
+
 instance Show Licence where
+  show PublicDomain      = "Public Domain"
   show AllRightsReserved = "All rights reserved"
   show CC0               = "CC0 1.0"
   show CCBy4             = "CC-BY 4.0 International"
@@ -48,7 +63,6 @@ instance Show Licence where
   show CCByNc4           = "CC-BY-NC 4.0 International"
   show CCByNcSa4         = "CC-BY-NC-SA 4.0 International"
   show CCByNcNd4         = "CC-BY-NC-ND 4.0 International"
-  show PublicDomain      = "Public Domain"
 
 instance Enum Licence where
   fromEnum PublicDomain      = -2
