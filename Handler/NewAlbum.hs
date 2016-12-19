@@ -16,8 +16,10 @@
 
 module Handler.NewAlbum where
 
-import Import
+import Import as I
+import Data.List as L (head)
 import Data.Text as T
+import Text.Blaze (toMarkup)
 import System.Directory
 import System.FilePath
 
@@ -48,8 +50,8 @@ postNewAlbumR = do
         albumForm userId
       case result of
         FormSuccess album -> do
-          namesakes <- runDB $ selectList [AlbumTitle ==. albumTitle album, albumOwner ==. userId] []
-          if null lamesakes
+          namesakes <- runDB $ selectList [AlbumTitle ==. albumTitle album, AlbumOwner ==. userId] []
+          if I.null namesakes
           then do
             -- Put album in Database
             albumId <- runDB $ insert album
@@ -64,8 +66,9 @@ postNewAlbumR = do
             setMessage "Album successfully created"
             redirect $ AlbumR albumId
           else do
-            setMessage $ "You already have an album named " ++ albumTitle album
-            redirect $ AlbumR $ entityKey $ head namesakes
+            setMessage $ toMarkup $ "You already have an album named " `T.append`
+              albumTitle album
+            redirect $ AlbumR $ entityKey $ L.head namesakes
         _ -> do
           setMessage "There was an error creating the album"
           redirect NewAlbumR

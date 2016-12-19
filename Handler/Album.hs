@@ -18,6 +18,7 @@ module Handler.Album where
 
 import Import
 import qualified Data.Text as T
+import Text.Blaze (toMarkup)
 import System.FilePath
 import Yesod.RssFeed
 import Yesod.AtomFeed
@@ -54,12 +55,12 @@ getBeautyAlbumR ownerName albumName = do
   tempOwner <- runDB $ getBy $ UniqueUser ownerName
   case tempOwner of
     Just (Entity ownerId _) -> do
-      tempAlbum <- rundB $ selectFirst [AlbumTitle ==. albumName, albumOwner ==. ownerId] []
+      tempAlbum <- runDB $ selectFirst [AlbumTitle ==. albumName, AlbumOwner ==. ownerId] []
       case tempAlbum of
         Just (Entity albumId _) ->
           getAlbumR albumId
         Nothing -> do
-          setMessage $ "This user has no album named " `T.append` albumName
+          setMessage $ toMarkup $ "This user has no album named " `T.append` albumName
           redirect $ UserR ownerName
     Nothing -> do
       setMessage "This user does not exist"
