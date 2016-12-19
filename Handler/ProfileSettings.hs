@@ -47,6 +47,7 @@ postProfileSettingsR userId = do
              UserName =. userName temp
            , UserSlug =. userSlug temp
            , UserEmail =. userEmail temp
+           , UserDefaultLicence =. (userDefaultLicence temp)
            ]
          setMessage "Profile settings changed successfully"
          redirect $ UserR $ userName user

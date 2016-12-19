@@ -15,7 +15,7 @@
       Licence:
       <p>
         $maybe thing <- link
-          <a href=#{thing}>#{lic}
+          <a href=#{thing} target="_blank">#{lic}
         $nothing
           #{lic}
     <p>

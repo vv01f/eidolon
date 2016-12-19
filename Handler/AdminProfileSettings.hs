@@ -116,6 +116,7 @@ postAdminProfileSettingsR ownerId = do
                 , UserSlug =. userSlug temp
                 , UserEmail =. userEmail temp
                 , UserAdmin =. userAdmin temp
+                , UserDefaultLicence =. userDefaultLicence temp
                 ]
               setMessage "User data updated successfully"
               redirect AdminR
