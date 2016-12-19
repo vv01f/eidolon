@@ -48,3 +48,19 @@ getAlbumR albumId = do
     Nothing -> do
       setMessage "This album does not exist"
       redirect HomeR
+
+getBeautyAlbumR :: T.Text -> T.Text -> Handler Html
+getBeautyAlbumR ownerName albumName = do
+  tempOwner <- runDB $ getBy $ UniqueUser ownerName
+  case tempOwner of
+    Just (Entity ownerId _) -> do
+      tempAlbum <- rundB $ selectFirst [AlbumTitle ==. albumName, albumOwner ==. ownerId] []
+      case tempAlbum of
+        Just (Entity albumId _) ->
+          getAlbumR albumId
+        Nothing -> do
+          setMessage $ "This user has no album named " `T.append` albumName
+          redirect $ UserR ownerName
+    Nothing -> do
+      setMessage "This user does not exist"
+      redirect HomeR

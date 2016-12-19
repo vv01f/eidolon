@@ -26,7 +26,8 @@
 /logout				LogoutR			GET
 /activate/#T.Text		ActivateR		GET POST
 /profile/#UserId		ProfileR		GET
-/user/#T.Text			UserR			GET
+/#T.Text			UserR			GET
+/#T.Text/T.Text                 BeatyAlbumR             GET
 /upload				UploadR			GET POST
 /newalbum			NewAlbumR		GET POST
 /album/#AlbumId			AlbumR			GET
