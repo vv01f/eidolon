@@ -172,6 +172,9 @@ Migrations/0.0.7-0.1.0.0/Migration.hs`
 * Follow the prompts of the script
 * Start eidolon
 
+###0.1.5.6-0.1.6.0
+* Just restart eidolon. It handles the rest automagically.
+
 ##Acknowledgements:
 
 * This software uses the web Framework "Yesod" by Michael Snoyman. See more at:
