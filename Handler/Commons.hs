@@ -114,7 +114,10 @@ moveMedium med mId destId = do
   $(logError) "removing reference"
   removeReference mId $ mediumAlbum med
   -- move physical Files
-  let filen = show $ length (albumContent dest) + 1
+  -- let filen = show $ length (albumContent dest) + 1
+  let ac = albumContent dest
+      [PersistInt64 int] = if L.null ac then [PersistInt64 1] else keyToValues $ maximum $ ac
+      filen = show $ fromIntegral int + 1
       ext   = takeExtension $ mediumPath med
       prefix = "static" </> "data" </> T.unpack (extractKey $ albumOwner dest) </> T.unpack (extractKey destId)
       nPath = prefix </> filen ++ ext
