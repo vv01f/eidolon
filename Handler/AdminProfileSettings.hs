@@ -29,7 +29,7 @@ getAdminProfilesR = do
   adminCheck <- loginIsAdmin
   case adminCheck of
     Right _ -> do
-      profiles <- runDB $ selectList [] [Desc UserName]
+      profiles <- runDB $ selectList [] [Asc UserName]
       defaultLayout $ do
         setTitle "Administration: Profiles"
         $(widgetFile "adminProfiles")
@@ -83,8 +83,6 @@ getAdminProfileSettingsR ownerId = do
       tempOwner <- runDB $ get ownerId
       case tempOwner of
         Just owner -> do
-          tempUserId <- lookupSession "userId"
-          let userId = getUserIdFromText $ fromJust tempUserId
           (adminProfileSetWidget, enctype) <- generateFormPost $
             renderBootstrap3 BootstrapBasicForm $
             adminProfileForm owner
