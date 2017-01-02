@@ -4,7 +4,7 @@ $newline always
     <h1>Profile Settings
     ^{adminProfileSetWidget}
 
-  <a href=@{AdminProfileDeleteR userId}>Delete user
+  <a href=@{AdminProfileDeleteR ownerId}>Delete user
 
 <div .item>
   <div class="inner">

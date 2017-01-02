@@ -138,8 +138,10 @@ adminProfileForm owner = User
   <*> pure (userSalted owner)
   <*> pure (userAlbums owner)
   <*> areq boolField (bfs ("Admin" :: T.Text)) (Just $ userAdmin owner)
-  <*> areq (selectField optionsEnum) (bfs ("Default licence" :: T.Text)) (Just $ userDefaultLicence owner)
+  <*> areq (selectField licenses) (bfs ("Default licence" :: T.Text)) (Just $ userDefaultLicence owner)
   <*  bootstrapSubmit ("Change settings" :: BootstrapSubmit T.Text)
+  where
+    licenses = optionsPairs $ map (\a -> (T.pack (show (toEnum a :: Licence)), a)) [-2..6]
 
 getAdminProfileDeleteR :: UserId -> Handler Html
 getAdminProfileDeleteR ownerId = do
