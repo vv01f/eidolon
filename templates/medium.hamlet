@@ -56,11 +56,11 @@
       $forall (Entity replyId reply) <- replies
         $if commentParent reply == Just commentId
           <div .comment .reply .medium>
-            <a href=@{ProfileR $ commentAuthor reply}>#{fromMaybe "" $ lookup (commentAuthor comment) authors}</a> replied on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime reply}:
+            <a href=@{ProfileR $ commentAuthor reply}>#{fromMaybe "" $ lookup (commentAuthor reply) authors}</a> replied on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime reply}:
             <hr>
             #{commentContent reply}
             <hr>
-            $if userId == (Just $ commentAuthor comment)
+            $if userId == (Just $ commentAuthor reply)
               <a href=@{CommentDeleteR replyId}>Delete this comment
     
   $if userId /= Nothing

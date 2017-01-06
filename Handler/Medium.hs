@@ -50,11 +50,11 @@ getMediumR mediumId = do
       comments <- runDB $ selectList
         [ CommentOrigin ==. mediumId
         , CommentParent ==. Nothing ]
-        [ Desc CommentTime ]
+        [ Asc CommentTime ]
       replies <- runDB $ selectList
         [ CommentOrigin ==. mediumId
         , CommentParent !=. Nothing ]
-        [ Desc CommentTime ]
+        [ Asc CommentTime ]
       let tr = StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumThumb medium) []
           pr = StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumPreview medium) []
           ir = StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumPath medium) []
