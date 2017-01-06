@@ -18,7 +18,8 @@ module Model where
 
 import ClassyPrelude.Yesod
 import Database.Persist.Quasi
-import Yesod.Markdown
+import Text.Markdown
+import Yesod.Text.Markdown
 import qualified System.FilePath as FP
 
 -- You can define all of your database entities in the entities file.

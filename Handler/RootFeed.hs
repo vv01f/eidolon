@@ -17,6 +17,7 @@
 module Handler.RootFeed where
 
 import Import
+import Text.Markdown
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as LT
 import qualified Data.List as L
@@ -59,7 +60,7 @@ commentFeedBuilder mId = do
       |]
     , feedLanguage = "en"
     , feedUpdated = time
-    , feedLogo = Just (StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumThumb medium) [], unTextarea $ fromMaybe (Textarea "") $ mediumDescription medium)
+    , feedLogo = Just (StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumThumb medium) [], LT.toStrict $ unMarkdown $ fromMaybe (Markdown "") $ mediumDescription medium)
     , feedEntries = es
     }
 
@@ -191,7 +192,7 @@ mediumToEntry ent = do
     { feedEntryLink = MediumR (entityKey ent)
     , feedEntryUpdated = mediumTime (entityVal ent)
     , feedEntryTitle = mediumTitle (entityVal ent)
-    , feedEntryContent = toHtml (fromMaybe (Textarea "") $ mediumDescription $ entityVal ent)
+    , feedEntryContent = toHtml (fromMaybe (Markdown "") $ mediumDescription $ entityVal ent)
     , feedEntryEnclosure = Just $ EntryEnclosure
         (StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumPreview $ entityVal ent) [])
         size
@@ -203,3 +204,6 @@ getSize path = do
   stat <- P.getFileStatus path
   P.COff raw <- return $ P.fileSize stat
   return $ (fromIntegral raw :: Int)
+
+unMarkdown :: Markdown -> LT.Text
+unMarkdown (Markdown t) = t

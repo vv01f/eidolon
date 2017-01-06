@@ -48,7 +48,7 @@ Medium
     mime Text
     time UTCTime
     owner UserId
-    description Textarea Maybe
+    description Markdown Maybe
     tags Texts
     album AlbumId
     preview FP.FilePath

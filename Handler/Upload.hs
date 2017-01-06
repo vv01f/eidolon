@@ -17,6 +17,8 @@
 module Handler.Upload where
 
 import Import as I
+import Yesod.Text.Markdown
+import Text.Markdown
 import Handler.Commons
 import Data.Time
 import Data.Maybe
@@ -213,7 +215,7 @@ dUploadForm userId user albumId = FileBulk
   <*> areq multiFileField "Select file(s)" Nothing
   <*> lift (liftIO getCurrentTime)
   <*> pure userId
-  <*> aopt textareaField (bfs ("Description" :: T.Text)) Nothing
+  <*> aopt markdownField (bfs ("Description" :: T.Text)) Nothing
   <*> areq tagField (bfs ("Enter tags" :: T.Text)) Nothing
   <*> pure albumId
   <*> areq (selectField licences) (bfs ("Licence" :: T.Text)) (defLicence)
@@ -228,7 +230,7 @@ data FileBulk = FileBulk
   , fileBulkFiles :: [FileInfo]
   , fileBulkTime :: UTCTime
   , fileBulkOwner :: UserId
-  , fileBulkDesc :: Maybe Textarea
+  , fileBulkDesc :: Maybe Markdown
   , fileBulkTags :: [T.Text]
   , fileBulkAlbum :: AlbumId
   , fileBulkLicence :: Int
@@ -263,7 +265,7 @@ bulkUploadForm userId user = (\a b c d e f g h -> FileBulk b c d e f g a h)
   <*> areq multiFileField "Select file(s)" Nothing
   <*> lift (liftIO getCurrentTime)
   <*> pure userId
-  <*> aopt textareaField (bfs ("Description" :: T.Text)) Nothing
+  <*> aopt markdownField (bfs ("Description" :: T.Text)) Nothing
   <*> areq tagField (bfs ("Enter tags" :: T.Text)) Nothing
   <*> areq (selectField licences) (bfs ("Licence" :: T.Text)) (defLicence)
   <*  bootstrapSubmit ("Upload" :: BootstrapSubmit T.Text)

@@ -21,7 +21,8 @@ import Data.Time
 import Data.Maybe
 import qualified Data.Text as T
 import System.FilePath
-import Yesod.Markdown
+import Text.Markdown
+import Yesod.Text.Markdown
 import Yesod.RssFeed
 import Yesod.AtomFeed
 

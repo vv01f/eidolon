@@ -17,6 +17,7 @@
 module Handler.MediumSettings where
 
 import Import
+import Yesod.Text.Markdown
 import Handler.Commons
 import System.FilePath
 import qualified Data.Text as T
@@ -70,7 +71,7 @@ mediumSettingsForm medium = Medium
   <*> pure (mediumMime medium)
   <*> pure (mediumTime medium)
   <*> pure (mediumOwner medium)
-  <*> aopt textareaField (bfs ("Description" :: T.Text)) (Just $ mediumDescription medium)
+  <*> aopt markdownField (bfs ("Description" :: T.Text)) (Just $ mediumDescription medium)
   <*> areq tagField (bfs ("Tags" :: T.Text)) (Just $ mediumTags medium)
   <*> pure (mediumAlbum medium)
   <*> pure (mediumPreview medium)
