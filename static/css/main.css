@@ -197,6 +197,32 @@ ul, ol {
 	text-align: left;
 }
 
+.tags ul {
+	padding: 0;
+}
+
+.tags li {
+	display: inline;
+}
+
+.tags li:before {
+	display: inline-block;
+	background-image: url(../img/tags.svg);
+	width: 1.8ex;
+	height: 1.5ex;
+	background-size: contain;
+	background-repeat: no-repeat;
+	content: "";
+}
+
+.comment {
+	text-align: left;
+}
+
+.reply {
+	padding-left: 50px;
+}
+
 .js-hidden {
 	display: none;
 }
