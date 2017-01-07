@@ -34,14 +34,12 @@ import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as BC
 import Data.Aeson.Types
 
-data Credentials = Credentials
-  { credentialsName   :: Text
-  , credentialsPasswd :: Text
-  }
-  deriving Show
-
 getLoginR :: Handler Html
-getLoginR =
+getLoginR = do
+  master <- getYesod
+  let addWarn = "http://" `T.isPrefixOf` appRoot (appSettings master)
+  (loginRawWidget, _) <- generateFormPost $
+    renderBootstrap3 BootstrapBasicForm loginForm
   defaultLayout $ do
     setTitle "Eidolon :: Login"
     $(widgetFile "login")
@@ -94,11 +92,42 @@ postLoginR = do
     _ ->
       returnJsonError ("Protocol error" :: T.Text)
 
+postLoginRawR :: Handler Html
+postLoginRawR = do
+  ((res, _), _) <- runFormPost $
+    renderBootstrap3 BootstrapBasicForm loginForm
+  case res of
+    FormSuccess cred -> do
+      muser <- runDB $ getBy $ UniqueUser $ credentialsName cred
+      case muser of
+        Just (Entity uId user) -> do
+          let testSalted = BC.unpack $ hmacKeccak (userSalt user) (encodeUtf8 $ credentialsPasswd cred)
+          if fromHex' testSalted == userSalted user
+          then do
+            setSession "userId" $ extractKey uId
+            setMessage "Successfully logged in"
+            redirect $ ProfileR uId
+          else do
+            setMessage "Wrong password"
+            redirect LoginR
+        Nothing -> do
+          setMessage "No such user"
+          redirect LoginR
+    _ -> do
+      setMessage "Login error"
+      redirect LoginR
 
-loginForm :: Form Credentials
-loginForm = renderDivs $ Credentials
-  <$> areq textField "Username" Nothing
-  <*> areq passwordField "Password" Nothing
+data Credentials = Credentials
+  { credentialsName   :: Text
+  , credentialsPasswd :: Text
+  }
+  deriving Show
+
+loginForm :: AForm Handler Credentials
+loginForm = Credentials
+  <$> areq textField (bfs ("Username" :: T.Text)) Nothing
+  <*> areq passwordField (bfs ("Password" :: T.Text)) Nothing
+  <*  bootstrapSubmit ("Login" :: BootstrapSubmit T.Text)
 
 getLogoutR :: Handler Html
 getLogoutR = do

@@ -23,8 +23,10 @@
 /page/#Int			PageR			GET
 /signup				SignupR			GET POST
 /login				LoginR			GET POST
+/loginraw			LoginRawR		POST
 /logout				LogoutR			GET
 /activate/#T.Text		ActivateR		GET POST
+/activateraw/#T.Text		ActivateRawR		POST
 /profile/#UserId		ProfileR		GET
 /user/#T.Text			UserR			GET
 /user/#T.Text/album/#T.Text	BeautyAlbumR		GET

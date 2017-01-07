@@ -1,7 +1,18 @@
 $newline always
 <div .medium>
   <h3>Activate your account
-  <div .noscript .redbox>You need to have Javascript enabled<br/>
+  <div .noscript>
+    <div .redbox>
+      You are activating without JavaScript!
+      $if addWarn
+        Your password will be sent completely unencrypted! There is no TLS to
+        wrap your connection in!
+      $else
+        Your password will be sent unencrypted within a TLS connection. Check
+        your connection for leaks before proceeding.
+    <form method="post" action=@{ActivateRawR token}>
+      ^{activateRawWidget}
+
   <form .js-hidden>
     <div .form-group .required>
       <label for="password1">Password:

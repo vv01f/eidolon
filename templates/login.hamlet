@@ -1,7 +1,17 @@
 $newline always
 <div .medium>
   <h3>Login
-  <div .noscript .redbox>Please enable Javascript to log in<br/>
+  <div .noscript>
+    <div .redbox>
+      You are logging in without JavaScript!
+      $if addWarn
+        Your password will be sent completely unencrypted! There is no TLS to
+        wrap your connection in!
+      $else
+        Your password will be sent unencrypted within a TLS connection. Check
+        your connection for leaks before proceeding.
+    <form method="post" action=@{LoginRawR}>
+      ^{loginRawWidget}
   <form .js-hidden>
     <div .form-group .required>
       <label for="username">User:
