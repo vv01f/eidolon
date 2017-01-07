@@ -53,15 +53,16 @@
           <a href=@{CommentReplyR commentId}>Reply to this comment
           $if userId == (Just $ commentAuthor comment)
             <a href=@{CommentDeleteR commentId}>Delete this comment
-      $forall (Entity replyId reply) <- replies
-        $if commentParent reply == Just commentId
-          <div .comment .reply .medium>
-            <a href=@{ProfileR $ commentAuthor reply}>#{fromMaybe "" $ lookup (commentAuthor reply) authors}</a> replied on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime reply}:
+        $forall (Entity replyId reply) <- replies
+          $if commentParent reply == Just commentId
             <hr>
-            #{commentContent reply}
-            <hr>
-            $if userId == (Just $ commentAuthor reply)
-              <a href=@{CommentDeleteR replyId}>Delete this comment
+            <div .comment .reply>
+              <a href=@{ProfileR $ commentAuthor reply}>#{fromMaybe "" $ lookup (commentAuthor reply) authors}</a> replied on #{formatTime defaultTimeLocale "%A %F %H:%M" $ commentTime reply}:
+              <hr>
+              #{commentContent reply}
+              <hr>
+              $if userId == (Just $ commentAuthor reply)
+                <a href=@{CommentDeleteR replyId}>Delete this comment
     
   $if userId /= Nothing
     <div .medium>
