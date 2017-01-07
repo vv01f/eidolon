@@ -35,6 +35,8 @@ import Graphics.Rasterific.Svg as SVG
 import Graphics.Svg
 import Graphics.Text.TrueType
 
+import Debug.Trace
+
 getDirectUploadR :: AlbumId -> Handler Html
 getDirectUploadR albumId = do
   tempAlbum <- runDB $ get albumId
@@ -143,17 +145,19 @@ generateThumbs
   -> T.Text             -- ^ MIME-Type (used for svg et al.)
   -> Handler ThumbsMeta -- ^ Resulting metadata to store
 generateThumbs path uId aId mime = do
-  eimg <- liftIO $ readImage path
-  orig <- case eimg of
-    Left err -> -- This branch contains svg and other data formats. to be extended for pdf et al.
-      case mime of
-        "image/svg+xml" -> do
-          svg <- liftIO $ loadSvgFile path
-          (img, _) <- liftIO $ renderSvgDocument emptyFontCache Nothing 100 $ fromJust svg
-          return img
-        _ -> error err
-    Right img -> do -- This branch contains "classical" image formats like bmp or png
-      return $ convertRGBA8 img
+  orig <- case mime of
+    "image/svg+xml" -> do
+      svg <- liftIO $ loadSvgFile path
+      (img, _) <- liftIO $ renderSvgDocument emptyFontCache Nothing 100 $ fromJust svg
+      return img
+    _ -> do
+      eimg <- liftIO $ readImage path
+      case eimg of
+        Left err ->
+          error err
+        Right img -> do -- This branch contains "classical" image formats like bmp or png
+          liftIO $ traceIO "I am here!"
+          return $ convertRGBA8 img
   let thumbName = FP.takeBaseName path ++ "_thumb.png"
       prevName = FP.takeBaseName path ++ "_preview.png"
       pathPrefix = "static" FP.</> "data" FP.</> T.unpack (extractKey uId) FP.</> T.unpack (extractKey aId)
