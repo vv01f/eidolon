@@ -192,7 +192,9 @@ mediumToEntry ent = do
     { feedEntryLink = MediumR (entityKey ent)
     , feedEntryUpdated = mediumTime (entityVal ent)
     , feedEntryTitle = mediumTitle (entityVal ent)
-    , feedEntryContent = toHtml (fromMaybe (Markdown "") $ mediumDescription $ entityVal ent)
+    , feedEntryContent = toHtml ((fromMaybe (Markdown "") $ mediumDescription $ entityVal ent)
+      `mappend` Markdown (LT.pack "\n\n")
+      `mappend` Markdown (LT.pack $ show $ (toEnum $ mediumLicence (entityVal ent) :: Licence)))
     , feedEntryEnclosure = Just $ EntryEnclosure
         (StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumPreview $ entityVal ent) [])
         size
