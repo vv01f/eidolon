@@ -211,8 +211,10 @@ handleUpload len albumId prefix time owner desc tags licence spec (index, file) 
           case spec of
             NewFile ->
               insertMedium medium albumId
-            Replace _ ->
-              return ()
+            Replace mId ->
+              runDB $ update mId
+                [ MediumPath =. ('/' : path)
+                ]
           return Nothing
         else do
           liftIO $ removeFile (FP.normalise path)
