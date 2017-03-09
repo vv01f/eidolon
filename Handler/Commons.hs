@@ -20,8 +20,19 @@ import Import
 import qualified Data.Text as T
 import Data.String
 import qualified Data.List as L
+import Data.Time
+import Data.Maybe (fromJust)
+import Data.Int (Int64(..))
 import System.FilePath as FP
 import System.Directory
+import Text.Markdown
+import Codec.Picture as P
+import Codec.Picture.Metadata as PM hiding (insert, delete)
+import Codec.Picture.ScaleDCT
+import Codec.ImageType
+import Graphics.Svg
+import Graphics.Rasterific.Svg
+import Graphics.Text.TrueType
 
 loginIsAdmin :: IsString t => Handler (Either (t, Route App)  ())
 loginIsAdmin = do
@@ -152,3 +163,145 @@ removeReference mId aId = do
   let newMediaList = removeItem mId $ albumContent album
   -- update reference list
   runDB $ update aId [AlbumContent =. newMediaList]
+
+data UploadSpec
+  = NewFile
+  | Replace MediumId
+
+handleUpload
+  :: Int
+  -> AlbumId
+  -> T.Text
+  -> UTCTime
+  -> UserId
+  -> Maybe Markdown
+  -> [T.Text]
+  -> Int
+  -> UploadSpec
+  -> (Int, FileInfo)
+  -> Handler (Maybe T.Text)
+handleUpload len albumId prefix time owner desc tags licence spec (index, file) = do
+  let mime = fileContentType file
+  if mime `elem` acceptedTypes
+    then do
+      albRef <- runDB $ getJust albumId
+      let ownerId = albumOwner albRef
+      path <- writeOnDrive file ownerId albumId spec
+      isOk <- liftIO $ checkCVE_2016_3714 path mime
+      if isOk
+        then do
+          meta <- generateThumbs path ownerId albumId mime
+          tempName <- if len == 1
+            then return prefix
+            else return
+              ( prefix `T.append` " " `T.append` T.pack (show index) `T.append`
+              " of " `T.append` T.pack (show len))
+          medium <- return $ Medium
+            tempName
+            ('/' : path)
+            ('/' : metaThumbPath meta)
+            mime
+            time
+            owner
+            desc
+            tags
+            albumId
+            ('/' : metaPreviewPath meta)
+            licence
+          case spec of
+            NewFile ->
+              insertMedium medium albumId
+            Replace _ ->
+              return ()
+          return Nothing
+        else do
+          liftIO $ removeFile (FP.normalise path)
+          return $ Just $ fileName file
+    else
+      return $ Just $ fileName file
+
+data ThumbsMeta = ThumbsMeta
+  { metaThumbPath :: FP.FilePath
+  , metaPreviewPath :: FP.FilePath
+  }
+
+-- | generate thumbnail and preview images from uploaded image
+generateThumbs
+  :: FP.FilePath        -- ^ Path to original image
+  -> UserId             -- ^ Uploading user
+  -> AlbumId            -- ^ Destination album
+  -> T.Text             -- ^ MIME-Type (used for svg et al.)
+  -> Handler ThumbsMeta -- ^ Resulting metadata to store
+generateThumbs path uId aId mime = do
+  orig <- case mime of
+    "image/svg+xml" -> do
+      svg <- liftIO $ loadSvgFile path
+      (img, _) <- liftIO $ renderSvgDocument emptyFontCache Nothing 100 $ fromJust svg
+      return img
+    _ -> do
+      eimg <- liftIO $ readImage path
+      case eimg of
+        Left err ->
+          error err
+        Right img -> -- This branch contains "classical" image formats like bmp or png
+          return $ convertRGBA8 img
+  let thumbName = FP.takeBaseName path ++ "_thumb.png"
+      prevName = FP.takeBaseName path ++ "_preview.png"
+      pathPrefix = "static" FP.</> "data" FP.</> T.unpack (extractKey uId) FP.</> T.unpack (extractKey aId)
+      tPath = pathPrefix FP.</> thumbName
+      pPath = pathPrefix FP.</> prevName
+      -- origPix = convertRGBA8 orig
+      oWidth = P.imageWidth orig :: Int
+      oHeight = P.imageHeight orig :: Int
+      tWidth = floor (fromIntegral oWidth / fromIntegral oHeight * fromIntegral tHeight :: Double)
+      tHeight = 230 :: Int
+      pHeight = 600 :: Int
+      pScale = (fromIntegral pHeight :: Double) / (fromIntegral oHeight :: Double)
+      pWidth = floor (fromIntegral oWidth * pScale)
+      tPix = scale (tWidth, tHeight) orig
+      pPix = scale (pWidth, pHeight) orig
+  liftIO $ savePngImage tPath $ ImageRGBA8 tPix
+  liftIO $ savePngImage pPath $ ImageRGBA8 pPix
+  return $ ThumbsMeta
+    { metaThumbPath    = tPath
+    , metaPreviewPath  = pPath
+    }
+
+checkCVE_2016_3714 :: FP.FilePath -> T.Text -> IO Bool
+checkCVE_2016_3714 p m =
+  case m of
+    "image/jpeg"     -> isJpeg p
+    "image/jpg"      -> isJpeg p
+    "image/png"      -> isPng p
+    "image/x-ms-bmp" -> isBmp p
+    "image/x-bmp"    -> isBmp p
+    "image/bmp"      -> isBmp p
+    "image/tiff"     -> isTiff p
+    "image/tiff-fx"  -> isTiff p
+    "image/svg+xml"  -> return True -- TODO: have to check XML for that.
+    "image/gif"      -> isGif p
+    _                -> return False
+
+writeOnDrive :: FileInfo -> UserId -> AlbumId -> UploadSpec -> Handler FP.FilePath
+writeOnDrive fil userId albumId spec = do
+  album <- runDB $ getJust albumId
+  let ac = albumContent album
+  [PersistInt64 int] <- case spec of
+    NewFile -> 
+      if L.null ac then return [PersistInt64 1] else return $ keyToValues $ maximum $ ac
+    Replace mId -> do
+      medium <- runDB $ getJust mId
+      return $ (PersistInt64 (read $ takeBaseName $ mediumPath medium :: Int64)) : []
+  let filen = show $ fromIntegral int + case spec of
+        Replace _ -> 0
+        NewFile   -> 1
+      ext = FP.takeExtension $ T.unpack $ fileName fil
+      path = "static" FP.</> "data" FP.</> T.unpack (extractKey userId) FP.</> T.unpack (extractKey albumId) FP.</> filen ++ ext
+  dde <- liftIO $ doesDirectoryExist $ FP.dropFileName path
+  if not dde
+    then
+      liftIO $ createDirectoryIfMissing True $ FP.dropFileName path
+    else
+      return ()
+  liftIO $ fileMove fil path
+  return path

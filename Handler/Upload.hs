@@ -27,13 +27,13 @@ import Data.List as L
 import qualified System.FilePath as FP
 import System.Directory
 import Text.Blaze.Internal
-import Codec.ImageType
-import Codec.Picture as P
-import Codec.Picture.Metadata as PM
-import Codec.Picture.ScaleDCT
+-- import Codec.ImageType
+-- import Codec.Picture as P
+-- import Codec.Picture.Metadata as PM
+-- import Codec.Picture.ScaleDCT
 import Graphics.Rasterific.Svg as SVG
-import Graphics.Svg
-import Graphics.Text.TrueType
+-- import Graphics.Svg
+-- import Graphics.Text.TrueType
 
 import Debug.Trace
 
@@ -86,27 +86,17 @@ postDirectUploadR albumId = do
                   let fils = fileBulkFiles temp
                   let indFils = zip [1..] fils
                   errNames <- mapM
-                    (\(index, file) -> do
-                      let mime = fileContentType file
-                      if mime `elem` acceptedTypes
-                        then do
-                          path <- writeOnDrive file ownerId albumId
-                          isOk <- liftIO $ checkCVE_2016_3714 path mime
-                          if isOk
-                            then do
-                              meta <- generateThumbs path ownerId albumId mime
-                              tempName <- if length indFils == 1
-                                then return $ fileBulkPrefix temp
-                                else return (fileBulkPrefix temp `T.append` " " `T.append` T.pack (show (index :: Int)) `T.append` " of " `T.append` T.pack (show (length indFils)))
-                              let medium = Medium tempName ('/' : path) ('/' : metaThumbPath meta) mime (fileBulkTime temp) (fileBulkOwner temp) (fileBulkDesc temp) (fileBulkTags temp) albumId ('/' : metaPreviewPath meta) (fileBulkLicence temp)
-                              insertMedium medium albumId
-                              return Nothing
-                          else do
-                            liftIO $ removeFile (FP.normalise path)
-                            return $ Just $ fileName file
-                        else
-                          return $ Just $ fileName file
-                      ) indFils
+                    (handleUpload
+                      (length indFils)
+                      (fileBulkAlbum temp)
+                      (fileBulkPrefix temp)
+                      (fileBulkTime temp)
+                      (fileBulkOwner temp)
+                      (fileBulkDesc temp)
+                      (fileBulkTags temp)
+                      (fileBulkLicence temp)
+                      NewFile
+                    )indFils
                   let onlyErrNames = removeItem Nothing errNames
                   if
                     L.null onlyErrNames
@@ -130,88 +120,6 @@ postDirectUploadR albumId = do
     Nothing -> do
       setMessage "This Album does not exist"
       redirect $ AlbumR albumId
-
--- | Type to pass metadata about imgaes around.
-data ThumbsMeta = ThumbsMeta
-  { metaThumbPath    :: FP.FilePath -- ^ Filepath of the new thumbnail image
-  , metaPreviewPath  :: FP.FilePath -- ^ Filepath of the new preview image
-  }
-
--- | generate thumbnail and preview images from uploaded image
-generateThumbs
-  :: FP.FilePath        -- ^ Path to original image
-  -> UserId             -- ^ Uploading user
-  -> AlbumId            -- ^ Destination album
-  -> T.Text             -- ^ MIME-Type (used for svg et al.)
-  -> Handler ThumbsMeta -- ^ Resulting metadata to store
-generateThumbs path uId aId mime = do
-  orig <- case mime of
-    "image/svg+xml" -> do
-      svg <- liftIO $ loadSvgFile path
-      (img, _) <- liftIO $ renderSvgDocument emptyFontCache Nothing 100 $ fromJust svg
-      return img
-    _ -> do
-      eimg <- liftIO $ readImage path
-      case eimg of
-        Left err ->
-          error err
-        Right img -> do -- This branch contains "classical" image formats like bmp or png
-          liftIO $ traceIO "I am here!"
-          return $ convertRGBA8 img
-  let thumbName = FP.takeBaseName path ++ "_thumb.png"
-      prevName = FP.takeBaseName path ++ "_preview.png"
-      pathPrefix = "static" FP.</> "data" FP.</> T.unpack (extractKey uId) FP.</> T.unpack (extractKey aId)
-      tPath = pathPrefix FP.</> thumbName
-      pPath = pathPrefix FP.</> prevName
-      -- origPix = convertRGBA8 orig
-      oWidth = P.imageWidth orig :: Int
-      oHeight = P.imageHeight orig :: Int
-      tWidth = floor (fromIntegral oWidth / fromIntegral oHeight * fromIntegral tHeight :: Double)
-      tHeight = 230 :: Int
-      pHeight = 600 :: Int
-      pScale = (fromIntegral pHeight :: Double) / (fromIntegral oHeight :: Double)
-      pWidth = floor (fromIntegral oWidth * pScale)
-      tPix = scale (tWidth, tHeight) orig
-      pPix = scale (pWidth, pHeight) orig
-  liftIO $ savePngImage tPath $ ImageRGBA8 tPix
-  liftIO $ savePngImage pPath $ ImageRGBA8 pPix
-  return $ ThumbsMeta
-    { metaThumbPath    = tPath
-    , metaPreviewPath  = pPath
-    }
-
-checkCVE_2016_3714 :: FP.FilePath -> T.Text -> IO Bool
-checkCVE_2016_3714 p m =
-  case m of
-    "image/jpeg"     -> isJpeg p
-    "image/jpg"      -> isJpeg p
-    "image/png"      -> isPng p
-    "image/x-ms-bmp" -> isBmp p
-    "image/x-bmp"    -> isBmp p
-    "image/bmp"      -> isBmp p
-    "image/tiff"     -> isTiff p
-    "image/tiff-fx"  -> isTiff p
-    "image/svg+xml"  -> return True -- TODO: have to check XML for that.
-    "image/gif"      -> isGif p
-    _                -> return False
-
-writeOnDrive :: FileInfo -> UserId -> AlbumId -> Handler FP.FilePath
-writeOnDrive fil userId albumId = do
-  --filen <- return $ fileName fil
-  album <- runDB $ getJust albumId
-  let ac = albumContent album
-      [PersistInt64 int] = if L.null ac then [PersistInt64 1] else keyToValues $ maximum $ ac
-      filen = show $ fromIntegral int + 1
-      ext = FP.takeExtension $ T.unpack $ fileName fil
-      path = "static" FP.</> "data" FP.</> T.unpack (extractKey userId) FP.</> T.unpack (extractKey albumId) FP.</> filen ++ ext
-  dde <- liftIO $ doesDirectoryExist $ FP.dropFileName path
-  if not dde
-    then
-      liftIO $ createDirectoryIfMissing True $ FP.dropFileName path
-    else
-      return ()
-  liftIO $ fileMove fil path
-  return path
 
 dUploadForm :: UserId -> User -> AlbumId -> AForm Handler FileBulk
 dUploadForm userId user albumId = FileBulk
@@ -299,41 +207,17 @@ postUploadR = do
           let fils = fileBulkFiles temp
           let indFils = zip [1..] fils
           errNames <- mapM
-            (\(index, file) -> do
-              let mime = fileContentType file
-              if mime `elem` acceptedTypes
-                then do
-                  let inAlbumId = fileBulkAlbum temp
-                  albRef <- runDB $ getJust inAlbumId
-                  let ownerId = albumOwner albRef
-                  path <- writeOnDrive file ownerId inAlbumId
-                  isOk <- liftIO $ checkCVE_2016_3714 path mime
-                  if isOk
-                    then do
-                      meta <- generateThumbs path ownerId inAlbumId mime
-                      tempName <- if
-                        length indFils == 1
-                        then return $ fileBulkPrefix temp
-                        else
-                          return
-                            (fileBulkPrefix temp `T.append`
-                            " " `T.append`
-                            T.pack (show (index :: Int)) `T.append`
-                            " of " `T.append`
-                            T.pack (show (length indFils)))
-                      let medium = Medium tempName ('/' : path) ('/' : metaThumbPath meta) mime (fileBulkTime temp) (fileBulkOwner temp) (fileBulkDesc temp) (fileBulkTags temp) inAlbumId ('/' : metaPreviewPath meta) (fileBulkLicence temp)
-                      -- mId <- runDB $ I.insert medium
-                      -- inALbum <- runDB $ getJust inAlbumId
-                      -- let newMediaList = mId : albumContent inALbum
-                      -- runDB $ update inAlbumId [AlbumContent =. newMediaList]
-                      insertMedium medium inAlbumId
-                      return Nothing
-                    else do
-                      liftIO $ removeFile (FP.normalise path)
-                      return $ Just $ fileName file
-                else
-                  return $ Just $ fileName file
-              ) indFils
+            (handleUpload
+              (length indFils)
+              (fileBulkAlbum temp)
+              (fileBulkPrefix temp)
+              (fileBulkTime temp)
+              (fileBulkOwner temp)
+              (fileBulkDesc temp)
+              (fileBulkTags temp)
+              (fileBulkLicence temp)
+              NewFile
+            )indFils
           let onlyErrNames = removeItem Nothing errNames
           if
             L.null onlyErrNames

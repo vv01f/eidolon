@@ -21,7 +21,9 @@ import Yesod.Text.Markdown
 import Handler.Commons
 import System.FilePath
 import qualified Data.Text as T
-import Data.Maybe (catMaybes)
+import Data.Maybe
+import Text.Markdown
+import Control.Monad (when)
 
 getMediumSettingsR :: MediumId -> Handler Html
 getMediumSettingsR mediumId = do
@@ -49,11 +51,26 @@ postMediumSettingsR mediumId = do
       case result of
         FormSuccess temp -> do
           _ <- runDB $ update mediumId
-            [ MediumTitle =. mediumTitle temp
-            , MediumDescription =. mediumDescription temp
-            , MediumTags =. mediumTags temp
-            , MediumLicence =. mediumLicence temp
+            [ MediumTitle =. msTitle temp
+            , MediumDescription =. msDescription temp
+            , MediumTags =. msTags temp
+            , MediumLicence =. msLicence temp
             ]
+          when (not $ isNothing $ msData temp) $ do
+            err <- handleUpload
+              1
+              (mediumAlbum medium)
+              (msTitle temp)
+              (mediumTime medium)
+              (mediumOwner medium)
+              (msDescription temp)
+              (msTags temp)
+              (msLicence temp)
+              (Replace mediumId)
+              (1, (fromJust $ msData temp))
+            when (not $ isNothing err) $ do
+              setMessage "There was an error uploading the File"
+              redirect $ MediumSettingsR mediumId
           setMessage "Medium settings changed succesfully"
           redirect $ MediumR mediumId
         _ -> do
@@ -63,18 +80,20 @@ postMediumSettingsR mediumId = do
       setMessage errorMsg
       redirect route
 
-mediumSettingsForm :: Medium -> AForm Handler Medium
-mediumSettingsForm medium = Medium
+data MediumSettings = MediumSettings
+  { msTitle       :: T.Text
+  , msData        :: Maybe FileInfo
+  , msDescription :: Maybe Markdown
+  , msTags        :: [T.Text]
+  , msLicence     :: Int
+  }
+
+mediumSettingsForm :: Medium -> AForm Handler MediumSettings
+mediumSettingsForm medium = MediumSettings
   <$> areq textField (bfs ("Title" :: T.Text)) (Just $ mediumTitle medium)
-  <*> pure (mediumPath medium)
-  <*> pure (mediumThumb medium)
-  <*> pure (mediumMime medium)
-  <*> pure (mediumTime medium)
-  <*> pure (mediumOwner medium)
+  <*> aopt fileField (bfs ("Update medium" :: T.Text)) (Nothing)
   <*> aopt markdownField (bfs ("Description" :: T.Text)) (Just $ mediumDescription medium)
   <*> areq tagField (bfs ("Tags" :: T.Text)) (Just $ mediumTags medium)
-  <*> pure (mediumAlbum medium)
-  <*> pure (mediumPreview medium)
   <*> areq (selectField licences) (bfs ("Licence" :: T.Text)) (Just $ mediumLicence medium)
   <*  bootstrapSubmit ("Change settings" :: BootstrapSubmit T.Text)
   where
