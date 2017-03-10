@@ -1,16 +1,16 @@
-#eidolon
+# eidolon
 
-##Introduction
+## Introduction
 
 A image gallery service written in Haskell as a yesod webapp.
 
 Visit the test instance at [eidolon.nek0.eu][eidolon]
 
-##Installation
+## Installation
 
-###Dependencies
+### Dependencies
 
-####Build dependencies
+#### Build dependencies
 
 A working Haskell capable environment. For that you will need `ghc` and
 `cabal-install`, which you can install with:
@@ -52,7 +52,7 @@ for migrations also install:
 
 * libmagic-dev
 
-####Elasticsearch dependencies
+#### Elasticsearch dependencies
 
 **WARNING: THIS SECTION IS ONLY VALID FOR VERSIONS >= 0.0.5 and < 0.1.0.0**
 
@@ -65,7 +65,7 @@ sudo apt-get install elasticsearch
 On how to configure your elasticsearch server, look into the
 [elasticsearch documentation][elasticdocu].
 
-###Building
+### Building
 
 get the source with
 
@@ -87,7 +87,7 @@ make all
 
 Everything should work automagically from there.
 
-##Deploying
+## Deploying
 
 After compiling you will find an executable called `eidolon` in
 `dist/build/eidolon/eidolon`. Copy or link it anywhere you
@@ -102,13 +102,13 @@ information.
 It may also be necessery to create a reverse proxy to your gallery. I would
 recommend using [nginx](http://nginx.org/).
 
-##Customizing
+## Customizing
 
 Unfortunately the gallery is not highly customizable, but you can change most of
 its appearance by changing the files `static/css/main.css`. Especially the
 default background image can be changed by replacing `static/css/img/bg.jpg`.
 
-##Starting
+## Starting
 
 You can start the gallery now by running the executable. You need to provide a
 settings file as argument, normally found in `config/settings.yml`
@@ -117,9 +117,9 @@ Since eidolon will block your console, I recommend wrapping a init-script around
 it. how you can do that is written in my
 [blog](http://nek0.eu/posts/2014-10-23-Daemonize-a-yesod-app.html).
 
-##Migrations
+## Migrations
 
-###0.0.3-0.0.4
+### 0.0.3-0.0.4
 
 * do not start or restart your eidolon service before migration
 * run migration script from your run location (where your `static` folder with
@@ -131,7 +131,7 @@ all the images is located)
 	* without sandbox: `runghc /path/to/eidolon/Migrations/0.0.3-0.0.4/Migration.hs`
 * start or restart your eidolon service
 
-###0.0.4-0.0.5
+### 0.0.4-0.0.5
 
 * run migration script from your run location (where your `static` folder with
 all the images is located)
@@ -142,7 +142,7 @@ all the images is located)
 	* without sandbox: `runghc /path/to/eidolon/Migrations/0.0.4-0.0.5/Migration.hs`
 * start or restart your eidolon service
 
-###0.0.7-0.1.0.0
+### 0.0.7-0.1.0.0
 
 You have two options to accomplish the migration:
 1. Build the migration binary with `cabal exec -- ghc --make
@@ -152,36 +152,36 @@ location.
 in the project directory and run `cabal exec -- runghc
 Migrations/0.0.7-0.1.0.0/Migration.hs`
 
-###0.1.2.4-0.1.3.0
+### 0.1.2.4-0.1.3.0
 * Stop Eidolon
 * Log into your database and issue this command:
 `ALTER TABLE "comment" DROP COLUMN "author_slug";`
 * Start Eidolon
 
-###0.1.3.3-0.1.4.0
+### 0.1.3.3-0.1.4.0
 * Stop eidolon
 * Compile migration script with `cabal exec -- ghc --make Migrations/0.1.3.3-0.1.4.0/Migration.hs`
 * Copy or move compiled script to run location and execute
 * Follow the prompts of the script
 * Start eidolon
 
-###0.1.4.0-0.1.5.0
+### 0.1.4.0-0.1.5.0
 * Stop eidolon
 * Compile migration script with `cabal exec -- ghc --make Migrations/0.1.4.0-0.1.5.0/Migration.hs`
 * Copy or move compiled script to run location and execute
 * Follow the prompts of the script
 * Start eidolon
 
-###0.1.5.6-0.1.6.0
+### 0.1.5.6-0.1.6.0
 * Just restart eidolon. It handles the rest automagically.
 
-###0.1.6.1-0.1.7.0
+### 0.1.6.1-0.1.7.0
 * No database changes. Just restart eidolon.
 
-###0.1.7.2-0.1.8.0
+### 0.1.7.2-0.1.8.0
 * No database changes, just new dependencies to install.
 
-##Acknowledgements:
+## Acknowledgements:
 
 * This software uses the web Framework "Yesod" by Michael Snoyman. See more at:
 <http://www.yesodweb.com/>
