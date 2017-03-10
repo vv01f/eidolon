@@ -34,6 +34,8 @@ import Graphics.Svg
 import Graphics.Rasterific.Svg
 import Graphics.Text.TrueType
 
+import Debug.Trace
+
 loginIsAdmin :: IsString t => Handler (Either (t, Route App)  ())
 loginIsAdmin = do
   msu <- lookupSession "userId"
@@ -168,18 +170,19 @@ data UploadSpec
   = NewFile
   | Replace MediumId
 
+-- | function to handle uploaded media files
 handleUpload
-  :: Int
-  -> AlbumId
-  -> T.Text
-  -> UTCTime
-  -> UserId
-  -> Maybe Markdown
-  -> [T.Text]
-  -> Int
-  -> UploadSpec
-  -> (Int, FileInfo)
-  -> Handler (Maybe T.Text)
+  :: Int                    -- ^ number of uploaded media
+  -> AlbumId                -- ^ 'AlbumId' of destination album
+  -> T.Text                 -- ^ Title or title prefix
+  -> UTCTime                -- ^ Time of upload
+  -> UserId                 -- ^ 'UserId' of media owner
+  -> Maybe Markdown         -- ^ Description text
+  -> [T.Text]               -- ^ Tags
+  -> Int                    -- ^ Licence
+  -> UploadSpec             -- ^ New file or replacement file?
+  -> (Int, FileInfo)        -- ^ actual file
+  -> Handler (Maybe T.Text) -- ^ Returns the filename if something fails
 handleUpload len albumId prefix time owner desc tags licence spec (index, file) = do
   let mime = fileContentType file
   if mime `elem` acceptedTypes
@@ -196,20 +199,20 @@ handleUpload len albumId prefix time owner desc tags licence spec (index, file) 
             else return
               ( prefix `T.append` " " `T.append` T.pack (show index) `T.append`
               " of " `T.append` T.pack (show len))
-          medium <- return $ Medium
-            tempName
-            ('/' : path)
-            ('/' : metaThumbPath meta)
-            mime
-            time
-            owner
-            desc
-            tags
-            albumId
-            ('/' : metaPreviewPath meta)
-            licence
           case spec of
-            NewFile ->
+            NewFile -> do
+              medium <- return $ Medium
+                tempName
+                ('/' : path)
+                ('/' : metaThumbPath meta)
+                mime
+                time
+                owner
+                desc
+                tags
+                albumId
+                ('/' : metaPreviewPath meta)
+                licence
               insertMedium medium albumId
             Replace mId ->
               runDB $ update mId
@@ -238,7 +241,9 @@ generateThumbs path uId aId mime = do
   orig <- case mime of
     "image/svg+xml" -> do
       svg <- liftIO $ loadSvgFile path
+      liftIO $ traceIO "------------------> SVG loaded!"
       (img, _) <- liftIO $ renderSvgDocument emptyFontCache Nothing 100 $ fromJust svg
+      liftIO $ traceIO "------------------> SVG rendered!"
       return img
     _ -> do
       eimg <- liftIO $ readImage path
@@ -255,15 +260,19 @@ generateThumbs path uId aId mime = do
       -- origPix = convertRGBA8 orig
       oWidth = P.imageWidth orig :: Int
       oHeight = P.imageHeight orig :: Int
-      tWidth = floor (fromIntegral oWidth / fromIntegral oHeight * fromIntegral tHeight :: Double)
       tHeight = 230 :: Int
       pHeight = 600 :: Int
+      tWidth = ceiling (fromIntegral oWidth / fromIntegral oHeight * fromIntegral tHeight :: Double)
       pScale = (fromIntegral pHeight :: Double) / (fromIntegral oHeight :: Double)
-      pWidth = floor (fromIntegral oWidth * pScale)
+      pWidth = ceiling (fromIntegral oWidth * pScale)
       tPix = scale (tWidth, tHeight) orig
       pPix = scale (pWidth, pHeight) orig
+  liftIO $ traceIO $ show oWidth
+  liftIO $ traceIO "------------------> Image scaled!"
   liftIO $ savePngImage tPath $ ImageRGBA8 tPix
+  liftIO $ traceIO "------------------> Saved thumbnail!"
   liftIO $ savePngImage pPath $ ImageRGBA8 pPix
+  liftIO $ traceIO "------------------> Saved preview!"
   return $ ThumbsMeta
     { metaThumbPath    = tPath
     , metaPreviewPath  = pPath
