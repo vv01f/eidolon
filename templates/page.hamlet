@@ -1,15 +1,13 @@
 $doctype 5
 $if page == 1
   <div .item .subheader>
-    <div class="inner">
-      <p>
-        <a href=@{HomeR}>
+    <div style="height:100%" class="inner">
+      <a href=@{HomeR}>
           newer
 $else
   <div .item .subheader>
-    <div class="inner">
-      <p>
-        <a href=@{PageR (page - 1)}>
+    <div style="height:100%" class="inner">
+      <a style="inline-block" href=@{PageR (page - 1)}>
           newer
 $forall (Entity mediumId medium) <- pageMedia
   <div .item>
@@ -19,7 +17,6 @@ $forall (Entity mediumId medium) <- pageMedia
         <figcaption>#{mediumTitle medium}
 $if nextMedia
   <div .item .subheader>
-    <div class="inner">
-      <p>
-        <a href=@{PageR (page + 1)}>
+    <div style="height:100%" class="inner">
+        <a style="inline-block" href=@{PageR (page + 1)}>
          older
