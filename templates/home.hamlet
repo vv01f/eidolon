@@ -4,13 +4,12 @@ $doctype 5
   <p>
     A simple gallery System in Haskell and Yesod
 $forall (Entity mediumId medium) <- recentMedia
-  <div class="item">
+  <div .item>
     <a href=@{MediumR mediumId}>
       <figure>
         <img src=@{StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumThumb medium) []} title=#{mediumTitle medium}>
         <figcaption>#{mediumTitle medium}
 $if nextMedia
-  <div .item .subheader .pagin>
-    <p>
-      <a href=@{PageR 1}>
-        older
+  <div .item .subheader>
+    <a .pagin href=@{PageR 1}>
+      older
