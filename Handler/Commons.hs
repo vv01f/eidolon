@@ -17,6 +17,7 @@
 module Handler.Commons where
 
 import Import
+import Scale
 import qualified Data.Text as T
 import Data.String
 import qualified Data.List as L
@@ -242,7 +243,21 @@ generateThumbs path uId aId mime = do
     "image/svg+xml" -> do
       svg <- liftIO $ loadSvgFile path
       liftIO $ traceIO "------------------> SVG loaded!"
-      (img, _) <- liftIO $ renderSvgDocument emptyFontCache Nothing 100 $ fromJust svg
+      let (swidth, sheight) = documentSize 100 (fromJust svg)
+          scale =
+            let
+              picScale = (fromIntegral swidth / fromIntegral sheight) :: Double
+              nwidth =
+                if swidth < 1000
+                then 1000 :: Int
+                else swidth
+              nheight =
+                if swidth < 1000
+                then floor (1000 / picScale)
+                else sheight
+            in
+              Just (nwidth, nheight)
+      (img, _) <- liftIO $ renderSvgDocument emptyFontCache scale 100 $ fromJust svg
       liftIO $ traceIO "------------------> SVG rendered!"
       return img
     _ -> do
@@ -265,8 +280,8 @@ generateThumbs path uId aId mime = do
       tWidth = ceiling (fromIntegral oWidth / fromIntegral oHeight * fromIntegral tHeight :: Double)
       pScale = (fromIntegral pHeight :: Double) / (fromIntegral oHeight :: Double)
       pWidth = ceiling (fromIntegral oWidth * pScale)
-      tPix = scale (tWidth, tHeight) orig
-      pPix = scale (pWidth, pHeight) orig
+      tPix = scaleBilinearAlpha tWidth tHeight orig
+      pPix = scaleBilinearAlpha pWidth pHeight orig
   liftIO $ traceIO $ show oWidth
   liftIO $ traceIO "------------------> Image scaled!"
   liftIO $ savePngImage tPath $ ImageRGBA8 tPix

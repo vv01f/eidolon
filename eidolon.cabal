@@ -1,5 +1,5 @@
 name:                eidolon
-version:             0.1.8.6
+version:             0.1.8.7
 synopsis:            Image gallery in Yesod
 homepage:            https://eidolon.nek0.eu
 license:             AGPL-3
@@ -26,6 +26,7 @@ library
                      Helper
                      Import
                      Model
+                     Scale
                      Settings
                      Settings.StaticFiles
                      Settings.Development
