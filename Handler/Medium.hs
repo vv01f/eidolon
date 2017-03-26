@@ -93,7 +93,7 @@ postMediumR mediumId = do
               sendMail (userEmail owner) (userSl `T.append` " commented on your medium")
                 [shamlet|
                   <h1>Hello #{userSlug owner}
-                  <p>#{userSl} commented on your medium {mediumTitle medium}:
+                  <p>#{userSl} commented on your medium #{mediumTitle medium}:
                   <p>#{commentContent temp}
                   <p>To follow the comment thread follow 
                     <a href=#{link}>
