@@ -107,7 +107,7 @@ postMediumR mediumId = do
               redirect $ MediumR mediumId
         Nothing -> do
           setMessage "You need to be looged in to comment on media"
-          redirect LoginR
+          redirect $ AuthR LoginR
     Nothing -> do
       setMessage "This image does not exist"
       redirect HomeR
@@ -141,7 +141,7 @@ getCommentReplyR commentId = do
             $(widgetFile "commentReply")
         Nothing -> do
           setMessage "You need to be logged in to comment on media"
-          redirect LoginR
+          redirect $ AuthR LoginR
     Nothing -> do
       setMessage "This comment does not Exist"
       redirect HomeR
@@ -198,7 +198,7 @@ postCommentReplyR commentId = do
               redirect $ CommentReplyR commentId
         Nothing -> do
           setMessage "You need to be logged in to post replies"
-          redirect LoginR
+          redirect $ AuthR LoginR
     Nothing -> do
       setMessage "This comment does not exist!"
       redirect HomeR
@@ -223,7 +223,7 @@ getCommentDeleteR commentId = do
               redirect $ MediumR $ commentOrigin comment
         Nothing -> do
           setMessage "You must be logged in to delete comments"
-          redirect LoginR
+          redirect $ AuthR LoginR
     Nothing -> do
       setMessage "This comment does not exist"
       redirect HomeR
@@ -261,7 +261,7 @@ postCommentDeleteR commentId = do
               redirect $ MediumR $ commentOrigin comment
         Nothing -> do
           setMessage "You must be logged in to delete comments"
-          redirect LoginR
+          redirect $ AuthR LoginR
     Nothing -> do
       setMessage "This comment does not exist"
       redirect HomeR

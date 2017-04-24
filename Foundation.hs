@@ -14,6 +14,8 @@
 --  You should have received a copy of the GNU Affero General Public License
 --  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+{-# LANGUAGE FlexibleInstances #-}
+
 module Foundation where
 
 import Prelude
@@ -31,8 +33,12 @@ import Yesod.Core.Types
 -- costom imports
 import qualified Data.Text as T
 import Data.Text.Encoding
+import Data.Maybe (fromJust)
 import Network.Wai
-import Helper
+import Helper hiding (hmacKeccak)
+import Yesod.Auth
+import Yesod.Auth.HmacKeccak
+import System.IO.Unsafe (unsafePerformIO)
 
 -- | The site argument for your application. This can be a good place to
 -- keep settings and values requiring initialization before your application
@@ -68,28 +74,20 @@ renderLayout widget = do
     master <- getYesod
     route <- getCurrentRoute
     mmsg <- getMessage
-    msu <- lookupSession "userId"
-    username <- case msu of
-      Just a -> do
-        let uId = getUserIdFromText a
-        user <- runDB $ getJust uId
-        return $ userName user
+    -- msu <- lookupSession "userId"
+    musername <- maybeAuthId
+    slug <- case musername of
+      Just name -> do
+        user <- runDB $ getBy $ UniqueUser name
+        return $ userSlug $ entityVal $ fromJust user
       Nothing ->
         return ("" :: T.Text)
-    slug <- case msu of
-      Just a -> do
-        let uId = getUserIdFromText a
-        user <- runDB $ getJust uId
-        return $ userSlug user
+    admin <- case musername of
+      Just name -> do
+        user <- runDB $ getBy $ UniqueUser name
+        return $ userAdmin $ entityVal $ fromJust user
       Nothing ->
-        return ("" :: T.Text)
-    madmin <- case msu of
-      Just a -> do
-        let uId = getUserIdFromText a
-        user <- runDB $ getJust uId
-        return $ Just $ userAdmin user
-      Nothing ->
-        return Nothing
+        return False
     let block = appSignupBlocked $ appSettings master
 
     -- We break up the default layout into two components:
@@ -114,6 +112,7 @@ renderLayout widget = do
     pc <- widgetToPageContent $ do
         mapM_ addScript $ map StaticR
             [ js_picturefill_js
+            , js_jquery_min_js
             ]
         mapM_ addStylesheet $ map StaticR
             [ css_bootstrap_min_css
@@ -131,7 +130,7 @@ approotRequest master req =
       Nothing -> appRoot $ appSettings master
     where
       prefix =
-        if 
+        if
           "https://" `T.isPrefixOf` appRoot (appSettings master)
           then
             "https://"
@@ -206,28 +205,22 @@ instance YesodPersist App where
 instance YesodPersistRunner App where
     getDBRunner = defaultGetDBRunner appConnPool
 
--- instance YesodAuth App where
---    type AuthId App = UserId
+instance YesodAuth App where
+    type AuthId App = Username
 
-    -- Where to send a user after successful login
---    loginDest _ = HomeR
-    -- Where to send a user after logout
---    logoutDest _ = HomeR
+  -- Where to send a user after successful login
+    loginDest _ = HomeR
+  -- Where to send a user after logout
+    logoutDest _ = HomeR
 
---    getAuthId creds = runDB $ do
---        x <- getBy $ UniqueUser $ credsIdent creds
---        case x of
---            Just (Entity uid _) -> return $ Just uid
---            Nothing -> do
---                fmap Just $ insert User
---                    { userIdent = credsIdent creds
---                    , userPassword = Nothing
---                    }
+    getAuthId = return . Just . credsIdent
 
-    -- You can add other plugins like BrowserID, email or OAuth here
---    authPlugins _ = [authBrowserId def]
+  -- You can add other plugins like BrowserID, email or OAuth here
+    authPlugins _ = [hmacPlugin]
 
---    authHttpManager = httpManager
+    authHttpManager = error "no HttpManager needed"
+
+    maybeAuthId = lookupSession credsKey
 
 -- This instance is required to use forms. You can modify renderMessage to
 -- achieve customized and internationalized form validation messages.
@@ -244,3 +237,60 @@ instance RenderMessage App FormMessage where
 -- wiki:
 --
 -- https://github.com/yesodweb/yesod/wiki/Sending-email
+
+instance YesodHmacKeccak (HmacPersistDB App User Token) App where
+  runHmacDB = runHmacPersistDB
+
+instance UserCredentials (Entity User) where
+  userUserName = userName . entityVal
+  userUserSalt = userSalt . entityVal
+  userUserSalted = userSalted . entityVal
+  userUserEmail = userEmail . entityVal
+  userUserActive = userActive . entityVal
+
+instance TokenData (Entity Token) where
+  tokenTokenKind = tokenKind . entityVal
+  tokenTokenUsername = tokenUsername . entityVal
+  tokenTokenToken = tokenToken . entityVal
+
+instance PersistUserCredentials User where
+  userUsernameF   = UserName
+  userUserSaltF   = UserSalt
+  userUserSaltedF = UserSalted
+  userUserEmailF  = UserEmail
+  userUserActiveF = UserActive
+  uniqueUsername  = UniqueUser
+
+  userCreate name email salt = User name name email salt "" [] False (-1) False
+
+instance PersistToken Token where
+  tokenTokenTokenF = TokenToken
+  tokenTokenKindF = TokenKind
+  tokenTokenUsernameF = TokenUsername
+  uniqueToken = UniqueToken
+
+  tokenCreate t u k = Token t k u
+
+instance HmacSendMail App where
+  sendVerifyEmail username email url =
+    sendMail email "Please activate your account!" $
+      [shamlet|
+<h1>Hello #{username} and welcome to Eidolon!
+To complete your signup process, please activate your account by visiting the
+following link:
+<a href=#{url}>#{url}
+
+See you soon!
+      |]
+
+  sendReactivateEmail username email url = do
+    muser <- runDB $ getBy $ UniqueUser username
+    let user = entityVal $ fromJust muser
+    sendMail email "Reset your password" $
+      [shamlet|
+<h1>Welcome again to Eidolon #{userSlug user}
+To reset your password visit the following link:
+<a href=#{url}>#{url}
+
+See you soon!
+      |]

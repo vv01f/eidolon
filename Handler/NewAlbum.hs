@@ -37,7 +37,7 @@ getNewAlbumR = do
         $(widgetFile "newAlbum")
     Nothing -> do
       setMessage "You need to be logged in"
-      redirect LoginR
+      redirect $ AuthR LoginR
 
 postNewAlbumR :: Handler Html
 postNewAlbumR = do
@@ -74,7 +74,7 @@ postNewAlbumR = do
           redirect NewAlbumR
     Nothing -> do
       setMessage "You must be logged in to create albums"
-      redirect LoginR
+      redirect $ AuthR LoginR
 
 albumForm :: UserId -> AForm Handler Album
 albumForm userId = Album

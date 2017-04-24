@@ -49,7 +49,7 @@ getAlbumSettingsR albumId = do
               redirect $ AlbumR albumId
         Nothing -> do
           setMessage "You must be logged in to change settings"
-          redirect LoginR
+          redirect $ AuthR LoginR
     Nothing -> do
       setMessage "This album does not exist"
       redirect HomeR
@@ -121,7 +121,7 @@ postAlbumSettingsR albumId = do
               redirect $ AlbumR albumId
         Nothing -> do
           setMessage "You must be logged in to change settings"
-          redirect LoginR
+          redirect $ AuthR LoginR
     Nothing -> do
       setMessage "This album does not exist"
       redirect HomeR
@@ -160,7 +160,7 @@ getAlbumDeleteR albumId = do
               redirect $ AlbumR albumId
         Nothing -> do
           setMessage "You must be logged in to delete albums"
-          redirect LoginR
+          redirect $ AuthR LoginR
     Nothing -> do
       setMessage "This album does not exist"
       redirect HomeR
@@ -220,7 +220,7 @@ postAlbumDeleteR albumId = do
               redirect $ AlbumR albumId
         Nothing -> do
           setMessage "You must be logged in to delete albums"
-          redirect LoginR
+          redirect $ AuthR LoginR
     Nothing -> do
       setMessage "This album does not exist"
       redirect HomeR

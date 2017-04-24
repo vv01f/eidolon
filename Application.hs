@@ -48,9 +48,10 @@ import Network.Wai.Middleware.RequestLogger (Destination (Logger),
 -- Import all relevant handler modules here.
 -- Don't forget to add new modules to your cabal file!
 import Handler.Home
-import Handler.Signup
-import Handler.Login
-import Handler.Activate
+-- import Handler.Signup
+-- import Handler.Login
+-- import Handler.Activate
+-- import Handler.Reactivate
 import Handler.Profile
 import Handler.Upload
 import Handler.NewAlbum
@@ -58,7 +59,6 @@ import Handler.Album
 import Handler.Medium
 import Handler.AlbumSettings
 import Handler.MediumSettings
-import Handler.Reactivate
 import Handler.ProfileSettings
 import Handler.ProfileDelete
 import Handler.Admin

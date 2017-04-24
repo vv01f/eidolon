@@ -21,6 +21,7 @@ module Import
 import           Prelude              as Import hiding (head, init, last,
                                                  readFile, tail, writeFile)
 import           Yesod                as Import hiding (Route (..))
+import           Yesod.Auth           as Import
 import           Yesod.Static         as Import
 import           Yesod.Form.Bootstrap3 as Import
 

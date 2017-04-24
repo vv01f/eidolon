@@ -139,6 +139,7 @@ adminProfileForm owner = User
   <*> pure (userAlbums owner)
   <*> areq boolField (bfs ("Admin" :: T.Text)) (Just $ userAdmin owner)
   <*> areq (selectField licenses) (bfs ("Default licence" :: T.Text)) (Just $ userDefaultLicence owner)
+  <*> pure (userActive owner)
   <*  bootstrapSubmit ("Change settings" :: BootstrapSubmit T.Text)
   where
     licenses = optionsPairs $ map (\a -> (T.pack (show (toEnum a :: Licence)), a)) [-2..6]

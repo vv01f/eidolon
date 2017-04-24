@@ -5,7 +5,7 @@
         <li>
           <a href=@{HomeR}>
             Home
-        $maybe _ <- msu
+        $maybe username <- musername
           <li>
             <label for="cb1">
               <a>
@@ -22,20 +22,19 @@
                 <a href=@{UploadR}>
                   Upload images
               <li>
-                <a href=@{LogoutR}>
+                <a href=@{AuthR LogoutR}>
                   Logout
-              $maybe admin <- madmin
-                $if admin
-                  <li>
-                    <a href=@{AdminR} .red>
-                      Administration
+              $if admin
+                <li>
+                  <a href=@{AdminR} .red>
+                    Administration
         $nothing
           <li>
-            <a href=@{LoginR}>
+            <a href=@{AuthR LoginR}>
               Login
           $if block == False
             <li>
-              <a href=@{SignupR}>
+              <a href=@{AuthR newAccountR}>
                 Signup
     <!--<div .col-md-3 .col-sm-6 #search>
       ^{pageBody searchWidget}-->

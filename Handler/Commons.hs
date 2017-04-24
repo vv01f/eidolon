@@ -51,7 +51,7 @@ loginIsAdmin = do
         else
           return $ Left ("You have no admin rights", HomeR)
     Nothing ->
-      return $ Left ("You are not logged in", LoginR)
+      return $ Left ("You are not logged in", AuthR LoginR)
 
 profileCheck :: IsString t => UserId -> Handler (Either (t, Route App) User)
 profileCheck userId = do
@@ -69,7 +69,7 @@ profileCheck userId = do
             else
               return $ Left ("You can only change your own profile settings", UserR $ userName user)
         Nothing ->
-          return $ Left ("You nedd to be logged in to change settings", LoginR)
+          return $ Left ("You nedd to be logged in to change settings", AuthR LoginR)
     Nothing ->
       return $ Left ("This user does not exist", HomeR)
 
@@ -93,7 +93,7 @@ mediumCheck mediumId = do
             else
               return $ Left ("You must own this medium to change its settings", MediumR mediumId)
         Nothing ->
-          return $ Left ("You must be logged in to change settings", LoginR)
+          return $ Left ("You must be logged in to change settings", AuthR LoginR)
     Nothing ->
       return $ Left ("This medium does not exist", HomeR)
 

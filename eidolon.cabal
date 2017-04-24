@@ -31,9 +31,10 @@ library
                      Settings.StaticFiles
                      Settings.Development
                      Handler.Home
-                     Handler.Signup
-                     Handler.Login
-                     Handler.Activate
+                     -- Handler.Signup
+                     -- Handler.Login
+                     -- Handler.Activate
+                     -- Handler.Reactivate
                      Handler.Profile
                      Handler.Upload
                      Handler.NewAlbum
@@ -41,7 +42,6 @@ library
                      Handler.Medium
                      Handler.AlbumSettings
                      Handler.MediumSettings
-                     Handler.Reactivate
                      Handler.ProfileSettings
                      Handler.ProfileDelete
                      Handler.Admin
@@ -142,6 +142,8 @@ library
                  , yesod-form                    >= 1.4.7
                  , magic
                  , texmath < 0.9
+                 , yesod-auth
+                 , yesod-auth-hmac-keccak
 
 executable         eidolon
     if flag(library-only)

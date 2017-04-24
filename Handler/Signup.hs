@@ -64,7 +64,7 @@ postSignupR = do
           let newUser = User newUserName newUserName (fromJust mEmail) salt "" [] False (fromEnum AllRightsReserved)
           activatorText <- liftIO generateString
           _ <- runDB $ insert $ Activator activatorText newUser
-          _ <- runDB $ insert $ Token (encodeUtf8 activatorText) "activate" Nothing
+          _ <- runDB $ insert $ Token (encodeUtf8 activatorText) "activate" newUserName
           activateLink <- ($ ActivateR activatorText) <$> getUrlRender
           sendMail (userEmail newUser) "Please activate your account!" $
             [shamlet|

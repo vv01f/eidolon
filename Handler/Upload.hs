@@ -61,7 +61,7 @@ getDirectUploadR albumId = do
               redirect $ AlbumR albumId
         Nothing -> do
           setMessage "You must be logged in to upload"
-          redirect LoginR
+          redirect $ AuthR LoginR
     Nothing -> do
       setMessage "This album does not exist"
       redirect HomeR
@@ -168,7 +168,7 @@ getUploadR = do
             $(widgetFile "bulkUpload")
     Nothing -> do
       setMessage "You need to be logged in"
-      redirect LoginR
+      redirect $ AuthR LoginR
 
 bulkUploadForm :: UserId -> User -> AForm Handler FileBulk
 bulkUploadForm userId user = (\a b c d e f g h -> FileBulk b c d e f g a h)
@@ -234,4 +234,4 @@ postUploadR = do
           redirect UploadR
     Nothing -> do
       setMessage "You need to be logged in"
-      redirect LoginR
+      redirect $ AuthR LoginR

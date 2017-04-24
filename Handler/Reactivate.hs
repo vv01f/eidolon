@@ -37,7 +37,7 @@ postReactivateR = do
         then do
           userTokens <- foldM (\userTokens (Entity userId user) -> do
             token <- liftIO $ generateString
-            _ <- runDB $ insert $ Token (encodeUtf8 token) "activate" (Just userId)
+            _ <- runDB $ insert $ Token (encodeUtf8 token) "activate" (userName user)
             return $ (user, token) : userTokens
             ) [] users
           _ <- foldM (\sent (user, token) ->

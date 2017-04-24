@@ -70,6 +70,7 @@ profileSettingsForm user = User
   <*> pure (userAdmin user)
   <*> areq (selectField licences) (bfs ("Default licence for media" :: T.Text))
     (Just $ userDefaultLicence user)
+  <*> pure (userActive user)
   <*  bootstrapSubmit ("Change settings" :: BootstrapSubmit Text)
   where
     licences = optionsPairs $ map (\a -> (T.pack (show (toEnum a :: Licence)), a)) [-2..6]

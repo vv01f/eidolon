@@ -15,171 +15,186 @@
 --  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 module Handler.Activate where
 
-import Import as I hiding (returnJson)
-import Data.Text
-import Data.Text.Encoding
-import Data.Maybe
-import System.Directory
-import System.FilePath
-
-import qualified Data.ByteString.Char8 as BC
-
-import Handler.Login
-
-getActivateR :: Text -> Handler Html
-getActivateR token = do
-  t <- runDB $ selectFirst [ActivatorToken ==. token] []
-  (activateRawWidget, _) <- generateFormPost $
-    renderBootstrap3 BootstrapBasicForm activateForm
-  case t of
-    Nothing -> do
-      mToken <- runDB $ selectFirst [TokenToken ==. encodeUtf8 token, TokenKind ==. "activate"] []
-      case mToken of
-        Just (Entity _ uToken) -> do
-          user <- runDB $ getJust (fromJust $ tokenUser uToken)
-          let hexSalt = toHex $ userSalt user
-          master <- getYesod
-          let addWarn = "http://" `isPrefixOf` appRoot (appSettings master)
-          defaultLayout $ do
-            setTitle "Activate your account"
-            $(widgetFile "activate")
-        _ -> do
-          setMessage "Invalid token!"
-          redirect HomeR
-    Just (Entity _ activator) -> do
-      let uSalt = userSalt $ activatorUser activator
-      mToken <- runDB $ selectFirst [TokenToken ==. encodeUtf8 token, TokenKind ==. "activate"] []
-      case mToken of
-        Just (Entity _ _) -> do
-          let hexSalt = toHex uSalt
-          master <- getYesod
-          let addWarn = "http://" `isPrefixOf` appRoot (appSettings master)
-          defaultLayout $
-            $(widgetFile "activate")
-        _ -> do
-          setMessage "Invalid token!"
-          redirect HomeR
-
-postActivateR :: Text -> Handler RepJson
-postActivateR token = do
-  msalted <- fromJust <$> lookupPostParam "salted"
-  let salted = fromHex' $ unpack msalted
-  mToken <- runDB $ selectFirst [TokenToken ==. encodeUtf8 token, TokenKind ==. "activate"] []
-  case mToken of
-    Just (Entity uTokenId uToken) ->
-      if
-        isNothing (tokenUser uToken)
-        then do
-          newUser <- runDB $ selectFirst [ActivatorToken ==. token] []
-          case newUser of
-            Just (Entity aId activ) -> do
-              namesakes <- runDB $ selectList [UserName ==. userName (activatorUser activ)] []
-              if
-                I.null namesakes
-                then do
-                  -- putting user in active state
-                  uId <- runDB $ insert $ activatorUser activ
-                  runDB $ update uId [UserSalted =. salted]
-                  -- create user directory
-                  liftIO $ createDirectoryIfMissing True $
-                    "static" </> "data" </> unpack (extractKey uId)
-                  -- cleanup
-                  runDB $ delete aId
-                  runDB $ delete uTokenId
-                  -- login and redirect
-                  setSession "userId" (extractKey uId)
-                  welcomeLink <- ($ ProfileR uId) <$> getUrlRender
-                  returnJson ["welcome" .= welcomeLink]
-                else do
-                  -- cleanup
-                  runDB $ delete aId
-                  runDB $ delete uTokenId
-                  returnJsonError ("Somebody already activated your username. Your token has been deleted" :: String)
-            Nothing ->
-              returnJsonError ("Invalid token" :: String)
-        else do
-          runDB $ update (fromJust $ tokenUser uToken) [UserSalted =. salted]
-          -- cleanup
-          runDB $ delete uTokenId
-          setSession "userId" (extractKey $ fromJust $ tokenUser uToken)
-          welcomeLink <- ($ ProfileR (fromJust $ tokenUser uToken)) <$> getUrlRender
-          returnJson ["welcome" .= welcomeLink]
-    _ ->
-      returnJsonError ("Invalid activation token!" :: String)
-
-data ActivateFormRes = ActivateFormRes
-  { pass1 :: Text
-  , pass2 :: Text
-  }
-
-activateForm :: AForm Handler ActivateFormRes
-activateForm = ActivateFormRes
-  <$> areq passwordField (bfs ("Password" :: Text)) Nothing
-  <*> areq passwordField (bfs ("Repeat Password" :: Text)) Nothing
-  <*  bootstrapSubmit ("Activate" :: BootstrapSubmit Text)
-
-postActivateRawR :: Text -> Handler Html
-postActivateRawR token = do
-  ((res, _), _) <- runFormPost $
-    renderBootstrap3 BootstrapBasicForm activateForm
-  case res of
-    FormSuccess pwd -> do
-      if pass1 pwd == pass2 pwd
-      then do
-        mToken <- runDB $ selectFirst [TokenToken ==. encodeUtf8 token, TokenKind ==. "activate"] []
-        case mToken of
-          Just (Entity uTokenId uToken) ->
-            if
-              isNothing (tokenUser uToken)
-              then do
-                newUser <- runDB $ selectFirst [ActivatorToken ==. token] []
-                case newUser of
-                  Just (Entity aId activ) -> do
-                    namesakes <- runDB $ selectList [UserName ==. userName (activatorUser activ)] []
-                    if
-                      I.null namesakes
-                      then do
-                        let salted = fromHex' $ BC.unpack $ hmacKeccak (userSalt $ activatorUser activ) (encodeUtf8 $ pass1 pwd)
-                        -- putting user in active state
-                        uId <- runDB $ insert $ activatorUser activ
-                        runDB $ update uId [UserSalted =. salted]
-                        -- create user directory
-                        liftIO $ createDirectoryIfMissing True $
-                          "static" </> "data" </> unpack (extractKey uId)
-                        -- cleanup
-                        runDB $ delete aId
-                        runDB $ delete uTokenId
-                        -- login and redirect
-                        setSession "userId" (extractKey uId)
-                        setMessage "Successfully activated"
-                        redirect $ ProfileR uId
-                      else do
-                        -- cleanup
-                        runDB $ delete aId
-                        runDB $ delete uTokenId
-                        setMessage "Somebody already activated your username. Your token has been deleted"
-                        redirect HomeR
-                  Nothing -> do
-                    setMessage "Invalid token"
-                    redirect HomeR
-              else do
-                uuser <- runDB $ getJust $ fromJust $ tokenUser uToken
-                let salted = fromHex' $ BC.unpack $ hmacKeccak (userSalt uuser) (encodeUtf8 $ pass1 pwd)
-                runDB $ update (fromJust $ tokenUser uToken) [UserSalted =. salted]
-                -- cleanup
-                runDB $ delete uTokenId
-                setSession "userId" (extractKey $ fromJust $ tokenUser uToken)
-                setMessage "Successfully activated"
-                redirect $ ProfileR (fromJust $ tokenUser uToken)
-          Nothing -> do
-            setMessage "Invalid activation token!"
-            redirect HomeR
-      else do
-        setMessage "Passwords must match!"
-        redirect $ ActivateR token
-    _ -> do
-      setMessage "Activation error"
-      redirect HomeR
+-- import Import as I hiding (returnJson)
+-- import Data.Text
+-- import Data.Text.Encoding
+-- import Data.Maybe
+-- import System.Directory
+-- import System.FilePath
+-- 
+-- import qualified Data.ByteString.Char8 as BC
+-- 
+-- import Handler.Login
+-- 
+-- -- getActivateR :: Text -> Handler Html
+-- getActivateR token = do
+--   t <- runDB $ getBy $ UniqueToken token
+--   case t of
+--     Nothing -> do
+--       setMessage "Invalid token!"
+--       redirect HomeR
+--     Just (Entity tId token) -> do
+--       master <- getYesod
+--       (Entity uId user) <-
+--         runDB $ getJust <$> getBy $ UniqueUser $ tokenUsername token
+--       let hexSalt = toHex $ userSalt user
+--           addWarn = "http://" `isPrefixOf` appRoot (appSettings master)
+--       defaultLayout $ do
+--         setTitle "Activate your account"
+--         $(widgetFile "activate")
+-- 
+--   t <- runDB $ selectFirst [ActivatorToken ==. token] []
+--   (activateRawWidget, _) <- generateFormPost $
+--     renderBootstrap3 BootstrapBasicForm activateForm
+--   case t of
+--     Nothing -> do
+--       mToken <- runDB $ selectFirst [TokenToken ==. encodeUtf8 token, TokenKind ==. "activate"] []
+--       case mToken of
+--         Just (Entity _ uToken) -> do
+--           user <- runDB $ getBy $ UniqueUser $ tokenUsername uToken
+--           let hexSalt = toHex $ userSalt user
+--           master <- getYesod
+--           let addWarn = "http://" `isPrefixOf` appRoot (appSettings master)
+--           defaultLayout $ do
+--             setTitle "Activate your account"
+--             $(widgetFile "activate")
+--         _ -> do
+--           setMessage "Invalid token!"
+--           redirect HomeR
+--     Just (Entity _ activator) -> do
+--       let uSalt = userSalt $ activatorUser activator
+--       mToken <- runDB $ selectFirst [TokenToken ==. encodeUtf8 token, TokenKind ==. "activate"] []
+--       case mToken of
+--         Just (Entity _ _) -> do
+--           let hexSalt = toHex uSalt
+--           master <- getYesod
+--           let addWarn = "http://" `isPrefixOf` appRoot (appSettings master)
+--           defaultLayout $
+--             $(widgetFile "activate")
+--         _ -> do
+--           setMessage "Invalid token!"
+--           redirect HomeR
+-- 
+-- postActivateR :: Text -> Handler RepJson
+-- postActivateR token = do
+--   msalted <- fromJust <$> lookupPostParam "salted"
+--   let salted = fromHex' $ unpack msalted
+--   mToken <- runDB $ selectFirst [TokenToken ==. encodeUtf8 token, TokenKind ==. "activate"] []
+--   case mToken of
+--     Just (Entity uTokenId uToken) ->
+--       if
+--         isNothing (tokenUser uToken)
+--         then do
+--           newUser <- runDB $ selectFirst [ActivatorToken ==. token] []
+--           case newUser of
+--             Just (Entity aId activ) -> do
+--               namesakes <- runDB $ selectList [UserName ==. userName (activatorUser activ)] []
+--               if
+--                 I.null namesakes
+--                 then do
+--                   -- putting user in active state
+--                   uId <- runDB $ insert $ activatorUser activ
+--                   runDB $ update uId [UserSalted =. salted]
+--                   -- create user directory
+--                   liftIO $ createDirectoryIfMissing True $
+--                     "static" </> "data" </> unpack (extractKey uId)
+--                   -- cleanup
+--                   runDB $ delete aId
+--                   runDB $ delete uTokenId
+--                   -- login and redirect
+--                   setSession "userId" (extractKey uId)
+--                   welcomeLink <- ($ ProfileR uId) <$> getUrlRender
+--                   returnJson ["welcome" .= welcomeLink]
+--                 else do
+--                   -- cleanup
+--                   runDB $ delete aId
+--                   runDB $ delete uTokenId
+--                   returnJsonError ("Somebody already activated your username. Your token has been deleted" :: String)
+--             Nothing ->
+--               returnJsonError ("Invalid token" :: String)
+--         else do
+--           runDB $ update (fromJust $ tokenUser uToken) [UserSalted =. salted]
+--           -- cleanup
+--           runDB $ delete uTokenId
+--           setSession "userId" (extractKey $ fromJust $ tokenUser uToken)
+--           welcomeLink <- ($ ProfileR (fromJust $ tokenUser uToken)) <$> getUrlRender
+--           returnJson ["welcome" .= welcomeLink]
+--     _ ->
+--       returnJsonError ("Invalid activation token!" :: String)
+-- 
+-- data ActivateFormRes = ActivateFormRes
+--   { pass1 :: Text
+--   , pass2 :: Text
+--   }
+-- 
+-- activateForm :: AForm Handler ActivateFormRes
+-- activateForm = ActivateFormRes
+--   <$> areq passwordField (bfs ("Password" :: Text)) Nothing
+--   <*> areq passwordField (bfs ("Repeat Password" :: Text)) Nothing
+--   <*  bootstrapSubmit ("Activate" :: BootstrapSubmit Text)
+-- 
+-- postActivateRawR :: Text -> Handler Html
+-- postActivateRawR token = do
+--   ((res, _), _) <- runFormPost $
+--     renderBootstrap3 BootstrapBasicForm activateForm
+--   case res of
+--     FormSuccess pwd -> do
+--       if pass1 pwd == pass2 pwd
+--       then do
+--         mToken <- runDB $ selectFirst [TokenToken ==. encodeUtf8 token, TokenKind ==. "activate"] []
+--         case mToken of
+--           Just (Entity uTokenId uToken) ->
+--             if
+--               isNothing (tokenUser uToken)
+--               then do
+--                 newUser <- runDB $ selectFirst [ActivatorToken ==. token] []
+--                 case newUser of
+--                   Just (Entity aId activ) -> do
+--                     namesakes <- runDB $ selectList [UserName ==. userName (activatorUser activ)] []
+--                     if
+--                       I.null namesakes
+--                       then do
+--                         let salted = fromHex' $ BC.unpack $ hmacKeccak (userSalt $ activatorUser activ) (encodeUtf8 $ pass1 pwd)
+--                         -- putting user in active state
+--                         uId <- runDB $ insert $ activatorUser activ
+--                         runDB $ update uId [UserSalted =. salted]
+--                         -- create user directory
+--                         liftIO $ createDirectoryIfMissing True $
+--                           "static" </> "data" </> unpack (extractKey uId)
+--                         -- cleanup
+--                         runDB $ delete aId
+--                         runDB $ delete uTokenId
+--                         -- login and redirect
+--                         setSession "userId" (extractKey uId)
+--                         setMessage "Successfully activated"
+--                         redirect $ ProfileR uId
+--                       else do
+--                         -- cleanup
+--                         runDB $ delete aId
+--                         runDB $ delete uTokenId
+--                         setMessage "Somebody already activated your username. Your token has been deleted"
+--                         redirect HomeR
+--                   Nothing -> do
+--                     setMessage "Invalid token"
+--                     redirect HomeR
+--               else do
+--                 uuser <- runDB $ getJust $ fromJust $ tokenUser uToken
+--                 let salted = fromHex' $ BC.unpack $ hmacKeccak (userSalt uuser) (encodeUtf8 $ pass1 pwd)
+--                 runDB $ update (fromJust $ tokenUser uToken) [UserSalted =. salted]
+--                 -- cleanup
+--                 runDB $ delete uTokenId
+--                 setSession "userId" (extractKey $ fromJust $ tokenUser uToken)
+--                 setMessage "Successfully activated"
+--                 redirect $ ProfileR (fromJust $ tokenUser uToken)
+--           Nothing -> do
+--             setMessage "Invalid activation token!"
+--             redirect HomeR
+--       else do
+--         setMessage "Passwords must match!"
+--         redirect $ ActivateR token
+--     _ -> do
+--       setMessage "Activation error"
+--       redirect HomeR
 
 -- returnJson :: (Monad m, a ~ Value) =>
 --               [(Text, a)] -> m RepJson

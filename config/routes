@@ -15,18 +15,20 @@
 --  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /static StaticR Static appStatic
+/auth AuthR Auth getAuth
 
 /favicon.ico FaviconR GET
 /robots.txt RobotsR GET
 
 /				HomeR			GET
 /page/#Int			PageR			GET
-/signup				SignupR			GET POST
-/login				LoginR			GET POST
-/loginraw			LoginRawR		POST
-/logout				LogoutR			GET
-/activate/#T.Text		ActivateR		GET POST
-/activateraw/#T.Text		ActivateRawR		POST
+-- /signup				SignupR			GET POST
+-- /login				LoginR			GET POST
+-- /loginraw			LoginRawR		POST
+-- /logout				LogoutR			GET
+-- /activate/#T.Text		ActivateR		GET POST
+-- /activateraw/#T.Text		ActivateRawR		POST
+-- /reactivate			ReactivateR		GET POST
 /profile/#UserId		ProfileR		GET
 /user/#T.Text			UserR			GET
 /user/#T.Text/album/#T.Text	BeautyAlbumR		GET
@@ -42,7 +44,6 @@
 /medium/#MediumId/move          MediumMoveR             GET POST
 /comment/#CommentId/reply	CommentReplyR		GET POST
 /comment/#CommentId/delcom	CommentDeleteR		GET POST
-/reactivate			ReactivateR		GET POST
 /profile/#UserId/settings	ProfileSettingsR	GET POST
 /profile/#UserId/delete		ProfileDeleteR		GET POST
 

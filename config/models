@@ -23,6 +23,7 @@ User
     albums [AlbumId]
     admin Bool
     defaultLicence Int		default=-1
+    active Bool			default=True
     UniqueUser name
     deriving Typeable Eq Show
 Activator
@@ -32,7 +33,8 @@ Activator
 Token
     token ByteString
     kind Text
-    user UserId Maybe
+    username Text
+    UniqueToken token
     deriving Eq Show
 Album
     title Text

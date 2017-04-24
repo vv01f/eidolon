@@ -52,12 +52,12 @@ postLoginR = do
   mHexResponse <- lookupPostParam "response"
   case (mUserName, mHexToken, mHexResponse) of
     (Just userName, Nothing, Nothing) -> do
-      tempUser <- runDB $ selectFirst [UserName ==. userName] []
+      tempUser <- runDB $ getBy $ UniqueUser userName
       case tempUser of
         Just (Entity userId user) -> do
           let salt = userSalt user
           token <- liftIO makeRandomToken
-          runDB $ insert_ $ Token (encodeUtf8 token) "login" (Just userId)
+          runDB $ insert_ $ Token (encodeUtf8 token) "login" userName
           returnJson ["salt" .= toHex salt, "token" .= toHex (encodeUtf8 token)]
         Nothing ->
           returnJsonError ("No such user" :: T.Text)
@@ -67,16 +67,17 @@ postLoginR = do
         savedToken <- runDB $ selectFirst [TokenKind ==. "login", TokenToken ==. tempToken] []
         case savedToken of
           Just (Entity tokenId token) -> do
-            let savedUserId = tokenUser token
-            queriedUser <- runDB $ getJust (fromJust savedUserId)
-            let salted = userSalted queriedUser
-            let hexSalted = toHex salted
-            let expected = hmacKeccak (encodeUtf8 $ toHex $ tokenToken token) (encodeUtf8 hexSalted)
+            let savedUserName = tokenUsername token
+            mqueriedUser <- runDB $ getBy $ UniqueUser savedUserName
+            let queriedUser = entityVal $ fromJust mqueriedUser
+                salted = userSalted queriedUser
+                hexSalted = toHex salted
+                expected = hmacKeccak (encodeUtf8 $ toHex $ tokenToken token) (encodeUtf8 hexSalted)
             if encodeUtf8 hexResponse == expected
               then do
                 -- Success!!
                 runDB $ delete tokenId
-                return $ Right savedUserId
+                return $ Right $ (entityKey $ fromJust mqueriedUser)
               else
                 return $ Left ("Wrong password" :: T.Text)
           Nothing ->
@@ -85,9 +86,9 @@ postLoginR = do
         Left msg ->
           returnJsonError msg
         Right userId -> do
-          setSession "userId" $ extractKey (fromJust userId)
+          setSession "userId" $ extractKey userId
           setMessage "Succesfully logged in"
-          welcomeLink <- ($ProfileR (fromJust userId)) <$> getUrlRender
+          welcomeLink <- ($ProfileR userId) <$> getUrlRender
           returnJson ["welcome" .= welcomeLink]
     _ ->
       returnJsonError ("Protocol error" :: T.Text)
