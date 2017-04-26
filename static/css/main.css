@@ -57,7 +57,7 @@ a:hover, .item a:hover, .medium a:hover, a:hover figcaption {
 	text-align: center;
 }
 
-.item, .medium {
+.item, .medium, .loginDiv, .newaccount, .reactivate {
 	color: rgba(0,0,0,0.7);
 	display: inline-block;
 	position: relative;
