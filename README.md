@@ -181,6 +181,9 @@ Migrations/0.0.7-0.1.0.0/Migration.hs`
 ### 0.1.7.2-0.1.8.0
 * No database changes, just new dependencies to install.
 
+### 0.1.8.8-0.1.9.0
+* You can drop the table `activator` from the database. It is no longer needed.
+
 ## Acknowledgements:
 
 * This software uses the web Framework "Yesod" by Michael Snoyman. See more at:

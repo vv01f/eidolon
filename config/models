@@ -26,10 +26,10 @@ User
     active Bool			default=True
     UniqueUser name
     deriving Typeable Eq Show
-Activator
-    token Text
-    user User
-    deriving Eq Show
+-- Activator
+--     token Text
+--     user User
+--     deriving Eq Show
 Token
     token ByteString
     kind Text
