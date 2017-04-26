@@ -25,10 +25,10 @@ import System.FilePath
 
 getNewAlbumR :: Handler Html
 getNewAlbumR = do
-  msu <- lookupSession "userId"
-  case msu of
-    Just tempUserId -> do
-      userId <- lift $ pure $ getUserIdFromText tempUserId
+  musername <- maybeAuthId
+  case musername of
+    Just username -> do
+      (Just (Entity userId _)) <- runDB $ getBy $ UniqueUser username
       (albumWidget, enctype) <- generateFormPost $
         renderBootstrap3 BootstrapBasicForm $
         albumForm userId
@@ -41,10 +41,10 @@ getNewAlbumR = do
 
 postNewAlbumR :: Handler Html
 postNewAlbumR = do
-  msu <- lookupSession "userId"
-  case msu of
-    Just tempUserId -> do
-      let userId = getUserIdFromText tempUserId
+  musername <- maybeAuthId
+  case musername of
+    Just username -> do
+      (Just (Entity userId _)) <- runDB $ getBy $ UniqueUser username
       ((result, _), _) <- runFormPost $
         renderBootstrap3 BootstrapBasicForm $
         albumForm userId

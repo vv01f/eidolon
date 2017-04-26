@@ -26,7 +26,7 @@ import qualified Data.Text as T
 import Data.List as L
 import qualified System.FilePath as FP
 import System.Directory
-import Text.Blaze.Internal
+import Text.Blaze
 -- import Codec.ImageType
 -- import Codec.Picture as P
 -- import Codec.Picture.Metadata as PM
@@ -43,15 +43,14 @@ getDirectUploadR albumId = do
   case tempAlbum of -- does the requested album exist
     Just album -> do
       let ownerId = albumOwner album
-      msu <- lookupSession "userId"
-      case msu of -- is anybody logged in
-        Just tempUserId -> do
-          let userId = getUserIdFromText tempUserId
+      musername <- maybeAuthId
+      case musername of -- is anybody logged in
+        Just username -> do
+          (Just (Entity userId user)) <- runDB $ getBy $ UniqueUser username
           if
             userId == ownerId || userId `elem` albumShares album
             -- is the owner present or a user with whom the album is shared
             then do
-              user <- runDB $ getJust userId
               (dUploadWidget, enctype) <- generateFormPost $ renderBootstrap3 BootstrapBasicForm $ dUploadForm userId user albumId
               defaultLayout $ do
                 setTitle $ toHtml ("Eidolon :: Upload medium to " `T.append` albumTitle album)
@@ -72,14 +71,13 @@ postDirectUploadR albumId = do
   case tempAlbum of -- does the album exist
     Just album -> do
       let ownerId = albumOwner album
-      msu <- lookupSession "userId"
-      case msu of -- is anybody logged in
-        Just tempUserId -> do
-          let userId = getUserIdFromText tempUserId
+      musername <- maybeAuthId
+      case musername of -- is anybody logged in
+        Just username -> do
+          (Just (Entity userId user)) <- runDB $ getBy $ UniqueUser username
           if userId == ownerId || userId `elem` albumShares album
             -- is the logged in user the owner or is the album shared with him
             then do
-              user <- runDB $ getJust userId
               ((result, _), _) <- runFormPost $ renderBootstrap3 BootstrapBasicForm $ dUploadForm userId user albumId
               case result of
                 FormSuccess temp -> do
@@ -97,15 +95,16 @@ postDirectUploadR albumId = do
                       (fileBulkLicence temp)
                       NewFile
                     )indFils
-                  let onlyErrNames = removeItem Nothing errNames
+                  let onlyErrNames = catMaybes errNames
                   if
                     L.null onlyErrNames
                     then do
                       setMessage "All images succesfully uploaded"
                       redirect $ AlbumR albumId
                     else do
-                      let justErrNames = map fromJust onlyErrNames
-                      let msg = Content $ Text.Blaze.Internal.Text $ "File type not supported of: " `T.append` T.intercalate ", " justErrNames
+                      let msg = toMarkup $
+                            "File type not supported of: " `T.append`
+                            (T.intercalate ", " onlyErrNames)
                       setMessage msg
                       redirect HomeR
                 _ -> do
@@ -135,7 +134,7 @@ dUploadForm userId user albumId = FileBulk
   where
     licences = optionsPairs $ I.map (\a -> (T.pack (show (toEnum a :: Licence)), a)) [-2..6]
     defLicence = Just $ userDefaultLicence user
-      
+
 
 data FileBulk = FileBulk
   { fileBulkPrefix :: T.Text
@@ -150,11 +149,10 @@ data FileBulk = FileBulk
 
 getUploadR :: Handler Html
 getUploadR = do
-  msu <- lookupSession "userId"
-  case msu of
-    Just tempUserId -> do
-      let userId = getUserIdFromText tempUserId
-      user <- runDB $ getJust userId
+  musername <- maybeAuthId
+  case musername of
+    Just username -> do
+      (Just (Entity userId user)) <- runDB $ getBy $ UniqueUser username
       let albums = userAlbums user
       if
         I.null albums
@@ -196,11 +194,10 @@ bulkUploadForm userId user = (\a b c d e f g h -> FileBulk b c d e f g a h)
 
 postUploadR :: Handler Html
 postUploadR = do
-  msu <- lookupSession "userId"
-  case msu of
-    Just tempUserId -> do
-      let userId = getUserIdFromText tempUserId
-      user <- runDB $ getJust userId
+  musername <- maybeAuthId
+  case musername of
+    Just username -> do
+      (Just (Entity userId user)) <- runDB $ getBy $ UniqueUser username
       ((result, _), _) <- runFormPost $ renderBootstrap3 BootstrapBasicForm $ bulkUploadForm userId user
       case result of
         FormSuccess temp -> do
@@ -218,15 +215,16 @@ postUploadR = do
               (fileBulkLicence temp)
               NewFile
             )indFils
-          let onlyErrNames = removeItem Nothing errNames
+          let onlyErrNames = catMaybes errNames
           if
             L.null onlyErrNames
             then do
               setMessage "All images succesfully uploaded"
               redirect $ AlbumR $ fileBulkAlbum temp
             else do
-              let justErrNames = map fromJust onlyErrNames
-              let msg = Content $ Text.Blaze.Internal.Text $ "File type not supported of: " `T.append` T.intercalate ", " justErrNames
+              let msg = toMarkup $
+                    "File type not supported of: "
+                    `T.append` T.intercalate ", " onlyErrNames
               setMessage msg
               redirect $ AlbumR $ fileBulkAlbum temp
         _ -> do

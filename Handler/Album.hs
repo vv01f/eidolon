@@ -31,15 +31,14 @@ getAlbumR albumId = do
       let ownerId = albumOwner album
       owner <- runDB $ getJust ownerId
       let ownerName = userName owner
-      let ownerSlug = userSlug owner
-      msu <- lookupSession "userId"
-      presence <- case msu of
-        Just tempUserId -> do
-          let userId = getUserIdFromText tempUserId
-          return $ (userId == ownerId) || (userId `elem` albumShares album)
+          ownerSlug = userSlug owner
+      musername <- maybeAuthId
+      presence <- case musername of
+        Just username -> do
+          (Just (Entity uId _)) <- runDB $ getBy $ UniqueUser username
+          return $ (username == ownerName) || (uId `elem` albumShares album)
         Nothing ->
           return False
---      media <- mapM (\a -> runDB $ getJust a) (albumContent album)
       media <- runDB $ selectList [MediumAlbum ==. albumId] [Desc MediumTime]
       defaultLayout $ do
         setTitle $ toHtml ("Eidolon :: Album " `T.append` albumTitle album)

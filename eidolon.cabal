@@ -32,7 +32,7 @@ library
                      Settings.Development
                      Handler.Home
                      -- Handler.Signup
-                     -- Handler.Login
+                     Handler.Login
                      -- Handler.Activate
                      -- Handler.Reactivate
                      Handler.Profile
@@ -141,7 +141,7 @@ library
                  , http-client
                  , yesod-form                    >= 1.4.7
                  , magic
-                 , texmath < 0.9
+                 , texmath
                  , yesod-auth
                  , yesod-auth-hmac-keccak
 

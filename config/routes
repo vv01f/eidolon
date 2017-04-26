@@ -24,7 +24,7 @@
 /page/#Int			PageR			GET
 -- /signup				SignupR			GET POST
 -- /login				LoginR			GET POST
--- /loginraw			LoginRawR		POST
+/loginraw			LoginRawR		GET POST
 -- /logout				LogoutR			GET
 -- /activate/#T.Text		ActivateR		GET POST
 -- /activateraw/#T.Text		ActivateRawR		POST

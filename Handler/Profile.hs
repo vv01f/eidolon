@@ -37,19 +37,19 @@ getProfileR ownerId = do
           then return $ Just alb
           else return Nothing
         ) allAlbs
-      let sharedAlbs = removeItem Nothing almostAlbs
+      let sharedAlbs = catMaybes almostAlbs
       recentMedia <- runDB $ selectList [MediumOwner ==. ownerId] [Desc MediumTime]
-      msu <- lookupSession "userId"
-      presence <- case msu of
-        Just tempUserId -> do
-          let userId = getUserIdFromText tempUserId
-          return (userId == ownerId)
+      -- msu <- lookupSession "userId"
+      musername <- maybeAuthId
+      presence <- case musername of
+        Just username ->
+          return (username == userName owner)
         Nothing ->
           return False
       defaultLayout $ do
-        setTitle $ toHtml ("Eidolon :: " `T.append` userSlug owner `T.append` "'s profile")
-        rssLink (UserFeedRssR ownerId) $ userSlug owner `T.append` "'s feed"
-        atomLink (UserFeedAtomR ownerId) $ userSlug owner `T.append` "'s feed"
+        setTitle $ toHtml ("Eidolon :: " `T.append` ownerSlug `T.append` "'s profile")
+        rssLink (UserFeedRssR ownerId) (ownerSlug `T.append` "'s feed")
+        atomLink (UserFeedAtomR ownerId) (ownerSlug `T.append` "'s feed")
         $(widgetFile "profile")
     Nothing -> do
       setMessage "This profile does not exist"

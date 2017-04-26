@@ -49,7 +49,7 @@ import Network.Wai.Middleware.RequestLogger (Destination (Logger),
 -- Don't forget to add new modules to your cabal file!
 import Handler.Home
 -- import Handler.Signup
--- import Handler.Login
+import Handler.Login
 -- import Handler.Activate
 -- import Handler.Reactivate
 import Handler.Profile

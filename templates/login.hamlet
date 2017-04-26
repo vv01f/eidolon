@@ -12,19 +12,3 @@ $newline always
         your connection for leaks before proceeding.
     <form method="post" action=@{LoginRawR}>
       ^{loginRawWidget}
-  <form .js-hidden>
-    <div .form-group .required>
-      <label for="username">User:
-      <input .form-control #username type="text" required>
-    <div .form-group .required>
-      <label for="password">Password:
-      <input .form-control #password type="password" required>
-    <div .form-group .optional>
-      <button .btn .btn-default type="submit" #login>Login
-    <div #progress>
-
-  <a href=@{ReactivateR}>Forgot your Password?
-
-  <script src="/static/js/jquery.min.js" type="text/javascript">
-  <!--<script src="/static/js/jsSHA.js" type="text/javascript">-->
-  <script src="/static/js/purs_login.js" type="text/javascript">

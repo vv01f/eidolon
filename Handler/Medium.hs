@@ -36,10 +36,11 @@ getMediumR mediumId = do
       let ownerName = userName owner
       let albumId = mediumAlbum medium
       album <- runDB $ getJust albumId
-      msu <- lookupSession "userId"
-      userId <- case msu of
-        Just tempUserId ->
-          return $ Just $ getUserIdFromText tempUserId
+      musername <- maybeAuthId
+      userId <- case musername of
+        Just username -> do
+          (Just (Entity uId _)) <- runDB $ getBy $ UniqueUser username
+          return $ Just uId
         Nothing ->
           return Nothing
       let presence = userId == (Just ownerId) || userId == Just (albumOwner album)
@@ -56,15 +57,20 @@ getMediumR mediumId = do
         [ CommentOrigin ==. mediumId
         , CommentParent !=. Nothing ]
         [ Asc CommentTime ]
-      let tr = StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumThumb medium) []
-          pr = StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumPreview medium) []
-          ir = StaticR $ StaticRoute (drop 2 $ map T.pack $ splitDirectories $ mediumPath medium) []
+      let tr = StaticR $ StaticRoute
+            (drop 2 $ map T.pack $ splitDirectories $ mediumThumb medium) []
+          pr = StaticR $ StaticRoute
+            (drop 2 $ map T.pack $ splitDirectories $ mediumPreview medium) []
+          ir = StaticR $ StaticRoute
+            (drop 2 $ map T.pack $ splitDirectories $ mediumPath medium) []
           lic = T.pack $ show (toEnum (mediumLicence medium) :: Licence)
           link = url (toEnum (mediumLicence medium) :: Licence)
       defaultLayout $ do
         setTitle $ toHtml ("Eidolon :: Medium " `T.append` (mediumTitle medium))
-        rssLink (CommentFeedRssR mediumId) $ "Comment feed of medium " `T.append` mediumTitle medium
-        atomLink (CommentFeedAtomR mediumId) $ "Comment feed of medium " `T.append` mediumTitle medium
+        rssLink (CommentFeedRssR mediumId) $
+          "Comment feed of medium " `T.append` mediumTitle medium
+        atomLink (CommentFeedAtomR mediumId) $
+          "Comment feed of medium " `T.append` mediumTitle medium
         $(widgetFile "medium")
     Nothing -> do
       setMessage "This image does not exist"
@@ -75,11 +81,10 @@ postMediumR mediumId = do
   tempMedium <- runDB $ get mediumId
   case tempMedium of
     Just medium -> do
-      msu <- lookupSession "userId"
-      case msu of
-        Just tempUserId -> do
-          let userId = getUserIdFromText tempUserId
-          u <- runDB $ getJust userId
+      musername <- maybeAuthId
+      case musername of
+        Just username -> do
+          (Just (Entity userId u)) <- runDB $ getBy $ UniqueUser username
           let userSl = userSlug u
           ((res, _), _) <- runFormPost $
             renderBootstrap3 BootstrapBasicForm $
@@ -95,7 +100,7 @@ postMediumR mediumId = do
                   <h1>Hello #{userSlug owner}
                   <p>#{userSl} commented on your medium #{mediumTitle medium}:
                   <p>#{commentContent temp}
-                  <p>To follow the comment thread follow 
+                  <p>To follow the comment thread follow
                     <a href=#{link}>
                       this link
                     .
@@ -126,10 +131,10 @@ getCommentReplyR commentId = do
   tempComment <- runDB $ get commentId
   case tempComment of
     Just comment -> do
-      msu <- lookupSession "userId"
-      case msu of
-        Just tempUserId -> do
-          let userId = getUserIdFromText tempUserId
+      musername <- maybeAuthId
+      case musername of
+        Just username -> do
+          (Just (Entity userId _)) <- runDB $ getBy $ UniqueUser username
           let mediumId = commentOrigin comment
           parAuth <- runDB $ get $ commentAuthor comment
           let parSlug = fromMaybe "" $ userSlug <$> parAuth
@@ -151,13 +156,12 @@ postCommentReplyR commentId = do
   tempComment <- runDB $ get commentId
   case tempComment of
     Just comment -> do
-      msu <- lookupSession "userId"
-      case msu of
-        Just tempUserId -> do
-          let userId = getUserIdFromText tempUserId
-          u <- runDB $ getJust userId
+      musername <- maybeAuthId
+      case musername of
+        Just username -> do
+          (Just (Entity userId u)) <- runDB $ getBy $ UniqueUser username
           let userSl = userSlug u
-          let mediumId = commentOrigin comment
+              mediumId = commentOrigin comment
           ((res, _), _) <- runFormPost $
             renderBootstrap3 BootstrapBasicForm $
             commentForm userId mediumId (Just commentId)
@@ -208,10 +212,10 @@ getCommentDeleteR commentId = do
   tempComment <- runDB $ get commentId
   case tempComment of
     Just comment -> do
-      msu <- lookupSession "userId"
-      case msu of
-        Just tempUserId -> do
-          let userId = getUserIdFromText tempUserId
+      musername <- maybeAuthId
+      case musername of
+        Just username -> do
+          (Just (Entity userId _)) <- runDB $ getBy $ UniqueUser username
           if
             Just userId == Just (commentAuthor comment)
             then do
@@ -233,10 +237,10 @@ postCommentDeleteR commentId = do
   tempComment <- runDB $ get commentId
   case tempComment of
     Just comment -> do
-      msu <- lookupSession "userId"
-      case msu of
-        Just tempUserId -> do
-          let userId = getUserIdFromText tempUserId
+      musername <- maybeAuthId
+      case musername of
+        Just username -> do
+          (Just (Entity userId _)) <- runDB $ getBy $ UniqueUser username
           if
             Just userId == Just (commentAuthor comment)
             then do

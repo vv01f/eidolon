@@ -119,20 +119,6 @@ postMediumDeleteR mediumId = do
       confirm <- lookupPostParam "confirm"
       case confirm of
         Just "confirm" -> do
-          -- -- delete comments
-          -- commEnts <- runDB $ selectList [CommentOrigin ==. mediumId] []
-          -- _ <- mapM (runDB . delete . entityKey) commEnts
-          -- -- delete references first
-          -- let albumId = mediumAlbum medium
-          -- album <- runDB $ getJust albumId
-          -- let mediaList = albumContent album
-          -- let newMediaList = removeItem mediumId mediaList
-          -- -- update reference List
-          -- runDB $ update albumId [AlbumContent =. newMediaList]
-          -- liftIO $ removeFile (normalise $ tail $ mediumPath medium)
-          -- liftIO $ removeFile (normalise $ tail $ mediumThumb medium)
-          -- liftIO $ removeFile (normalise $ tail $ mediumPreview medium)
-          -- runDB $ delete mediumId
           deleteMedium mediumId medium
           setMessage "Medium succesfully deleted"
           redirect HomeR

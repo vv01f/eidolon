@@ -37,13 +37,12 @@ import Graphics.Text.TrueType
 
 import Debug.Trace
 
-loginIsAdmin :: IsString t => Handler (Either (t, Route App)  ())
+loginIsAdmin :: IsString t => Handler (Either (t, Route App) ())
 loginIsAdmin = do
-  msu <- lookupSession "userId"
-  case msu of
-    Just tempUserId -> do
-      let userId = getUserIdFromText tempUserId
-      user <- runDB $ getJust userId
+  musername <- maybeAuthId
+  case musername of
+    Just username -> do
+      (Just (Entity userId user)) <- runDB $ getBy $ UniqueUser username
       if
         userAdmin user
         then
@@ -58,10 +57,10 @@ profileCheck userId = do
   tempUser <- runDB $ get userId
   case tempUser of
     Just user -> do
-      msu <- lookupSession "userId"
-      case msu of
-        Just tempLoginId -> do
-          let loginId = getUserIdFromText tempLoginId
+      musername <- maybeAuthId
+      case musername of
+        Just username -> do
+          (Just (Entity loginId _)) <- runDB $ getBy $ UniqueUser username
           if
             loginId == userId
             then
@@ -79,13 +78,13 @@ mediumCheck mediumId = do
   case tempMedium of
     Just medium -> do
       let ownerId = mediumOwner medium
-      msu <- lookupSession "userId"
-      case msu of
-        Just tempUserId -> do
-          let userId = getUserIdFromText tempUserId
+      musername <- maybeAuthId
+      case musername of
+        Just username -> do
+          (Just (Entity userId _)) <- runDB $ getBy $ UniqueUser username
           album <- runDB $ getJust $ mediumAlbum medium
           let presence = userId == ownerId
-          let albumOwnerPresence = userId == albumOwner album
+              albumOwnerPresence = userId == albumOwner album
           if
             presence || albumOwnerPresence
             then
@@ -313,7 +312,7 @@ writeOnDrive fil userId albumId spec = do
   album <- runDB $ getJust albumId
   let ac = albumContent album
   [PersistInt64 int] <- case spec of
-    NewFile -> 
+    NewFile ->
       if L.null ac then return [PersistInt64 1] else return $ keyToValues $ maximum $ ac
     Replace mId -> do
       medium <- runDB $ getJust mId

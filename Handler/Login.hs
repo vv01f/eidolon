@@ -34,8 +34,67 @@ import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as BC
 import Data.Aeson.Types
 
-getLoginR :: Handler Html
-getLoginR = do
+-- getLoginR :: Handler Html
+-- getLoginR = do
+--   master <- getYesod
+--   let addWarn = "http://" `T.isPrefixOf` appRoot (appSettings master)
+--   (loginRawWidget, _) <- generateFormPost $
+--     renderBootstrap3 BootstrapBasicForm loginForm
+--   defaultLayout $ do
+--     setTitle "Eidolon :: Login"
+--     $(widgetFile "login")
+
+
+-- postLoginR :: Handler RepJson
+-- postLoginR = do
+--   mUserName <- lookupPostParam "username"
+--   mHexToken <- lookupPostParam "token"
+--   mHexResponse <- lookupPostParam "response"
+--   case (mUserName, mHexToken, mHexResponse) of
+--     (Just userName, Nothing, Nothing) -> do
+--       tempUser <- runDB $ getBy $ UniqueUser userName
+--       case tempUser of
+--         Just (Entity userId user) -> do
+--           let salt = userSalt user
+--           token <- liftIO makeRandomToken
+--           runDB $ insert_ $ Token (encodeUtf8 token) "login" userName
+--           returnJson ["salt" .= toHex salt, "token" .= toHex (encodeUtf8 token)]
+--         Nothing ->
+--           returnJsonError ("No such user" :: T.Text)
+--     (Nothing, Just hexToken, Just hexResponse) -> do
+--       response <- do
+--         let tempToken = fromHex' $ T.unpack hexToken
+--         savedToken <- runDB $ selectFirst [TokenKind ==. "login", TokenToken ==. tempToken] []
+--         case savedToken of
+--           Just (Entity tokenId token) -> do
+--             let savedUserName = tokenUsername token
+--             mqueriedUser <- runDB $ getBy $ UniqueUser savedUserName
+--             let queriedUser = entityVal $ fromJust mqueriedUser
+--                 salted = userSalted queriedUser
+--                 hexSalted = toHex salted
+--                 expected = hmacKeccak (encodeUtf8 $ toHex $ tokenToken token) (encodeUtf8 hexSalted)
+--             if encodeUtf8 hexResponse == expected
+--               then do
+--                 -- Success!!
+--                 runDB $ delete tokenId
+--                 return $ Right $ (entityKey $ fromJust mqueriedUser)
+--               else
+--                 return $ Left ("Wrong password" :: T.Text)
+--           Nothing ->
+--             return $ Left "Invalid token"
+--       case response of
+--         Left msg ->
+--           returnJsonError msg
+--         Right userId -> do
+--           setSession "userId" $ extractKey userId
+--           setMessage "Succesfully logged in"
+--           welcomeLink <- ($ProfileR userId) <$> getUrlRender
+--           returnJson ["welcome" .= welcomeLink]
+--     _ ->
+--       returnJsonError ("Protocol error" :: T.Text)
+
+getLoginRawR :: Handler Html
+getLoginRawR = do
   master <- getYesod
   let addWarn = "http://" `T.isPrefixOf` appRoot (appSettings master)
   (loginRawWidget, _) <- generateFormPost $
@@ -43,55 +102,6 @@ getLoginR = do
   defaultLayout $ do
     setTitle "Eidolon :: Login"
     $(widgetFile "login")
-
-
-postLoginR :: Handler RepJson
-postLoginR = do
-  mUserName <- lookupPostParam "username"
-  mHexToken <- lookupPostParam "token"
-  mHexResponse <- lookupPostParam "response"
-  case (mUserName, mHexToken, mHexResponse) of
-    (Just userName, Nothing, Nothing) -> do
-      tempUser <- runDB $ getBy $ UniqueUser userName
-      case tempUser of
-        Just (Entity userId user) -> do
-          let salt = userSalt user
-          token <- liftIO makeRandomToken
-          runDB $ insert_ $ Token (encodeUtf8 token) "login" userName
-          returnJson ["salt" .= toHex salt, "token" .= toHex (encodeUtf8 token)]
-        Nothing ->
-          returnJsonError ("No such user" :: T.Text)
-    (Nothing, Just hexToken, Just hexResponse) -> do
-      response <- do
-        let tempToken = fromHex' $ T.unpack hexToken
-        savedToken <- runDB $ selectFirst [TokenKind ==. "login", TokenToken ==. tempToken] []
-        case savedToken of
-          Just (Entity tokenId token) -> do
-            let savedUserName = tokenUsername token
-            mqueriedUser <- runDB $ getBy $ UniqueUser savedUserName
-            let queriedUser = entityVal $ fromJust mqueriedUser
-                salted = userSalted queriedUser
-                hexSalted = toHex salted
-                expected = hmacKeccak (encodeUtf8 $ toHex $ tokenToken token) (encodeUtf8 hexSalted)
-            if encodeUtf8 hexResponse == expected
-              then do
-                -- Success!!
-                runDB $ delete tokenId
-                return $ Right $ (entityKey $ fromJust mqueriedUser)
-              else
-                return $ Left ("Wrong password" :: T.Text)
-          Nothing ->
-            return $ Left "Invalid token"
-      case response of
-        Left msg ->
-          returnJsonError msg
-        Right userId -> do
-          setSession "userId" $ extractKey userId
-          setMessage "Succesfully logged in"
-          welcomeLink <- ($ProfileR userId) <$> getUrlRender
-          returnJson ["welcome" .= welcomeLink]
-    _ ->
-      returnJsonError ("Protocol error" :: T.Text)
 
 postLoginRawR :: Handler Html
 postLoginRawR = do
@@ -105,18 +115,18 @@ postLoginRawR = do
           let testSalted = BC.unpack $ hmacKeccak (userSalt user) (encodeUtf8 $ credentialsPasswd cred)
           if fromHex' testSalted == userSalted user
           then do
-            setSession "userId" $ extractKey uId
+            setCreds False $ Creds "raw" (userName user) []
             setMessage "Successfully logged in"
             redirect $ ProfileR uId
           else do
             setMessage "Wrong password"
-            redirect LoginR
+            redirect $ AuthR LoginR
         Nothing -> do
           setMessage "No such user"
-          redirect LoginR
+          redirect $ AuthR LoginR
     _ -> do
       setMessage "Login error"
-      redirect LoginR
+      redirect $ AuthR LoginR
 
 data Credentials = Credentials
   { credentialsName   :: Text

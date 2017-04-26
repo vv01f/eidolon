@@ -163,7 +163,24 @@ instance Yesod App where
     -- urlRenderOverride _ _ = Nothing
 
     -- The page to be redirected to when authentication is required.
-    -- authRoute _ = Just $ AuthR LoginR
+    authRoute _ = Just $ AuthR LoginR
+
+    isAuthorized AdminR                    _ = getAdminAuth
+    isAuthorized AdminProfilesR            _ = getAdminAuth
+    isAuthorized (AdminProfileSettingsR _) _ = getAdminAuth
+    isAuthorized (AdminUserAlbumsR _)      _ = getAdminAuth
+    isAuthorized (AdminUserMediaR _)       _ = getAdminAuth
+    isAuthorized (AdminProfileDeleteR _)   _ = getAdminAuth
+    isAuthorized AdminAlbumsR              _ = getAdminAuth
+    isAuthorized (AdminAlbumSettingsR _)   _ = getAdminAuth
+    isAuthorized (AdminAlbumMediaR _)      _ = getAdminAuth
+    isAuthorized (AdminAlbumDeleteR _)     _ = getAdminAuth
+    isAuthorized AdminMediaR               _ = getAdminAuth
+    isAuthorized (AdminMediumSettingsR _)  _ = getAdminAuth
+    isAuthorized (AdminMediumDeleteR _)    _ = getAdminAuth
+    isAuthorized AdminCommentR             _ = getAdminAuth
+    isAuthorized (AdminCommentDeleteR _)   _ = getAdminAuth
+    isAuthorized _                         _ = return Authorized
 
     -- This function creates static content files in the static folder
     -- and names them based on a hash of their content. This allows
@@ -195,6 +212,20 @@ instance Yesod App where
             || level == LevelError
 
     makeLogger = return . appLogger
+
+getAdminAuth = do
+  musername <- maybeAuthId
+  case musername of
+    Nothing -> return AuthenticationRequired
+    Just un -> do
+      muser <- runDB $ getBy $ UniqueUser un
+      return $ case muser of
+        Just (Entity _ u)
+          | isAdmin u -> Authorized
+          | otherwise -> Unauthorized "You are not authorized"
+        Nothing -> AuthenticationRequired
+
+isAdmin = userAdmin
 
 -- How to run database actions.
 instance YesodPersist App where
@@ -240,6 +271,7 @@ instance RenderMessage App FormMessage where
 
 instance YesodHmacKeccak (HmacPersistDB App User Token) App where
   runHmacDB = runHmacPersistDB
+  rawLoginRoute = Just LoginRawR
 
 instance UserCredentials (Entity User) where
   userUserName = userName . entityVal
