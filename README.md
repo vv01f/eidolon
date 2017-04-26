@@ -182,7 +182,8 @@ Migrations/0.0.7-0.1.0.0/Migration.hs`
 * No database changes, just new dependencies to install.
 
 ### 0.1.8.8-0.1.9.0
-* Run `ALTER TABLE "token" DROP COLUMN "user";` from your postgres console.
+* Run `ALTER TABLE "token" DROP COLUMN "user";` and `truncate token;`
+  from your postgres console.
 * You can drop the table `activator` from the database. It is no longer needed.
 
 ## Acknowledgements:
